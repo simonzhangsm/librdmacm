@@ -1,8 +1,7 @@
 Version: 1
-Previous: 4d1a65e276c7a2c746896750bd4ea65df40e58ef
-Head: 0172a9fbd3fcccb7de456cc4606ea7aeb5dda8cc
+Previous: 4f0241b710a3a67338c0e670753f2acbd0207b42
+Head: e71a008fe1de887481348d026bb2970a469b24e8
 Applied:
-  snprintf: 7be390dbf5cb84349d8f955bd7bed29be1f026ef
-  refresh-temp: 0172a9fbd3fcccb7de456cc4606ea7aeb5dda8cc
+  snprintf: e71a008fe1de887481348d026bb2970a469b24e8
 Unapplied:
 Hidden:
