@@ -1,0 +1,14 @@
+Bottom: efccb146a38888a3e615a81017329971c08b8fc1
+Top:    efccb146a38888a3e615a81017329971c08b8fc1
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-04-24 11:20:55 -0700
+
+rping: Replace sprintf with snprintf to protect from buffer overflow
+
+Signed-off-by: Dotan Barak <dotanb@dev.mellanox.co.il>
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
