@@ -42,6 +42,7 @@
 #include <errno.h>
 #include <endian.h>
 #include <byteswap.h>
+#include <semaphore.h>
 
 #include <rdma/rdma_cma.h>
 
@@ -67,6 +68,33 @@ static inline uint64_t ntohll(uint64_t x) { return x; }
 #endif
 
 #define min(a, b) (a < b ? a : b)
+
+/*
+ * Fast synchronization for low contention locking.
+ */
+typedef struct {
+	sem_t sem;
+	volatile int cnt;
+} fastlock_t;
+static inline void fastlock_init(fastlock_t *lock)
+{
+	sem_init(&lock->sem, 0, 0);
+	lock->cnt = 0;
+}
+static inline void fastlock_destroy(fastlock_t *lock)
+{
+	sem_destroy(&lock->sem);
+}
+static inline void fastlock_acquire(fastlock_t *lock)
+{
+	if (__sync_add_and_fetch(&lock->cnt, 1) > 1)
+		sem_wait(&lock->sem);
+}
+static inline void fastlock_release(fastlock_t *lock)
+{
+	if (__sync_sub_and_fetch(&lock->cnt, 1) > 0)
+		sem_post(&lock->sem);
+}
 
 int ucma_complete(struct rdma_cm_id *id);
 static inline int ERR(int err)
