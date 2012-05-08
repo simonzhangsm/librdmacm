@@ -1,0 +1,22 @@
+Bottom: de666c51520c9988ea3a07e332fa0402fdef6010
+Top:    de666c51520c9988ea3a07e332fa0402fdef6010
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-07 17:16:47 -0700
+
+rsockets: Optimize synchronization to improve performance
+
+Performance analysis using VTune showed that pthread_mutex_unlock()
+is the single biggest contributor to increasing latency for 64-byte
+transfers.  Unlocked was followed by get_sw_cqe(), then
+__pthread_mutex_lock().  Replace the use of mutexes with an atomic
+and a semaphore.  When there's no contention for the lock (which
+would usually be the case when using nonblocking sockets), the
+code simply increments and decrements an atomic varible.  Semaphores
+are only used when contention occurs.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
