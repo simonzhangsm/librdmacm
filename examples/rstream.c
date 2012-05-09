@@ -44,6 +44,9 @@
 
 #include <rdma/rdma_cma.h>
 #include <rdma/rsocket.h>
+#include "../src/cma.h"
+
+static int test_mutex;
 
 static int test_size[] = {
 	64,
@@ -276,12 +279,31 @@ static int sync_test(int rs)
 static int run_test(int rs)
 {
 	int ret, i, t;
+	fastlock_t fl;
+	pthread_mutex_t mut;
 
+	fastlock_init(&fl);
+	pthread_mutex_init(&mut, NULL);
 	ret = sync_test(rs);
 	if (ret)
 		goto out;
 
+	printf("test mutex %s\n", test_mutex == 1 ? "fastlock" : "mutex/none");
 	gettimeofday(&start, NULL);
+	if (test_mutex) {
+		if (test_mutex == 1) {
+			for (i = 0; i < 2000000000; i++) {
+				fastlock_acquire(&fl);
+				fastlock_release(&fl);
+			}
+		} else {
+			for (i = 0; i < 2000000000; i++) {
+				pthread_mutex_lock(&mut);
+				pthread_mutex_unlock(&mut);
+			}
+		}
+	}
+
 	for (i = 0; i < iterations; i++) {
 		for (t = 0; t < transfer_count; t++) {
 			ret = dst_addr ? send_xfer(rs, transfer_size) :
@@ -302,6 +324,8 @@ static int run_test(int rs)
 	ret = 0;
 
 out:
+	fastlock_destroy(&fl);
+	pthread_mutex_destroy(&mut);
 	return ret;
 }
 
@@ -496,6 +520,9 @@ static int set_test_opt(char *optarg)
 			break;
 		case 'v':
 			verify = 1;
+			break;
+		case 'm':
+			test_mutex++;
 			break;
 		default:
 			return -1;
