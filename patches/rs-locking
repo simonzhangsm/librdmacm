@@ -5,14 +5,24 @@ Date:   2012-05-07 17:16:47 -0700
 
 rsockets: Optimize synchronization to improve performance
 
-Performance analysis using VTune showed that pthread_mutex_unlock()
-is the single biggest contributor to increasing latency for 64-byte
-transfers.  Unlocked was followed by get_sw_cqe(), then
-__pthread_mutex_lock().  Replace the use of mutexes with an atomic
-and a semaphore.  When there's no contention for the lock (which
-would usually be the case when using nonblocking sockets), the
-code simply increments and decrements an atomic varible.  Semaphores
-are only used when contention occurs.
+Hotspot performance analysis using VTune showed pthread_mutex_unlock()
+as the most significant hotspot when transferring small messages using
+rstream.  To reduce the impact of using pthread mutexes, replace it
+with a custom lock built using an atomic variable and a semaphore.
+When there's no contention for the lock (which is the expected case
+for nonblocking sockets), the synchronization is reduced to
+incrementing and decrementing an atomic variable.
+
+A test that acquired and released a lock 2 billion times reported that
+the custom lock was roughly 20% faster than using the mutex.
+26.6 seconds versus 33.0 seconds.
+
+Unfortunately, further analysis showed that using the custom lock
+provided a minimal performance gain on rstream itself, and simply
+moved the hotspot to the custom unlock call.  The hotspot is likely
+a result of some other interaction, rather than caused by slowness
+in releasing a lock.  However, we keep the custom lock based on
+the results of the direct lock tests that were done.
 
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
