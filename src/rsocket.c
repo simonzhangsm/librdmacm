@@ -870,7 +870,7 @@ static int rs_process_cq(struct rsocket *rs, int nonblock, int (*test)(struct rs
 			fastlock_release(&rs->cq_lock);
 
 			ret = rs_get_cq_event(rs);
-			fastlock_release(&cq_wait_lock);
+			fastlock_release(&rs->cq_wait_lock);
 			fastlock_acquire(&rs->cq_lock);
 		}
 	} while (!ret);
