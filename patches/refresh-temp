@@ -1,0 +1,22 @@
+Bottom: d4bd62f68b19a3992515a80d129cc327a1c971d8
+Top:    b2e4cd7d670a626fa22b05cff6a1dccc973e9f0d
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-09 13:52:31 -0700
+
+Refresh of rs-locking
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 6d43373..2ffde9b 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -870,7 +870,7 @@ static int rs_process_cq(struct rsocket *rs, int nonblock, int (*test)(struct rs
+ 			fastlock_release(&rs->cq_lock);
+ 
+ 			ret = rs_get_cq_event(rs);
+-			fastlock_release(&cq_wait_lock);
++			fastlock_release(&rs->cq_wait_lock);
+ 			fastlock_acquire(&rs->cq_lock);
+ 		}
+ 	} while (!ret);
