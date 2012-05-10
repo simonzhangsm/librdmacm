@@ -1,5 +1,5 @@
 Bottom: de666c51520c9988ea3a07e332fa0402fdef6010
-Top:    b2e4cd7d670a626fa22b05cff6a1dccc973e9f0d
+Top:    3fcdf48082614bb29c44242534cfeecb47e07114
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-07 17:16:47 -0700
 
@@ -29,8 +29,29 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 ---
 
+diff --git a/configure.in b/configure.in
+index 238ee59..fa90fcb 100644
+--- a/configure.in
++++ b/configure.in
+@@ -48,6 +48,16 @@ AC_CHECK_MEMBER(struct ibv_path_record.service_id, [],
+     AC_DEFINE(DEFINE_PATH_RECORD, 1, [adding path record definition]),
+     [#include <infiniband/sa.h>])
+ 
++dnl Check for gcc atomic intrinsics
++AC_MSG_CHECKING(compiler support for atomics)
++AC_TRY_LINK([int i = 0;],
++    [ return __sync_add_and_fetch(&i, 1) != __sync_sub_and_fetch(&i, 1); ],
++    [ AC_MSG_RESULT(yes) ],
++    [
++        AC_MSG_RESULT(no)
++        AC_DEFINE(DEFINE_ATOMICS, 1, [Set to 1 to implement atomics])
++    ])
++
+ dnl Checks for header files.
+ AC_HEADER_STDC
+ if test "$disable_libcheck" != "yes"; then
 diff --git a/src/cma.h b/src/cma.h
-index 91528c0..f28020e 100644
+index 91528c0..7703fe8 100644
 --- a/src/cma.h
 +++ b/src/cma.h
 @@ -42,6 +42,7 @@
@@ -41,13 +62,20 @@ index 91528c0..f28020e 100644
  
  #include <rdma/rdma_cma.h>
  
-@@ -68,6 +69,33 @@ static inline uint64_t ntohll(uint64_t x) { return x; }
+@@ -68,6 +69,41 @@ static inline uint64_t ntohll(uint64_t x) { return x; }
  
  #define min(a, b) (a < b ? a : b)
  
 +/*
 + * Fast synchronization for low contention locking.
 + */
++#if DEFINE_ATOMICS
++#define fastlock_t pthread_mutex_t
++#define fastlock_init(lock) pthread_mutex_init(lock, NULL)
++#define fastlock_destroy(lock) pthread_mutex_destroy(lock)
++#define fastlock_acquire(lock) pthread_mutex_lock(lock)
++#define fastlock_release(lock) pthread_mutex_unlock(lock)
++#else
 +typedef struct {
 +	sem_t sem;
 +	volatile int cnt;
@@ -71,6 +99,7 @@ index 91528c0..f28020e 100644
 +	if (__sync_sub_and_fetch(&lock->cnt, 1) > 0)
 +		sem_post(&lock->sem);
 +}
++#endif /* DEFINE_ATOMICS */
 +
  int ucma_complete(struct rdma_cm_id *id);
  static inline int ERR(int err)
