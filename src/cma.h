@@ -72,6 +72,13 @@ static inline uint64_t ntohll(uint64_t x) { return x; }
 /*
  * Fast synchronization for low contention locking.
  */
+#if DEFINE_ATOMICS
+#define fastlock_t pthread_mutex_t
+#define fastlock_init(lock) pthread_mutex_init(lock, NULL)
+#define fastlock_destroy(lock) pthread_mutex_destroy(lock)
+#define fastlock_acquire(lock) pthread_mutex_lock(lock)
+#define fastlock_release(lock) pthread_mutex_unlock(lock)
+#else
 typedef struct {
 	sem_t sem;
 	volatile int cnt;
@@ -95,6 +102,7 @@ static inline void fastlock_release(fastlock_t *lock)
 	if (__sync_sub_and_fetch(&lock->cnt, 1) > 0)
 		sem_post(&lock->sem);
 }
+#endif /* DEFINE_ATOMICS */
 
 int ucma_complete(struct rdma_cm_id *id);
 static inline int ERR(int err)
