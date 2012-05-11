@@ -1,5 +1,5 @@
 Bottom: 4824ade2aa44138cac7516403f6a7045fea3dbee
-Top:    4824ade2aa44138cac7516403f6a7045fea3dbee
+Top:    6f06120e0a9c54c1159bf2ce7335b8994f8497f5
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-11 10:41:02 -0700
 
@@ -10,4 +10,16 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 ---
 
-
+diff --git a/examples/rstream.c b/examples/rstream.c
+index a52a262..b089c2a 100644
+--- a/examples/rstream.c
++++ b/examples/rstream.c
+@@ -561,7 +561,7 @@ int main(int argc, char **argv)
+ 			printf("\t[-p port_number]\n");
+ 			printf("\t[-T test_option]\n");
+ 			printf("\t    s|sockets - use standard tcp/ip sockets\n");
+-			printf("\t    a|async - asynchronous operation\n");
++			printf("\t    a|async - asynchronous operation (use poll)\n");
+ 			printf("\t    b|blocking - use blocking calls\n");
+ 			printf("\t    n|nonblocking - use nonblocking calls\n");
+ 			printf("\t    v|verify - verify data\n");
