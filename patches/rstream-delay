@@ -1,0 +1,21 @@
+Bottom: ea75b8334003947a7f09ba5f0efcec267b5143c1
+Top:    ea75b8334003947a7f09ba5f0efcec267b5143c1
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-11 10:33:13 -0700
+
+librdmacm/rstream: Set rsocket nonblocking for base tests
+
+The base set of rstream tests want nonblocking rsockets, but don't
+actually set the rsocket to nonblocking.  It instead relies on the
+MSG_DONTWAIT flag.  Make the code match the expected behavior and
+set the rsocket to nonblocking and make nonblocking the default.
+
+Provide a test option to switch it back to blocking mode.  We keep
+the existing nonblocking test option for compatibility.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
