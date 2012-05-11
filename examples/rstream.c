@@ -56,8 +56,8 @@ static int test_size[] = {
 static int use_rs = 1;
 static int use_async;
 static int verify;
-static int flags;
-static int no_delay;
+static int flags = MSG_DONTWAIT;
+static int no_delay = 1;
 static int custom;
 static int iterations = 1;
 static int transfer_size = 1000;
@@ -151,8 +151,6 @@ static void init_latency_test(int size)
 {
 	size_str(test_name, size);
 	sprintf(test_name, "%s_lat", test_name);
-	no_delay = 1;
-	flags |= MSG_DONTWAIT;
 	transfer_count = 1;
 	transfer_size = size;
 	iterations = size_to_count(transfer_size);
@@ -162,8 +160,6 @@ static void init_bandwidth_test(int size)
 {
 	size_str(test_name, size);
 	sprintf(test_name, "%s_bw", test_name);
-	no_delay = 1;
-	flags |= MSG_DONTWAIT;
 	iterations = 1;
 	transfer_size = size;
 	transfer_count = size_to_count(transfer_size);
@@ -490,6 +486,10 @@ static int set_test_opt(char *optarg)
 		case 'a':
 			use_async = 1;
 			break;
+		case 'b':
+			flags &= ~MSG_DONTWAIT;
+			no_delay = 0;
+			break;
 		case 'n':
 			flags |= MSG_DONTWAIT;
 			no_delay = 1;
@@ -505,6 +505,9 @@ static int set_test_opt(char *optarg)
 			use_rs = 0;
 		} else if (!strncasecmp("async", optarg, 5)) {
 			use_async = 1;
+		} else if (!strncasecmp("block", optarg, 5)) {
+			flags &= ~MSG_DONTWAIT;
+			no_delay = 0;
 		} else if (!strncasecmp("nonblock", optarg, 8)) {
 			flags |= MSG_DONTWAIT;
 			no_delay = 1;
@@ -559,6 +562,7 @@ int main(int argc, char **argv)
 			printf("\t[-T test_option]\n");
 			printf("\t    s|sockets - use standard tcp/ip sockets\n");
 			printf("\t    a|async - asynchronous operation\n");
+			printf("\t    b|blocking - use blocking calls\n");
 			printf("\t    n|nonblocking - use nonblocking calls\n");
 			printf("\t    v|verify - verify data\n");
 			exit(1);
