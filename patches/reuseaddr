@@ -7,7 +7,7 @@ librdmacm/rsocket: Succeed setsockopt REUSEADDR on connected sockets
 
 The RDMA CM fail calls to set REUSEADDR on an rdma_cm_id if
 it is not in the idle state.  As a result, this causes a failure
-in NetPipe when is run with socket calls intercepted by rsockets.
+in NetPipe when run with socket calls intercepted by rsockets.
 Fix this by returning success when REUSEADDR is set on an rsocket
 that has already been connected.  When running over IB, REUSEADDR
 is not necessary, since the TCP/IP addresses are mapped.
