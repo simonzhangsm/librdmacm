@@ -56,7 +56,7 @@ static int test_size[] = {
 static int use_rs = 1;
 static int use_async;
 static int verify;
-static int flags;
+static int flags = MSG_DONTWAIT;
 static int no_delay = 1;
 static int custom;
 static int iterations = 1;
