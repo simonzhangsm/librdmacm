@@ -1,5 +1,5 @@
-Bottom: e158cfb023f019d4ef91f72e39f049c35cf5993e
-Top:    cf88942daee97c712f00f5b3c85efe180c90b3d3
+Bottom: 1e3526d39b2591bb10a08bfed2622f05f82b1bd8
+Top:    fb3f150e6146757e6bdb884182c4b19457bd6b6b
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-11 10:41:02 -0700
 
@@ -11,7 +11,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/rstream.c b/examples/rstream.c
-index a52a262..b089c2a 100644
+index 7f39b29..decb204 100644
 --- a/examples/rstream.c
 +++ b/examples/rstream.c
 @@ -561,7 +561,7 @@ int main(int argc, char **argv)
