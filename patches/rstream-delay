@@ -1,5 +1,5 @@
 Bottom: ea75b8334003947a7f09ba5f0efcec267b5143c1
-Top:    4824ade2aa44138cac7516403f6a7045fea3dbee
+Top:    e158cfb023f019d4ef91f72e39f049c35cf5993e
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-11 10:33:13 -0700
 
@@ -78,3 +78,16 @@ index 8aa089d..a52a262 100644
  			printf("\t    n|nonblocking - use nonblocking calls\n");
  			printf("\t    v|verify - verify data\n");
  			exit(1);
+diff --git a/man/rstream.1 b/man/rstream.1
+index 701db3a..58bd7e3 100644
+--- a/man/rstream.1
++++ b/man/rstream.1
+@@ -42,6 +42,8 @@ s | socket  - uses standard socket calls to transfer data
+ .P
+ a | async - uses asynchronous operation (e.g. select / poll)
+ .P
++b | blocking - uses blocking calls
++.P
+ n | nonblocking - uses non-blocking calls
+ .P
+ v | verify - verifies data transfers
