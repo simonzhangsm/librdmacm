@@ -1,10 +1,11 @@
 Version: 1
-Previous: 02a43ac728f0a87f1ae3db9125896027991158bb
-Head: 2f3d92fdd0c79f4825060433fd489995c1c83b80
+Previous: 80aaf5c1f7629b6ad2feb456187050d12037d9f5
+Head: 70e1daca5dc886c5e33aa4ba3f2daeee20d14ed6
 Applied:
   rs-locking: ec6a8efe211b0dc98548443c2e0d67e2c355351f
   reuseaddr: 5ce7d9c48d082fd1959918e9134f4bdd85c402d9
   rstream-delay: 2f3d92fdd0c79f4825060433fd489995c1c83b80
+  rstream-async-opt: 70e1daca5dc886c5e33aa4ba3f2daeee20d14ed6
 Unapplied:
   comp_locks: b89aab130b4619806557e11e6b9c10964f00743f
   preload: 5dfe7abc07064485c5100e04e5412279244c2bc3

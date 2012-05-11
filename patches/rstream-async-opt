@@ -1,0 +1,13 @@
+Bottom: 4824ade2aa44138cac7516403f6a7045fea3dbee
+Top:    4824ade2aa44138cac7516403f6a7045fea3dbee
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-11 10:41:02 -0700
+
+rstream: Clarify use of async test option
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
