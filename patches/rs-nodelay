@@ -9,7 +9,7 @@ The NODELAY option is coupled with whether the socket is blocking
 or nonblocking.  Remove this coupling and always set the NODELAY
 option.
 
-NODELAY currently has no affect on rsockets.
+NODELAY currently has no effect on rsockets.
 
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
