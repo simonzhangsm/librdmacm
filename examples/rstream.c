@@ -485,7 +485,6 @@ static int set_test_opt(char *optarg)
 			break;
 		case 'b':
 			flags &= ~MSG_DONTWAIT;
-			no_delay = 0;
 			break;
 		case 'n':
 			flags |= MSG_DONTWAIT;
@@ -503,7 +502,6 @@ static int set_test_opt(char *optarg)
 			use_async = 1;
 		} else if (!strncasecmp("block", optarg, 5)) {
 			flags &= ~MSG_DONTWAIT;
-			no_delay = 0;
 		} else if (!strncasecmp("nonblock", optarg, 8)) {
 			flags |= MSG_DONTWAIT;
 		} else if (!strncasecmp("verify", optarg, 6)) {
