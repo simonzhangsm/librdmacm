@@ -335,8 +335,8 @@ static void set_options(int rs)
 			break;
 	}
 
-	rs_setsockopt(rs, IPPROTO_TCP, TCP_NODELAY,
-		      (void *) &no_delay, sizeof(no_delay));
+	val = 1;
+	rs_setsockopt(rs, IPPROTO_TCP, TCP_NODELAY, (void *) &val, sizeof(val));
 
 	if (flags & MSG_DONTWAIT) {
 		rs_fcntl(rs, F_SETFL, O_NONBLOCK);
