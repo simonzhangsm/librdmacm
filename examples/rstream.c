@@ -57,7 +57,6 @@ static int use_rs = 1;
 static int use_async;
 static int verify;
 static int flags = MSG_DONTWAIT;
-static int no_delay = 1;
 static int custom;
 static int iterations = 1;
 static int transfer_size = 1000;
@@ -324,10 +323,8 @@ static void set_options(int rs)
 			break;
 	}
 
-	if (no_delay) {
-		rs_setsockopt(rs, IPPROTO_TCP, TCP_NODELAY,
-			      (void *) &no_delay, sizeof(no_delay));
-	}
+	rs_setsockopt(rs, IPPROTO_TCP, TCP_NODELAY,
+		      (void *) &no_delay, sizeof(no_delay));
 
 	if (flags & MSG_DONTWAIT) {
 		rs_fcntl(rs, F_SETFL, O_NONBLOCK);
@@ -488,11 +485,9 @@ static int set_test_opt(char *optarg)
 			break;
 		case 'b':
 			flags &= ~MSG_DONTWAIT;
-			no_delay = 0;
 			break;
 		case 'n':
 			flags |= MSG_DONTWAIT;
-			no_delay = 1;
 			break;
 		case 'v':
 			verify = 1;
@@ -507,10 +502,8 @@ static int set_test_opt(char *optarg)
 			use_async = 1;
 		} else if (!strncasecmp("block", optarg, 5)) {
 			flags &= ~MSG_DONTWAIT;
-			no_delay = 0;
 		} else if (!strncasecmp("nonblock", optarg, 8)) {
 			flags |= MSG_DONTWAIT;
-			no_delay = 1;
 		} else if (!strncasecmp("verify", optarg, 6)) {
 			verify = 1;
 		} else {
