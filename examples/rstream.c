@@ -55,7 +55,6 @@ static int test_size[] = {
 
 static int use_rs = 1;
 static int use_async;
-static int poll_timeout = -1;
 static int verify;
 static int flags = MSG_DONTWAIT;
 static int no_delay = 1;
@@ -502,6 +501,7 @@ static int set_test_opt(char *optarg)
 			break;
 		case 'a':
 			use_async = 1;
+			flags |= MSG_DONTWAIT;
 			break;
 		case 'b':
 			flags &= ~MSG_DONTWAIT;
@@ -510,9 +510,6 @@ static int set_test_opt(char *optarg)
 		case 'n':
 			flags |= MSG_DONTWAIT;
 			no_delay = 1;
-			break;
-		case 'p':
-			poll_timeout = 0;
 			break;
 		case 'v':
 			verify = 1;
@@ -531,8 +528,6 @@ static int set_test_opt(char *optarg)
 		} else if (!strncasecmp("nonblock", optarg, 8)) {
 			flags |= MSG_DONTWAIT;
 			no_delay = 1;
-		} else if (!strncasecmp("poll", optarg, 4)) {
-			poll_timeout = 0;
 		} else if (!strncasecmp("verify", optarg, 6)) {
 			verify = 1;
 		} else {
@@ -586,7 +581,6 @@ int main(int argc, char **argv)
 			printf("\t    a|async - asynchronous operation (use poll)\n");
 			printf("\t    b|blocking - use blocking calls\n");
 			printf("\t    n|nonblocking - use nonblocking calls\n");
-			printf("\t    p|poll - poll on asynchronous operations\n");
 			printf("\t    v|verify - verify data\n");
 			exit(1);
 		}
