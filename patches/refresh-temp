@@ -1,0 +1,24 @@
+Bottom: e458b46af068c102885a173b1e9d7a083a3f1511
+Top:    8f6ed845f1d4f512d6113d3b4ff5776c7e330fc4
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-16 15:49:24 -0700
+
+Refresh of rs-async-nonblock
+
+---
+
+diff --git a/examples/rstream.c b/examples/rstream.c
+index 5532905..2b25ef5 100644
+--- a/examples/rstream.c
++++ b/examples/rstream.c
+@@ -335,8 +335,8 @@ static void set_options(int rs)
+ 			break;
+ 	}
+ 
+-	rs_setsockopt(rs, IPPROTO_TCP, TCP_NODELAY,
+-		      (void *) &no_delay, sizeof(no_delay));
++	val = 1;
++	rs_setsockopt(rs, IPPROTO_TCP, TCP_NODELAY, (void *) &val, sizeof(val));
+ 
+ 	if (flags & MSG_DONTWAIT) {
+ 		rs_fcntl(rs, F_SETFL, O_NONBLOCK);
