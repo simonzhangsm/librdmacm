@@ -1,5 +1,5 @@
-Bottom: 456260422aff51feca00c1ee2db83c3d63b6e111
-Top:    8f6ed845f1d4f512d6113d3b4ff5776c7e330fc4
+Bottom: 0811012347b0773da571fc97d17714e8e0e598f4
+Top:    8fde2d81ba8df54624406b0a9293e9aca478d450
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-16 15:23:41 -0700
 
@@ -24,7 +24,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/rstream.c b/examples/rstream.c
-index 8d5a22d..2b25ef5 100644
+index ecaa779..181d54a 100644
 --- a/examples/rstream.c
 +++ b/examples/rstream.c
 @@ -57,6 +57,7 @@ static int use_rs = 1;
@@ -75,17 +75,6 @@ index 8d5a22d..2b25ef5 100644
  				return ret;
  		}
  
-@@ -323,8 +335,8 @@ static void set_options(int rs)
- 			break;
- 	}
- 
--	rs_setsockopt(rs, IPPROTO_TCP, TCP_NODELAY,
--		      (void *) &no_delay, sizeof(no_delay));
-+	val = 1;
-+	rs_setsockopt(rs, IPPROTO_TCP, TCP_NODELAY, (void *) &val, sizeof(val));
- 
- 	if (flags & MSG_DONTWAIT) {
- 		rs_fcntl(rs, F_SETFL, O_NONBLOCK);
 @@ -377,8 +389,8 @@ static int server_connect(void)
  			fds.fd = lrs;
  			fds.events = POLLIN;
@@ -127,7 +116,7 @@ index 8d5a22d..2b25ef5 100644
  }
  
  static int run(void)
-@@ -562,6 +577,9 @@ int main(int argc, char **argv)
+@@ -564,6 +579,9 @@ int main(int argc, char **argv)
  		}
  	}
  
