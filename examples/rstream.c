@@ -191,6 +191,17 @@ static int verify_buf(void *buf, int size)
 	return 0;
 }
 
+static int do_poll(struct pollfd *fds)
+{
+	int ret;
+
+	do {
+		ret = rs_poll(fds, 1, poll_timeout);
+	} while (ret < 0 && (errno == EAGAIN || errno == EWOULDBLOCK));
+
+	return ret;
+}
+
 static int send_xfer(int rs, int size)
 {
 	struct pollfd fds;
@@ -206,7 +217,7 @@ static int send_xfer(int rs, int size)
 
 	for (offset = 0; offset < size; ) {
 		if (use_async) {
-			ret = rs_poll(&fds, 1, -1);
+			ret = do_poll(&fds);
 			if (ret != 1)
 				return ret;
 		}
@@ -235,7 +246,7 @@ static int recv_xfer(int rs, int size)
 
 	for (offset = 0; offset < size; ) {
 		if (use_async) {
-			ret = rs_poll(&fds, 1, -1);
+			ret = do_poll(&fds);
 			if (ret != 1)
 				return ret;
 		}
@@ -380,7 +391,7 @@ static int server_connect(void)
 			fds.fd = lrs;
 			fds.events = POLLIN;
 
-			ret = rs_poll(&fds, 1, -1);
+			ret = do_poll(&fds);
 			if (ret != 1) {
 				perror("rpoll");
 				goto close;
@@ -424,21 +435,26 @@ static int client_connect(void)
 	ret = rs_connect(rs, res->ai_addr, res->ai_addrlen);
 	if (ret && (errno != EINPROGRESS)) {
 		perror("rconnect");
-		rs_close(rs);
-		rs = ret;
+		goto err;
 	}
 
 	if (errno == EINPROGRESS) {
 		fds.fd = rs;
 		fds.events = POLLOUT;
-		do {
-			ret = rs_poll(&fds, 1, -1);
-		} while (!ret);
+		ret = do_poll(&fds);
+		if (ret != 1) {
+			perror("rpoll");
+			goto err;
+		}
 	}
 
 free:
 	freeaddrinfo(res);
 	return rs;
+err:
+	freeaddrinfo(res);
+	rs_close(rs);
+	return -1;
 }
 
 static int run(void)
@@ -485,6 +501,7 @@ static int set_test_opt(char *optarg)
 			break;
 		case 'a':
 			use_async = 1;
+			flags |= MSG_DONTWAIT;
 			break;
 		case 'b':
 			flags &= ~MSG_DONTWAIT;
