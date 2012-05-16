@@ -1,5 +1,5 @@
-Bottom: 0811012347b0773da571fc97d17714e8e0e598f4
-Top:    8fde2d81ba8df54624406b0a9293e9aca478d450
+Bottom: 739e2ac1d4183624ea78971f116d0b6be0266833
+Top:    8f6ed845f1d4f512d6113d3b4ff5776c7e330fc4
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-16 15:23:41 -0700
 
@@ -24,7 +24,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/rstream.c b/examples/rstream.c
-index ecaa779..181d54a 100644
+index b73d59a..2b25ef5 100644
 --- a/examples/rstream.c
 +++ b/examples/rstream.c
 @@ -57,6 +57,7 @@ static int use_rs = 1;
@@ -116,7 +116,7 @@ index ecaa779..181d54a 100644
  }
  
  static int run(void)
-@@ -564,6 +579,9 @@ int main(int argc, char **argv)
+@@ -562,6 +577,9 @@ int main(int argc, char **argv)
  		}
  	}
  
