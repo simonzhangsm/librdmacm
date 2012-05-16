@@ -1,0 +1,44 @@
+Bottom: ed3c9123d122743be28892d7fce45407ab240329
+Top:    e2131f7e51447fe3fd85c9a62239f937dac571b5
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-16 11:59:05 -0700
+
+Refresh of rstream-spinpoll
+
+---
+
+diff --git a/examples/rstream.c b/examples/rstream.c
+index b7c33f6..27a6aeb 100644
+--- a/examples/rstream.c
++++ b/examples/rstream.c
+@@ -197,7 +197,7 @@ static int do_poll(struct pollfd *fds)
+ 	int ret;
+ 
+ 	do {
+-		ret = rs_poll(&fds, 1, poll_timeout);
++		ret = rs_poll(fds, 1, poll_timeout);
+ 	} while (ret < 0 && (errno == EAGAIN || errno == EWOULDBLOCK));
+ 
+ 	return ret;
+@@ -586,7 +586,7 @@ int main(int argc, char **argv)
+ 			printf("\t    a|async - asynchronous operation (use poll)\n");
+ 			printf("\t    b|blocking - use blocking calls\n");
+ 			printf("\t    n|nonblocking - use nonblocking calls\n");
+-			printf("\t    p|poll - poll on asynchronous operations\n")
++			printf("\t    p|poll - poll on asynchronous operations\n");
+ 			printf("\t    v|verify - verify data\n");
+ 			exit(1);
+ 		}
+diff --git a/man/rstream.1 b/man/rstream.1
+index 58bd7e3..98f3d8e 100644
+--- a/man/rstream.1
++++ b/man/rstream.1
+@@ -46,6 +46,8 @@ b | blocking - uses blocking calls
+ .P
+ n | nonblocking - uses non-blocking calls
+ .P
++p | poll - poll on asynchronous operations until complete
++.P
+ v | verify - verifies data transfers
+ .SH "NOTES"
+ Basic usage is to start rstream on a server system, then run
