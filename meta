@@ -1,13 +1,12 @@
 Version: 1
-Previous: d9840888029f84ed8cb841836c0d2cc0907d7926
-Head: b849cdcc8f1f98b139e77a20d1f2567e406437d9
+Previous: e7b120d04c2b21c188dea0107c576ea256c5335a
+Head: 7601a5adca71f10ad1cb63292c769b7b9a35dd08
 Applied:
   rs-locking: ec6a8efe211b0dc98548443c2e0d67e2c355351f
   reuseaddr: 5ce7d9c48d082fd1959918e9134f4bdd85c402d9
   rstream-delay: 8f0437ec677c4752126de8667e093667dd681d56
   rstream-async-opt: 0ee1dfc9ad50f07fd3708ebb04cb92e0fb2f41d5
-  rs-nodelay: a9c270a56c982051ee4ca99a6c3972aace71d600
-  refresh-temp: b849cdcc8f1f98b139e77a20d1f2567e406437d9
+  rs-nodelay: 7601a5adca71f10ad1cb63292c769b7b9a35dd08
 Unapplied:
   rstream-spinpoll: a7f657e418c1ba35ba61550f67f6bf7bb1352575
   comp_locks: b89aab130b4619806557e11e6b9c10964f00743f
