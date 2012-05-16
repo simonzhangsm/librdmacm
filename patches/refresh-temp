@@ -1,0 +1,125 @@
+Bottom: fb3f150e6146757e6bdb884182c4b19457bd6b6b
+Top:    ed3c9123d122743be28892d7fce45407ab240329
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-16 11:56:27 -0700
+
+Refresh of rstream-spinpoll
+
+---
+
+diff --git a/examples/rstream.c b/examples/rstream.c
+index decb204..b7c33f6 100644
+--- a/examples/rstream.c
++++ b/examples/rstream.c
+@@ -55,6 +55,7 @@ static int test_size[] = {
+ 
+ static int use_rs = 1;
+ static int use_async;
++static int poll_timeout = -1;
+ static int verify;
+ static int flags = MSG_DONTWAIT;
+ static int no_delay = 1;
+@@ -191,6 +192,17 @@ static int verify_buf(void *buf, int size)
+ 	return 0;
+ }
+ 
++static int do_poll(struct pollfd *fds)
++{
++	int ret;
++
++	do {
++		ret = rs_poll(&fds, 1, poll_timeout);
++	} while (ret < 0 && (errno == EAGAIN || errno == EWOULDBLOCK));
++
++	return ret;
++}
++
+ static int send_xfer(int rs, int size)
+ {
+ 	struct pollfd fds;
+@@ -206,7 +218,7 @@ static int send_xfer(int rs, int size)
+ 
+ 	for (offset = 0; offset < size; ) {
+ 		if (use_async) {
+-			ret = rs_poll(&fds, 1, -1);
++			ret = do_poll(&fds);
+ 			if (ret != 1)
+ 				return ret;
+ 		}
+@@ -235,7 +247,7 @@ static int recv_xfer(int rs, int size)
+ 
+ 	for (offset = 0; offset < size; ) {
+ 		if (use_async) {
+-			ret = rs_poll(&fds, 1, -1);
++			ret = do_poll(&fds);
+ 			if (ret != 1)
+ 				return ret;
+ 		}
+@@ -380,7 +392,7 @@ static int server_connect(void)
+ 			fds.fd = lrs;
+ 			fds.events = POLLIN;
+ 
+-			ret = rs_poll(&fds, 1, -1);
++			ret = do_poll(&fds);
+ 			if (ret != 1) {
+ 				perror("rpoll");
+ 				goto close;
+@@ -424,21 +436,26 @@ static int client_connect(void)
+ 	ret = rs_connect(rs, res->ai_addr, res->ai_addrlen);
+ 	if (ret && (errno != EINPROGRESS)) {
+ 		perror("rconnect");
+-		rs_close(rs);
+-		rs = ret;
++		goto err;
+ 	}
+ 
+ 	if (errno == EINPROGRESS) {
+ 		fds.fd = rs;
+ 		fds.events = POLLOUT;
+-		do {
+-			ret = rs_poll(&fds, 1, -1);
+-		} while (!ret);
++		ret = do_poll(&fds);
++		if (ret != 1) {
++			perror("rpoll");
++			goto err;
++		}
+ 	}
+ 
+ free:
+ 	freeaddrinfo(res);
+ 	return rs;
++err:
++	freeaddrinfo(res);
++	rs_close(rs);
++	return -1;
+ }
+ 
+ static int run(void)
+@@ -494,6 +511,9 @@ static int set_test_opt(char *optarg)
+ 			flags |= MSG_DONTWAIT;
+ 			no_delay = 1;
+ 			break;
++		case 'p':
++			poll_timeout = 0;
++			break;
+ 		case 'v':
+ 			verify = 1;
+ 			break;
+@@ -511,6 +531,8 @@ static int set_test_opt(char *optarg)
+ 		} else if (!strncasecmp("nonblock", optarg, 8)) {
+ 			flags |= MSG_DONTWAIT;
+ 			no_delay = 1;
++		} else if (!strncasecmp("poll", optarg, 4)) {
++			poll_timeout = 0;
+ 		} else if (!strncasecmp("verify", optarg, 6)) {
+ 			verify = 1;
+ 		} else {
+@@ -564,6 +586,7 @@ int main(int argc, char **argv)
+ 			printf("\t    a|async - asynchronous operation (use poll)\n");
+ 			printf("\t    b|blocking - use blocking calls\n");
+ 			printf("\t    n|nonblocking - use nonblocking calls\n");
++			printf("\t    p|poll - poll on asynchronous operations\n")
+ 			printf("\t    v|verify - verify data\n");
+ 			exit(1);
+ 		}
