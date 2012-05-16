@@ -1,5 +1,5 @@
 Bottom: fb3f150e6146757e6bdb884182c4b19457bd6b6b
-Top:    ed3c9123d122743be28892d7fce45407ab240329
+Top:    e2131f7e51447fe3fd85c9a62239f937dac571b5
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-16 11:26:33 -0700
 
@@ -14,7 +14,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/rstream.c b/examples/rstream.c
-index decb204..b7c33f6 100644
+index decb204..27a6aeb 100644
 --- a/examples/rstream.c
 +++ b/examples/rstream.c
 @@ -55,6 +55,7 @@ static int test_size[] = {
@@ -34,7 +34,7 @@ index decb204..b7c33f6 100644
 +	int ret;
 +
 +	do {
-+		ret = rs_poll(&fds, 1, poll_timeout);
++		ret = rs_poll(fds, 1, poll_timeout);
 +	} while (ret < 0 && (errno == EAGAIN || errno == EWOULDBLOCK));
 +
 +	return ret;
@@ -125,7 +125,20 @@ index decb204..b7c33f6 100644
  			printf("\t    a|async - asynchronous operation (use poll)\n");
  			printf("\t    b|blocking - use blocking calls\n");
  			printf("\t    n|nonblocking - use nonblocking calls\n");
-+			printf("\t    p|poll - poll on asynchronous operations\n")
++			printf("\t    p|poll - poll on asynchronous operations\n");
  			printf("\t    v|verify - verify data\n");
  			exit(1);
  		}
+diff --git a/man/rstream.1 b/man/rstream.1
+index 58bd7e3..98f3d8e 100644
+--- a/man/rstream.1
++++ b/man/rstream.1
+@@ -46,6 +46,8 @@ b | blocking - uses blocking calls
+ .P
+ n | nonblocking - uses non-blocking calls
+ .P
++p | poll - poll on asynchronous operations until complete
++.P
+ v | verify - verifies data transfers
+ .SH "NOTES"
+ Basic usage is to start rstream on a server system, then run
