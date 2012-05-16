@@ -1,0 +1,19 @@
+Bottom: fb3f150e6146757e6bdb884182c4b19457bd6b6b
+Top:    fb3f150e6146757e6bdb884182c4b19457bd6b6b
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-16 15:16:40 -0700
+
+rstream: Always set TCP_NODELAY on rsocket
+
+The NODELAY option is coupled with whether the socket is blocking
+or nonblocking.  Remove this coupling and always set the NODELAY
+option.
+
+NODELAY currently has no affect on rsockets.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
