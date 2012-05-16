@@ -1,12 +1,12 @@
 Version: 1
-Previous: a53b69e6eded5f976b052572fca01692df7401e4
-Head: 49e4eb6354a6b75a966040a156a8441ee5b18ba3
+Previous: 2893fa56924ea53e5f2d862735414db152eee5b0
+Head: 53932f9c5925f54b15f98fe644d872d7ac4722a7
 Applied:
   reuseaddr: 5ce7d9c48d082fd1959918e9134f4bdd85c402d9
   rs-nodelay: b0bd56d129bc21e6683e742da4eaac5b7709067c
   rs-delay: 49e4eb6354a6b75a966040a156a8441ee5b18ba3
+  rs-async-opt: 53932f9c5925f54b15f98fe644d872d7ac4722a7
 Unapplied:
-  rs-async-opt: 0ee1dfc9ad50f07fd3708ebb04cb92e0fb2f41d5
   rs-async-nonblock: 992a8c5abcb0199fd6214fd31b6695573ccb5bf5
   preload: 5dfe7abc07064485c5100e04e5412279244c2bc3
 Hidden:

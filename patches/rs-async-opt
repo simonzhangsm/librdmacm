@@ -1,5 +1,5 @@
-Bottom: 1e3526d39b2591bb10a08bfed2622f05f82b1bd8
-Top:    fb3f150e6146757e6bdb884182c4b19457bd6b6b
+Bottom: 891a16cb25ad39db51200ed1eb3262b8f982b9bd
+Top:    0811012347b0773da571fc97d17714e8e0e598f4
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-11 10:41:02 -0700
 
@@ -11,10 +11,10 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/rstream.c b/examples/rstream.c
-index 7f39b29..decb204 100644
+index 825c4de..ecaa779 100644
 --- a/examples/rstream.c
 +++ b/examples/rstream.c
-@@ -561,7 +561,7 @@ int main(int argc, char **argv)
+@@ -556,7 +556,7 @@ int main(int argc, char **argv)
  			printf("\t[-p port_number]\n");
  			printf("\t[-T test_option]\n");
  			printf("\t    s|sockets - use standard tcp/ip sockets\n");
