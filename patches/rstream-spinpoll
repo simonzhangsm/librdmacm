@@ -1,0 +1,16 @@
+Bottom: fb3f150e6146757e6bdb884182c4b19457bd6b6b
+Top:    fb3f150e6146757e6bdb884182c4b19457bd6b6b
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-16 11:26:33 -0700
+
+rstream: Provide test option to spin on rpoll
+
+Add a test option to use asynchronous rsockets with nonblocking
+rpoll call.  This simulates the behavior used by MPI.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
