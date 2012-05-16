@@ -197,7 +197,7 @@ static int do_poll(struct pollfd *fds)
 	int ret;
 
 	do {
-		ret = rs_poll(&fds, 1, poll_timeout);
+		ret = rs_poll(fds, 1, poll_timeout);
 	} while (ret < 0 && (errno == EAGAIN || errno == EWOULDBLOCK));
 
 	return ret;
@@ -586,7 +586,7 @@ int main(int argc, char **argv)
 			printf("\t    a|async - asynchronous operation (use poll)\n");
 			printf("\t    b|blocking - use blocking calls\n");
 			printf("\t    n|nonblocking - use nonblocking calls\n");
-			printf("\t    p|poll - poll on asynchronous operations\n")
+			printf("\t    p|poll - poll on asynchronous operations\n");
 			printf("\t    v|verify - verify data\n");
 			exit(1);
 		}
