@@ -1,5 +1,5 @@
 Version: 1
-Previous: 13d8ee842db3e83618aea6266bd628760400b4f6
+Previous: 8abc3aea7db8fd13c4e08a5e213b3bceaa420d87
 Head: 992a8c5abcb0199fd6214fd31b6695573ccb5bf5
 Applied:
   reuseaddr: 5ce7d9c48d082fd1959918e9134f4bdd85c402d9
@@ -8,6 +8,5 @@ Applied:
   rs-nodelay: 7601a5adca71f10ad1cb63292c769b7b9a35dd08
   rs-async-nonblock: 992a8c5abcb0199fd6214fd31b6695573ccb5bf5
 Unapplied:
-  comp_locks: b89aab130b4619806557e11e6b9c10964f00743f
   preload: 5dfe7abc07064485c5100e04e5412279244c2bc3
 Hidden:
