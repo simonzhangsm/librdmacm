@@ -1,0 +1,26 @@
+Bottom: 456260422aff51feca00c1ee2db83c3d63b6e111
+Top:    456260422aff51feca00c1ee2db83c3d63b6e111
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-16 15:23:41 -0700
+
+rstream: Set rsocket nonblocking if set to async operation
+
+If asynchronous use is specified (use of poll/select), set the
+rsocket to nonblocking.  This matches the common usage case for
+asynchronous sockets.
+
+When asynchronous support is enabled, the nonblocking/blocking
+test option determines whether the poll/select call will block,
+or if rstream will spin on the calls.
+
+This provides more flexibility with how the rsocket is used.
+Specifically, MPI often uses nonblocking sockets, but spins on
+poll/select.  However, many apps will use nonblocking sockets,
+but wait on poll/select.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
