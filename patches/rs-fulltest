@@ -1,5 +1,5 @@
 Bottom: 73ebe2ff1ff06d4ecc24c5fe35c8f54b8ad98f9f
-Top:    070f92a593aea528dcae7a68d42159b016d77109
+Top:    a069666dc428f246f9dc954bdb50553367794189
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-17 09:50:15 -0700
 
@@ -14,7 +14,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/rstream.c b/examples/rstream.c
-index ec9b4ff..cb65911 100644
+index ec9b4ff..104b318 100644
 --- a/examples/rstream.c
 +++ b/examples/rstream.c
 @@ -45,11 +45,29 @@
@@ -99,6 +99,29 @@ index ec9b4ff..cb65911 100644
  }
  
  static void cnt_str(char *str, long long cnt)
+@@ -119,16 +154,16 @@ static void show_perf(void)
+ 	bytes = (long long) iterations * transfer_count * transfer_size * 2;
+ 
+ 	/* name size transfers iterations bytes seconds Gb/sec usec/xfer */
+-	printf("%s\t", test_name);
++	printf("%-10s", test_name);
+ 	size_str(str, transfer_size);
+-	printf("%s\t", str);
++	printf("%-8s", str);
+ 	cnt_str(str, transfer_count);
+-	printf("%s\t", str);
++	printf("%-8s", str);
+ 	cnt_str(str, iterations);
+-	printf("%s\t", str);
++	printf("%-8s", str);
+ 	size_str(str, bytes);
+-	printf("%s\t", str);
+-	printf("%.2fs \t%.2f \t%.2f\n",
++	printf("%-8s", str);
++	printf("%8.2fs%10.2f%11.2f\n",
+ 		usec / 1000000., (bytes * 8) / (1000. * usec),
+ 		(usec / iterations) / (transfer_count * 2));
+ }
 @@ -457,7 +492,7 @@ static int run(void)
  {
  	int i, rs, ret = 0;
@@ -108,8 +131,13 @@ index ec9b4ff..cb65911 100644
  	if (!buf) {
  		perror("malloc");
  		return -1;
-@@ -472,11 +507,15 @@ static int run(void)
- 	printf("name \tbytes \txfers \titers \ttotal \ttime \tGb/sec \tusec/xfer\n");
+@@ -469,14 +504,19 @@ static int run(void)
+ 		goto free;
+ 	}
+ 
+-	printf("name \tbytes \txfers \titers \ttotal \ttime \tGb/sec \tusec/xfer\n");
++	printf("%-10s%-8s%-8s%-8s%-8s%8s %10s%13s\n",
++	       "name", "bytes", "xfers", "iters", "total", "time", "Gb/sec", "usec/xfer");
  	if (!custom) {
  		for (i = 0; i < TEST_CNT; i++) {
 -			init_latency_test(test_size[i]);
@@ -126,7 +154,7 @@ index ec9b4ff..cb65911 100644
  			run_test(rs);
  		}
  	} else {
-@@ -551,8 +590,12 @@ int main(int argc, char **argv)
+@@ -551,8 +591,12 @@ int main(int argc, char **argv)
  			transfer_count = atoi(optarg);
  			break;
  		case 'S':
@@ -141,7 +169,7 @@ index ec9b4ff..cb65911 100644
  			break;
  		case 'p':
  			port = optarg;
-@@ -567,7 +610,7 @@ int main(int argc, char **argv)
+@@ -567,7 +611,7 @@ int main(int argc, char **argv)
  			printf("\t[-b bind_address]\n");
  			printf("\t[-I iterations]\n");
  			printf("\t[-C transfer_count]\n");
