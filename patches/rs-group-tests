@@ -1,0 +1,15 @@
+Bottom: 8f6ed845f1d4f512d6113d3b4ff5776c7e330fc4
+Top:    8f6ed845f1d4f512d6113d3b4ff5776c7e330fc4
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-17 09:26:13 -0700
+
+rstream: Group latency/bandwidth tests together
+
+Rather than grouping tests by transfer size, group by the test type.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
