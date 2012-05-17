@@ -1,0 +1,16 @@
+Bottom: 73ebe2ff1ff06d4ecc24c5fe35c8f54b8ad98f9f
+Top:    73ebe2ff1ff06d4ecc24c5fe35c8f54b8ad98f9f
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-17 09:50:15 -0700
+
+rstream: Add test option to include more sizes
+
+Allow user to specify that a full set of transfer sizes should
+be tested.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
