@@ -1,5 +1,5 @@
 Bottom: 8f6ed845f1d4f512d6113d3b4ff5776c7e330fc4
-Top:    8f6ed845f1d4f512d6113d3b4ff5776c7e330fc4
+Top:    73ebe2ff1ff06d4ecc24c5fe35c8f54b8ad98f9f
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-17 09:26:13 -0700
 
@@ -12,4 +12,16 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 ---
 
-
+diff --git a/examples/rstream.c b/examples/rstream.c
+index 2b25ef5..ec9b4ff 100644
+--- a/examples/rstream.c
++++ b/examples/rstream.c
+@@ -474,6 +474,8 @@ static int run(void)
+ 		for (i = 0; i < TEST_CNT; i++) {
+ 			init_latency_test(test_size[i]);
+ 			run_test(rs);
++		}
++		for (i = 0; i < TEST_CNT; i++) {
+ 			init_bandwidth_test(test_size[i]);
+ 			run_test(rs);
+ 		}
