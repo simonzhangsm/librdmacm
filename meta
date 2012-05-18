@@ -1,8 +1,7 @@
 Version: 1
-Previous: 22b32ac6ef21396238430e742cebbdef5b66ed96
-Head: 8474bbe8e9dfb76dd905578ae5dea4a36af7e3d5
+Previous: 1b2e93d799c2e569ba9a0e93c58aa70e993ca613
+Head: 7c8fbc95903cf8f61422d7f2c58f83ba4f0b8ac4
 Applied:
-  rs-opts: 9b8dce35b0240c42e8425e389d65635e1a5a4f52
-  refresh-temp: 8474bbe8e9dfb76dd905578ae5dea4a36af7e3d5
+  rs-opts: 7c8fbc95903cf8f61422d7f2c58f83ba4f0b8ac4
 Unapplied:
 Hidden:
