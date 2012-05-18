@@ -1695,6 +1695,20 @@ int rsetsockopt(int socket, int level, int optname,
 		}
 		break;
 	case SOL_RDMA:
+		if (rs->state != rs_init && rs->state != rs_bound) {
+
+		switch (optname) {
+		case RDMA_SQSIZE:
+			*((int *) optval) = rs->sq_size;
+			*optlen = sizeof(int);
+			break;
+		case RDMA_RQSIZE:
+			*((int *) optval) = rs->rq_size;
+			*optlen = sizeof(int);
+			break;
+		default:
+			break;
+		}
 		break;
 	default:
 		break;
@@ -1762,7 +1776,19 @@ int rgetsockopt(int socket, int level, int optname,
 		}
 		break;
 	case SOL_RDMA:
-		ret = ENOTSUP;
+		switch (optname) {
+		case RDMA_SQSIZE:
+			*((int *) optval) = rs->sq_size;
+			*optlen = sizeof(int);
+			break;
+		case RDMA_RQSIZE:
+			*((int *) optval) = rs->rq_size;
+			*optlen = sizeof(int);
+			break;
+		default:
+			ret = ENOTSUP;
+			break;
+		}
 		break;
 	default:
 		ret = ENOTSUP;
