@@ -1,0 +1,18 @@
+Bottom: a069666dc428f246f9dc954bdb50553367794189
+Top:    a069666dc428f246f9dc954bdb50553367794189
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-18 10:00:58 -0700
+
+librdmacm: Support older acm.h header files
+
+Older versions of acm.h do not include the resolve_data or
+perf_data fields in struct acm_msg.  If we're using an older
+version of the acm.h header file, use an internal definition
+of struct acm_msg.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
