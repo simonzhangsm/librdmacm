@@ -1,5 +1,5 @@
 Bottom: 73ebe2ff1ff06d4ecc24c5fe35c8f54b8ad98f9f
-Top:    a069666dc428f246f9dc954bdb50553367794189
+Top:    7553b4a2424ee63be0ec596d9d62a0f8512d235c
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-17 09:50:15 -0700
 
@@ -178,3 +178,17 @@ index ec9b4ff..104b318 100644
  			printf("\t[-p port_number]\n");
  			printf("\t[-T test_option]\n");
  			printf("\t    s|sockets - use standard tcp/ip sockets\n");
+diff --git a/man/rstream.1 b/man/rstream.1
+index 58bd7e3..0909932 100644
+--- a/man/rstream.1
++++ b/man/rstream.1
+@@ -30,7 +30,8 @@ The number of messages to transfer from the client to the server and
+ back again on each iteration.  (default 1)
+ .TP
+ \-S transfer_size
+-The size of each send transfer, in bytes.  (default 1000)
++The size of each send transfer, in bytes.  (default 1000)  If 'all'
++is specified, rstream will run a series of tests of various sizes.
+ .TP
+ \-p server_port
+ The server's port number.
