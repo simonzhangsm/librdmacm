@@ -1,9 +1,8 @@
 Version: 1
-Previous: c1e2db1577d19252292af498bd69c4fbeab4cc88
-Head: 8c21800f5c7db8a359b10483a43ae00d3f3f0f42
+Previous: b780ad8409179e602231a057b1dca1e53fd194f2
+Head: 6b732ff34d98cf8745e2f5d2ff326cef4a3b05a7
 Applied:
   rs-opts: 7c8fbc95903cf8f61422d7f2c58f83ba4f0b8ac4
-  rs-opt-qpsize: 014d73d3406368b0c7d90e2a5a1dac5c517badca
-  refresh-temp: 8c21800f5c7db8a359b10483a43ae00d3f3f0f42
+  rs-opt-qpsize: 6b732ff34d98cf8745e2f5d2ff326cef4a3b05a7
 Unapplied:
 Hidden:

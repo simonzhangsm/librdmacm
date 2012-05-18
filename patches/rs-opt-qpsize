@@ -1,22 +1,38 @@
 Bottom: 232a5020b2d128a616b93f4b14bc5a527a330b7c
-Top:    232a5020b2d128a616b93f4b14bc5a527a330b7c
+Top:    e6975e492692c72dbfebbebe4c6165f5a6f594a9
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-18 16:56:15 -0700
 
-rsockets: Allow user to specify the QP size
+rsockets: Allow user to specify the QP sizes
 
-Add a setsockopt that allows the user to specify the desired
-size of the underlying QP.  The provided size is used as the
-maximum size when creating the QP.  The actual size of the QP
-is the smaller of the user provided maximum and the maximum
-size supported by the underlying hardware.
+Add setsockopt options that allow the user to specify the desired
+size of the underlying QP.  The provided sizes are used as the
+maximum size when creating the QP.  The actual sizes of the QP
+are the smaller of the user provided maximum and the maximum
+sizes supported by the underlying hardware.
 
-A user may retrieve the actual size of the QP through the
+A user may retrieve the actual sizes of the QP through the
 getsockopt call.
+
+The send and receive queue sizes are specified separately.
 
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
 ---
 
-
+diff --git a/include/rdma/rsocket.h b/include/rdma/rsocket.h
+index 87ee943..9fd9929 100644
+--- a/include/rdma/rsocket.h
++++ b/include/rdma/rsocket.h
+@@ -73,6 +73,10 @@ int rgetpeername(int socket, struct sockaddr *addr, socklen_t *addrlen);
+ int rgetsockname(int socket, struct sockaddr *addr, socklen_t *addrlen);
+ 
+ #define SOL_RDMA 0x10000
++enum {
++	RDMA_SQSIZE,
++	RDMA_RQSIZE
++};
+ 
+ int rsetsockopt(int socket, int level, int optname,
+ 		const void *optval, socklen_t optlen);
