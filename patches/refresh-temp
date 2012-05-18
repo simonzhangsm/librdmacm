@@ -1,0 +1,65 @@
+Bottom: a069666dc428f246f9dc954bdb50553367794189
+Top:    f88edc44196caddaa1a1e236d26ce27c4aab8166
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-18 10:35:55 -0700
+
+Refresh of old-acm
+
+---
+
+diff --git a/configure.in b/configure.in
+index fa90fcb..dec6064 100644
+--- a/configure.in
++++ b/configure.in
+@@ -73,6 +73,11 @@ fi
+ AC_CHECK_HEADER(infiniband/acm.h, 
+ 	AC_DEFINE([USE_IB_ACM], 1, [setting IBACM support]), [])
+ 
++AC_CHECK_HEADER(infiniband/acm.h,
++	AC_CHECK_MEMBER(struct acm_msg.resolve_data, [],
++		AC_DEFINE(DEFINE_ACM_MSG, 1, [adding ACM message definition]),
++			[#include <infiniband/acm.h>]), [])
++
+ AC_CACHE_CHECK(whether ld accepts --version-script, ac_cv_version_script,
+     if test -n "`$LD --help < /dev/null 2>/dev/null | grep version-script`"; then
+         ac_cv_version_script=yes
+diff --git a/src/acm.c b/src/acm.c
+index 7911b41..bcf11da 100755
+--- a/src/acm.c
++++ b/src/acm.c
+@@ -48,6 +48,18 @@
+ #ifdef USE_IB_ACM
+ #include <infiniband/acm.h>
+ 
++#if DEFINE_ACM_MSG
++typedef struct cma_acm_msg {
++	struct acm_hdr                  hdr;
++	union{
++		uint8_t                 data[ACM_MSG_DATA_LENGTH];
++		struct acm_ep_addr_data resolve_data[0];
++	};
++} cma_acm_msg_t;
++#else
++typedef struct acm_msg cma_acm_msg_t;
++#endif
++
+ static pthread_mutex_t acm_lock = PTHREAD_MUTEX_INITIALIZER;
+ static int sock;
+ static short server_port = 6125;
+@@ -237,7 +249,7 @@ err:
+ 	rdma_freeaddrinfo(ib_rai);
+ }
+ 
+-static void ucma_ib_save_resp(struct rdma_addrinfo *rai, struct acm_msg *msg)
++static void ucma_ib_save_resp(struct rdma_addrinfo *rai, cma_acm_msg_t *msg)
+ {
+ 	struct acm_ep_addr_data *ep_data;
+ 	struct ibv_path_data *path_data = NULL;
+@@ -306,7 +318,7 @@ static void ucma_copy_rai_addr(struct acm_ep_addr_data *data, struct sockaddr *a
+ 
+ void ucma_ib_resolve(struct rdma_addrinfo **rai, struct rdma_addrinfo *hints)
+ {
+-	struct acm_msg msg;
++	cma_acm_msg_t msg;
+ 	struct acm_ep_addr_data *data;
+ 	int ret;
