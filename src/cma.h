@@ -67,7 +67,7 @@ static inline uint64_t htonll(uint64_t x) { return x; }
 static inline uint64_t ntohll(uint64_t x) { return x; }
 #endif
 
-#define min(a, b) (a < b ? a : b)
+#define min(a, b) ((a) < (b) ? a : b)
 
 /*
  * Fast synchronization for low contention locking.
