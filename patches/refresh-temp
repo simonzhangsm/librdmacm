@@ -1,0 +1,22 @@
+Bottom: b37d006a6372969ddf786ae8c3abe0509cfaef04
+Top:    716b79e70dbab52362acd7d5f3617b47129f7001
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-20 22:11:16 -0700
+
+Refresh of rs-qpsize
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 495c2e3..331db78 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -344,7 +344,7 @@ static int rs_create_ep(struct rsocket *rs)
+ 	struct ibv_qp_init_attr qp_attr;
+ 	int i, ret;
+ 
+-	rs_check_qp_size(rs);
++	rs_set_qp_size(rs);
+ 	ret = rs_init_bufs(rs);
+ 	if (ret)
+ 		return ret;
