@@ -1,5 +1,5 @@
 Bottom: 7292817ed24068611ad6cac825c4f26c8476920e
-Top:    43f639f6fd5107bf4b50f4200b055136fa2925b5
+Top:    e59c7d297d75ab32441e4182b0c9e524692ce2c2
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-21 16:39:46 -0700
 
@@ -11,7 +11,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/rstream.c b/examples/rstream.c
-index 104b318..d2f4a9b 100644
+index 104b318..c440f04 100644
 --- a/examples/rstream.c
 +++ b/examples/rstream.c
 @@ -448,7 +448,8 @@ static int client_connect(void)
@@ -30,13 +30,13 @@ index 104b318..d2f4a9b 100644
  			goto err;
 +
 +		len = sizeof err;
-+		ret = getsockopt(rs, SOL_SOCKET, SO_ERROR, &err, &len);
++		ret = rs_getsockopt(rs, SOL_SOCKET, SO_ERROR, &err, &len);
 +		if (ret)
 +			goto err;
 +		if (err) {
 +			ret = -1;
 +			errno = err;
-+			perror("async rconnect")
++			perror("async rconnect");
 +			goto err;
 +		}
  	}
