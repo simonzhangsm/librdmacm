@@ -448,7 +448,7 @@ static int client_connect(void)
 {
 	struct addrinfo *res;
 	struct pollfd fds;
-	int ret, rs;
+	int ret, rs, err, len;
 
  	ret = getaddrinfo(dst_addr, port, NULL, &res);
 	if (ret) {
@@ -477,6 +477,13 @@ static int client_connect(void)
 		ret = do_poll(&fds);
 		if (ret)
 			goto err;
+
+		len = sizeof err;
+		ret = getsockopt(rs, SOL_SOCKET, SO_ERROR, &err, &len);
+		if (ret || err) {
+			ret = ret ? ret : err;
+			goto err;
+		}
 	}
 
 free:
