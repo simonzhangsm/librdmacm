@@ -344,7 +344,7 @@ static int rs_create_ep(struct rsocket *rs)
 	struct ibv_qp_init_attr qp_attr;
 	int i, ret;
 
-	rs_check_qp_size(rs);
+	rs_set_qp_size(rs);
 	ret = rs_init_bufs(rs);
 	if (ret)
 		return ret;
