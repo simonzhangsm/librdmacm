@@ -1,0 +1,29 @@
+Bottom: 43f639f6fd5107bf4b50f4200b055136fa2925b5
+Top:    e59c7d297d75ab32441e4182b0c9e524692ce2c2
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-21 16:50:16 -0700
+
+Refresh of conn-err
+
+---
+
+diff --git a/examples/rstream.c b/examples/rstream.c
+index d2f4a9b..c440f04 100644
+--- a/examples/rstream.c
++++ b/examples/rstream.c
+@@ -480,13 +480,13 @@ static int client_connect(void)
+ 			goto err;
+ 
+ 		len = sizeof err;
+-		ret = getsockopt(rs, SOL_SOCKET, SO_ERROR, &err, &len);
++		ret = rs_getsockopt(rs, SOL_SOCKET, SO_ERROR, &err, &len);
+ 		if (ret)
+ 			goto err;
+ 		if (err) {
+ 			ret = -1;
+ 			errno = err;
+-			perror("async rconnect")
++			perror("async rconnect");
+ 			goto err;
+ 		}
+ 	}
