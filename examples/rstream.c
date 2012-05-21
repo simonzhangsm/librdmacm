@@ -481,8 +481,11 @@ static int client_connect(void)
 
 		len = sizeof err;
 		ret = getsockopt(rs, SOL_SOCKET, SO_ERROR, &err, &len);
-		if (ret || err) {
-			ret = ret ? ret : err;
+		if (ret)
+			goto err;
+		if (err) {
+			ret = rdma_seterrno(err);
+			perror("async rconnect")
 			goto err;
 		}
 	}
