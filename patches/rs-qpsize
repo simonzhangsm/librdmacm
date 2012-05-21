@@ -1,5 +1,5 @@
 Bottom: 6bbc2f526b97dfafc16e7ec34dc8e4e1ce587f40
-Top:    b37d006a6372969ddf786ae8c3abe0509cfaef04
+Top:    716b79e70dbab52362acd7d5f3617b47129f7001
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-18 17:07:11 -0700
 
@@ -29,7 +29,7 @@ index 7703fe8..669b681 100644
  /*
   * Fast synchronization for low contention locking.
 diff --git a/src/rsocket.c b/src/rsocket.c
-index de0ec3e..495c2e3 100644
+index de0ec3e..331db78 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -55,6 +55,8 @@
@@ -133,7 +133,7 @@ index de0ec3e..495c2e3 100644
  	struct ibv_qp_init_attr qp_attr;
  	int i, ret;
  
-+	rs_check_qp_size(rs);
++	rs_set_qp_size(rs);
  	ret = rs_init_bufs(rs);
  	if (ret)
  		return ret;
