@@ -484,7 +484,8 @@ static int client_connect(void)
 		if (ret)
 			goto err;
 		if (err) {
-			ret = rdma_seterrno(err);
+			ret = -1;
+			errno = err;
 			perror("async rconnect")
 			goto err;
 		}
