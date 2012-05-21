@@ -1,5 +1,5 @@
 Bottom: 6bbc2f526b97dfafc16e7ec34dc8e4e1ce587f40
-Top:    6bbc2f526b97dfafc16e7ec34dc8e4e1ce587f40
+Top:    84dde5925d2ae4b35a6fc92a878e89811540430a
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-20 22:41:38 -0700
 
@@ -18,4 +18,19 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 ---
 
-
+diff --git a/src/cma.c b/src/cma.c
+index c32803d..9cd34cf 100755
+--- a/src/cma.c
++++ b/src/cma.c
+@@ -1096,10 +1096,10 @@ static void ucma_destroy_cqs(struct rdma_cm_id *id)
+ 	if (id->recv_cq_channel)
+ 		ibv_destroy_comp_channel(id->recv_cq_channel);
+ 
+-	if (id->send_cq)
++	if (id->send_cq && (id->send_cq != id->recv_cq))
+ 		ibv_destroy_cq(id->send_cq);
+ 
+-	if (id->send_cq_channel)
++	if (id->send_cq_channel && (id->send_cq_channel != id->recv_cq_channel))
+ 		ibv_destroy_comp_channel(id->send_cq_channel);
+ }
