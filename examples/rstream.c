@@ -448,7 +448,8 @@ static int client_connect(void)
 {
 	struct addrinfo *res;
 	struct pollfd fds;
-	int ret, rs, err, len;
+	int ret, rs, err;
+	socklen_t len;
 
  	ret = getaddrinfo(dst_addr, port, NULL, &res);
 	if (ret) {
