@@ -1,5 +1,5 @@
 Bottom: 7292817ed24068611ad6cac825c4f26c8476920e
-Top:    d9ab75e22bbc8454eec1cfd91c4d0f8a4eebd314
+Top:    a4f930386d1079ec83f29bd0c722114770f6554d
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-21 16:39:46 -0700
 
@@ -11,19 +11,20 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/rstream.c b/examples/rstream.c
-index 104b318..393b40f 100644
+index 104b318..cd8a962 100644
 --- a/examples/rstream.c
 +++ b/examples/rstream.c
-@@ -448,7 +448,7 @@ static int client_connect(void)
+@@ -448,7 +448,8 @@ static int client_connect(void)
  {
  	struct addrinfo *res;
  	struct pollfd fds;
 -	int ret, rs;
-+	int ret, rs, err, len;
++	int ret, rs, err;
++	socklen_t len;
  
   	ret = getaddrinfo(dst_addr, port, NULL, &res);
  	if (ret) {
-@@ -477,6 +477,13 @@ static int client_connect(void)
+@@ -477,6 +478,13 @@ static int client_connect(void)
  		ret = do_poll(&fds);
  		if (ret)
  			goto err;
