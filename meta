@@ -1,7 +1,8 @@
 Version: 1
-Previous: 515e0a99ea36fab0ff6fa519fd96a489d9ec9e63
-Head: 90b96504395c3e9f4652f4b46d63be3dea3689fe
+Previous: 0d6958a48c655602cb2b4e6ef29834821395e8ef
+Head: 6efa52c79449bcac31414f6682f87f9a30f05bae
 Applied:
+  destroy_cqs: 6efa52c79449bcac31414f6682f87f9a30f05bae
 Unapplied:
   rs-qpsize: adee5db68a8f004ef5a94dc0cad94b74bf685088
   rs-opts: 7c8fbc95903cf8f61422d7f2c58f83ba4f0b8ac4

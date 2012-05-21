@@ -1,0 +1,21 @@
+Bottom: 6bbc2f526b97dfafc16e7ec34dc8e4e1ce587f40
+Top:    6bbc2f526b97dfafc16e7ec34dc8e4e1ce587f40
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-20 22:41:38 -0700
+
+librdmacm: Check that send and recv CQs are different before destroying
+
+ucma_destroy_cqs() destroys both the send and recv CQs if they
+are non-null.  If the two CQs are actually the same one, this
+results in a crash when trying to destroy the second CQ.  Check
+that the CQs are different before destroying the second CQ.
+
+This fixes a crash when using rsockets, which sets the send and
+recv CQs to the same CQ.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
