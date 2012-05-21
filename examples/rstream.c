@@ -480,13 +480,13 @@ static int client_connect(void)
 			goto err;
 
 		len = sizeof err;
-		ret = getsockopt(rs, SOL_SOCKET, SO_ERROR, &err, &len);
+		ret = rs_getsockopt(rs, SOL_SOCKET, SO_ERROR, &err, &len);
 		if (ret)
 			goto err;
 		if (err) {
 			ret = -1;
 			errno = err;
-			perror("async rconnect")
+			perror("async rconnect");
 			goto err;
 		}
 	}
