@@ -1,0 +1,23 @@
+Bottom: d9ab75e22bbc8454eec1cfd91c4d0f8a4eebd314
+Top:    a4f930386d1079ec83f29bd0c722114770f6554d
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-21 16:43:48 -0700
+
+Refresh of conn-err
+
+---
+
+diff --git a/examples/rstream.c b/examples/rstream.c
+index 393b40f..cd8a962 100644
+--- a/examples/rstream.c
++++ b/examples/rstream.c
+@@ -448,7 +448,8 @@ static int client_connect(void)
+ {
+ 	struct addrinfo *res;
+ 	struct pollfd fds;
+-	int ret, rs, err, len;
++	int ret, rs, err;
++	socklen_t len;
+ 
+  	ret = getaddrinfo(dst_addr, port, NULL, &res);
+ 	if (ret) {
