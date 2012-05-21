@@ -1,5 +1,5 @@
 Bottom: 7292817ed24068611ad6cac825c4f26c8476920e
-Top:    3913d172c2d623b9aa46a39a6b725092c2b0d3ca
+Top:    43f639f6fd5107bf4b50f4200b055136fa2925b5
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-21 16:39:46 -0700
 
@@ -11,7 +11,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/rstream.c b/examples/rstream.c
-index 104b318..34ff421 100644
+index 104b318..d2f4a9b 100644
 --- a/examples/rstream.c
 +++ b/examples/rstream.c
 @@ -448,7 +448,8 @@ static int client_connect(void)
@@ -24,7 +24,7 @@ index 104b318..34ff421 100644
  
   	ret = getaddrinfo(dst_addr, port, NULL, &res);
  	if (ret) {
-@@ -477,6 +478,16 @@ static int client_connect(void)
+@@ -477,6 +478,17 @@ static int client_connect(void)
  		ret = do_poll(&fds);
  		if (ret)
  			goto err;
@@ -34,7 +34,8 @@ index 104b318..34ff421 100644
 +		if (ret)
 +			goto err;
 +		if (err) {
-+			ret = rdma_seterrno(err);
++			ret = -1;
++			errno = err;
 +			perror("async rconnect")
 +			goto err;
 +		}
