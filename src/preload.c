@@ -99,6 +99,7 @@ static pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
 
 static int sq_size;
 static int rq_size;
+static int sq_inline;
 
 enum fd_type {
 	fd_normal,
@@ -210,6 +211,10 @@ void getenv_options(void)
 	var = getenv("RS_RQ_SIZE");
 	if (var)
 		rq_size = atoi(var);
+
+	var = getenv("RS_INLINE");
+	if (var)
+		sq_inline = atoi(var);
 }
 
 static void init_preload(void)
@@ -313,6 +318,9 @@ void set_rsocket_options(int rsocket)
 
 	if (rq_size)
 		rsetsockopt(rsocket, SOL_RDMA, RDMA_RQSIZE, &rq_size, sizeof rq_size);
+
+	if (sq_inline)
+		rsetsockopt(rsocket, SOL_RDMA, RDMA_INLINE, &sq_inline, sizeof sq_inline);
 }
 
 int socket(int domain, int type, int protocol)
