@@ -163,6 +163,7 @@ struct rsocket {
 	uint16_t	  sseq_no;
 	uint16_t	  sseq_comp;
 	uint16_t	  sq_size;
+	uint16_t	  sq_inline;
 
 	uint16_t	  rq_size;
 	uint16_t	  rseq_no;
@@ -229,11 +230,13 @@ static struct rsocket *rs_alloc(struct rsocket *inherited_rs)
 	if (inherited_rs) {
 		rs->sbuf_size = inherited_rs->sbuf_size;
 		rs->rbuf_size = inherited_rs->rbuf_size;
+		rs->sq_inline = inherited_rs->sq_inline;
 		rs->sq_size = inherited_rs->sq_size;
 		rs->rq_size = inherited_rs->rq_size;
 		rs->ctrl_avail = inherited_rs->ctrl_avail;
 	} else {
 		rs->sbuf_size = rs->rbuf_size = RS_BUF_SIZE;
+		rs->sq_inline = RS_INLINE;
 		rs->sq_size = rs->rq_size = RS_QP_SIZE;
 		rs->ctrl_avail = RS_QP_CTRL_SIZE;
 	}
@@ -367,7 +370,7 @@ static int rs_create_ep(struct rsocket *rs)
 	qp_attr.cap.max_recv_wr = rs->rq_size;
 	qp_attr.cap.max_send_sge = 2;
 	qp_attr.cap.max_recv_sge = 1;
-	qp_attr.cap.max_inline_data = RS_INLINE;
+	qp_attr.cap.max_inline_data = rs->sq_inline;
 
 	ret = rdma_create_qp(rs->cm_id, NULL, &qp_attr);
 	if (ret)
@@ -1141,7 +1144,7 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
 		if (xfer_size > rs->target_sgl[rs->target_sge].length)
 			xfer_size = rs->target_sgl[rs->target_sge].length;
 
-		if (xfer_size <= RS_INLINE) {
+		if (xfer_size <= rs->sq_inline) {
 			sge.addr = (uintptr_t) buf;
 			sge.length = xfer_size;
 			sge.lkey = 0;
@@ -1257,7 +1260,7 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
 			ret = rs_write_data(rs, rs_wrid(1, xfer_size),
 					    rs->ssgl, 1,
 					    rs_msg_set(RS_OP_DATA, xfer_size),
-					    xfer_size <= RS_INLINE ? IBV_SEND_INLINE : 0);
+					    xfer_size <= rs->sq_inline ? IBV_SEND_INLINE : 0);
 			if (xfer_size < rs_sbuf_left(rs))
 				rs->ssgl[0].addr += xfer_size;
 			else
@@ -1271,7 +1274,7 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
 			ret = rs_write_data(rs, rs_wrid(1, xfer_size),
 					    rs->ssgl, 2,
 					    rs_msg_set(RS_OP_DATA, xfer_size),
-					    xfer_size <= RS_INLINE ? IBV_SEND_INLINE : 0);
+					    xfer_size <= rs->sq_inline ? IBV_SEND_INLINE : 0);
 			rs->ssgl[0].addr = (uintptr_t) rs->sbuf + rs->ssgl[1].length;
 		}
 		if (ret)
@@ -1710,6 +1713,9 @@ int rsetsockopt(int socket, int level, int optname,
 		case RDMA_RQSIZE:
 			rs->rq_size = min((*(uint32_t *) optval), RS_QP_MAX_SIZE);
 			break;
+		case RDMA_INLINE:
+			rs->sq_inline = min(*(uint32_t *) optval, RS_QP_MAX_SIZE);
+			break;
 		default:
 			break;
 		}
@@ -1787,6 +1793,10 @@ int rgetsockopt(int socket, int level, int optname,
 			break;
 		case RDMA_RQSIZE:
 			*((int *) optval) = rs->rq_size;
+			*optlen = sizeof(int);
+			break;
+		case RDMA_INLINE:
+			*((int *) optval) = rs->sq_inline;
 			*optlen = sizeof(int);
 			break;
 		default:
