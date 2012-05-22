@@ -1,0 +1,16 @@
+Bottom: 46a41435ac366ad36c28dcab41598bb149a98d57
+Top:    46a41435ac366ad36c28dcab41598bb149a98d57
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-21 18:46:36 -0700
+
+rsocket preload: Use environment variable to set QP size
+
+Allow the user to specify the size of the send/receive queues
+through environment variables: RS_SQ_SIZE, RS_RQ_SIZE.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
