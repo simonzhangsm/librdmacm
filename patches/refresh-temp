@@ -1,0 +1,42 @@
+Bottom: ab0042b0b446176d96f3c40a9ad37305b40bc446
+Top:    eab4fc9ba15a1131fec30f39f1adf8bc359ec9e6
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-22 11:50:03 -0700
+
+Refresh of pre-qpsize
+
+---
+
+diff --git a/src/preload.c b/src/preload.c
+index 1214bb5..a3ef488 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -99,6 +99,7 @@ static pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
+ 
+ static int sq_size;
+ static int rq_size;
++static int sq_inline;
+ 
+ enum fd_type {
+ 	fd_normal,
+@@ -210,6 +211,10 @@ void getenv_options(void)
+ 	var = getenv("RS_RQ_SIZE");
+ 	if (var)
+ 		rq_size = atoi(var);
++
++	var = getenv("RS_INLINE");
++	if (var)
++		sq_inline = atoi(var);
+ }
+ 
+ static void init_preload(void)
+@@ -313,6 +318,9 @@ void set_rsocket_options(int rsocket)
+ 
+ 	if (rq_size)
+ 		rsetsockopt(rsocket, SOL_RDMA, RDMA_RQSIZE, &rq_size, sizeof rq_size);
++
++	if (sq_inline)
++		rsetsockopt(rsocket, SOL_RDMA, RDMA_INLINE, &sq_inline, sizeof sq_inline);
+ }
+ 
+ int socket(int domain, int type, int protocol)
