@@ -1,5 +1,5 @@
 Bottom: a56e016c539a26a00f6719ca5ac0b7574ce02b22
-Top:    01e3c2c0f37572e9555ececfa38d5f92a80627fb
+Top:    7789841c5305f1e6ee8dd914ee3e43bfffbb7ba3
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-18 16:56:15 -0700
 
@@ -36,3 +36,49 @@ index 87ee943..9fd9929 100644
  
  int rsetsockopt(int socket, int level, int optname,
  		const void *optval, socklen_t optlen);
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 9d373b9..893cc57 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -1695,6 +1695,20 @@ int rsetsockopt(int socket, int level, int optname,
+ 		}
+ 		break;
+ 	case SOL_RDMA:
++		if (rs->state != rs_init && rs->state != rs_bound) {
++
++		switch (optname) {
++		case RDMA_SQSIZE:
++			*((int *) optval) = rs->sq_size;
++			*optlen = sizeof(int);
++			break;
++		case RDMA_RQSIZE:
++			*((int *) optval) = rs->rq_size;
++			*optlen = sizeof(int);
++			break;
++		default:
++			break;
++		}
+ 		break;
+ 	default:
+ 		break;
+@@ -1762,7 +1776,19 @@ int rgetsockopt(int socket, int level, int optname,
+ 		}
+ 		break;
+ 	case SOL_RDMA:
+-		ret = ENOTSUP;
++		switch (optname) {
++		case RDMA_SQSIZE:
++			*((int *) optval) = rs->sq_size;
++			*optlen = sizeof(int);
++			break;
++		case RDMA_RQSIZE:
++			*((int *) optval) = rs->rq_size;
++			*optlen = sizeof(int);
++			break;
++		default:
++			ret = ENOTSUP;
++			break;
++		}
+ 		break;
+ 	default:
+ 		ret = ENOTSUP;
