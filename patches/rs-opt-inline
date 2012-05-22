@@ -1,0 +1,13 @@
+Bottom: a49d0e144acdded02c6f0d1bcaf6b39d0f7c3965
+Top:    a49d0e144acdded02c6f0d1bcaf6b39d0f7c3965
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-22 11:39:21 -0700
+
+rsocket: Add option to specify size of inline data
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
