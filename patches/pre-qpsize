@@ -1,5 +1,5 @@
 Bottom: 257f30de8ca0e0356dbd176eadb68dbe5ab27e26
-Top:    ab0042b0b446176d96f3c40a9ad37305b40bc446
+Top:    eab4fc9ba15a1131fec30f39f1adf8bc359ec9e6
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-21 18:46:36 -0700
 
@@ -15,20 +15,21 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index 87778eb..1214bb5 100644
+index 87778eb..a3ef488 100644
 --- a/src/preload.c
 +++ b/src/preload.c
-@@ -97,6 +97,9 @@ static int (*real_fcntl)(int socket, int cmd, ... /* arg */);
+@@ -97,6 +97,10 @@ static int (*real_fcntl)(int socket, int cmd, ... /* arg */);
  static struct index_map idm;
  static pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
  
 +static int sq_size;
 +static int rq_size;
++static int sq_inline;
 +
  enum fd_type {
  	fd_normal,
  	fd_rsocket
-@@ -196,6 +199,19 @@ static enum fd_type fd_close(int index, int *fd)
+@@ -196,6 +200,23 @@ static enum fd_type fd_close(int index, int *fd)
  	return type;
  }
  
@@ -43,12 +44,16 @@ index 87778eb..1214bb5 100644
 +	var = getenv("RS_RQ_SIZE");
 +	if (var)
 +		rq_size = atoi(var);
++
++	var = getenv("RS_INLINE");
++	if (var)
++		sq_inline = atoi(var);
 +}
 +
  static void init_preload(void)
  {
  	static int init;
-@@ -231,6 +247,8 @@ static void init_preload(void)
+@@ -231,6 +252,8 @@ static void init_preload(void)
  	real_setsockopt = dlsym(RTLD_NEXT, "setsockopt");
  	real_getsockopt = dlsym(RTLD_NEXT, "getsockopt");
  	real_fcntl = dlsym(RTLD_NEXT, "fcntl");
@@ -57,7 +62,7 @@ index 87778eb..1214bb5 100644
  	init = 1;
  out:
  	pthread_mutex_unlock(&mut);
-@@ -285,6 +303,18 @@ err:
+@@ -285,6 +308,21 @@ err:
  	return ret;
  }
  
@@ -71,12 +76,15 @@ index 87778eb..1214bb5 100644
 +
 +	if (rq_size)
 +		rsetsockopt(rsocket, SOL_RDMA, RDMA_RQSIZE, &rq_size, sizeof rq_size);
++
++	if (sq_inline)
++		rsetsockopt(rsocket, SOL_RDMA, RDMA_INLINE, &sq_inline, sizeof sq_inline);
 +}
 +
  int socket(int domain, int type, int protocol)
  {
  	int index, ret;
-@@ -297,6 +327,7 @@ int socket(int domain, int type, int protocol)
+@@ -297,6 +335,7 @@ int socket(int domain, int type, int protocol)
  	ret = rsocket(domain, type, protocol);
  	if (ret >= 0) {
  		fd_store(index, ret, fd_rsocket);
