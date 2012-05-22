@@ -1,5 +1,5 @@
-Bottom: 6bbc2f526b97dfafc16e7ec34dc8e4e1ce587f40
-Top:    232a5020b2d128a616b93f4b14bc5a527a330b7c
+Bottom: b9ce68c6e1cb0fcfe7357714e1ebfef12bcdb15d
+Top:    a56e016c539a26a00f6719ca5ac0b7574ce02b22
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-18 16:36:07 -0700
 
@@ -31,10 +31,10 @@ index 5310d33..87ee943 100644
  		const void *optval, socklen_t optlen);
  int rgetsockopt(int socket, int level, int optname,
 diff --git a/src/rsocket.c b/src/rsocket.c
-index de0ec3e..95957d7 100644
+index 6cf492a..9d373b9 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
-@@ -1661,6 +1661,8 @@ int rsetsockopt(int socket, int level, int optname,
+@@ -1694,6 +1694,8 @@ int rsetsockopt(int socket, int level, int optname,
  			break;
  		}
  		break;
@@ -43,7 +43,7 @@ index de0ec3e..95957d7 100644
  	default:
  		break;
  	}
-@@ -1726,6 +1728,9 @@ int rgetsockopt(int socket, int level, int optname,
+@@ -1759,6 +1761,9 @@ int rgetsockopt(int socket, int level, int optname,
  			break;
  		}
  		break;
