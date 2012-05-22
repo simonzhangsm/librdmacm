@@ -268,8 +268,15 @@ static void rs_set_qp_size(struct rsocket *rs)
 
 	if (rs->sq_size > max_size)
 		rs->sq_size = max_size;
+	else if (rs->sq_size < 2)
+		rs->sq_size = 2;
+	if (rs->sq_size <= (RS_QP_CTRL_SIZE << 2))
+		rs->ctrl_avail = 1;
+
 	if (rs->rq_size > max_size)
 		rs->rq_size = max_size;
+	else if (rs->rq_size < 2)
+		rs->rq_size = 2;
 }
 
 static int rs_init_bufs(struct rsocket *rs)
@@ -1696,15 +1703,16 @@ int rsetsockopt(int socket, int level, int optname,
 		break;
 	case SOL_RDMA:
 		if (rs->state != rs_init && rs->state != rs_bound) {
+			ret = ERR(EINVAL);
+			break;
+		}
 
 		switch (optname) {
 		case RDMA_SQSIZE:
-			*((int *) optval) = rs->sq_size;
-			*optlen = sizeof(int);
+			rs->sq_size = min((*(uint32_t *) optval), RS_QP_MAX_SIZE);
 			break;
 		case RDMA_RQSIZE:
-			*((int *) optval) = rs->rq_size;
-			*optlen = sizeof(int);
+			rs->rq_size = min((*(uint32_t *) optval), RS_QP_MAX_SIZE);
 			break;
 		default:
 			break;
@@ -1714,7 +1722,7 @@ int rsetsockopt(int socket, int level, int optname,
 		break;
 	}
 
-	if (!ret) {
+	if (!ret && opts) {
 		if (opt_on)
 			*opts |= (1 << optname);
 		else
