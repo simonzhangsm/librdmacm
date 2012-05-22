@@ -373,7 +373,6 @@ static int rs_create_ep(struct rsocket *rs)
 	qp_attr.cap.max_inline_data = RS_INLINE;
 
 	ret = rdma_create_qp(rs->cm_id, NULL, &qp_attr);
-printf("create qp %d sq %d rq %d\n", ret, rs->sq_size, rs->rq_size);
 	if (ret)
 		return ret;
 
