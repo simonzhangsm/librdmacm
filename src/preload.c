@@ -308,17 +308,11 @@ err:
  */
 void set_rsocket_options(int rsocket)
 {
-	socklen_t len;
+	if (sq_size)
+		rsetsockopt(rsocket, SOL_RDMA, RDMA_SQSIZE, &sq_size, sizeof sq_size);
 
-	if (sq_size) {
-		len = sizeof(sq_size);
-		rsetsockopt(rsocket, SOL_RDMA, RDMA_SQSIZE, &sq_size, &len);
-	}
-
-	if (rq_size) {
-		len = sizeof(rq_size);
-		rsetsockopt(rsocket, SOL_RDMA, RDMA_RQSIZE, &rq_size, &len);
-	}
+	if (rq_size)
+		rsetsockopt(rsocket, SOL_RDMA, RDMA_RQSIZE, &rq_size, sizeof rq_size);
 }
 
 int socket(int domain, int type, int protocol)
