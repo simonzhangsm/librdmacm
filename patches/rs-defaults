@@ -1,0 +1,11 @@
+Bottom: eab4fc9ba15a1131fec30f39f1adf8bc359ec9e6
+Top:    eab4fc9ba15a1131fec30f39f1adf8bc359ec9e6
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-23 10:43:09 -0700
+
+rsocket: Change default QP size
+
+
+---
+
+
