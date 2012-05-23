@@ -81,6 +81,7 @@ static int size_option;
 static int iterations = 1;
 static int transfer_size = 1000;
 static int transfer_count = 1000;
+static int buffer_size;
 static char test_name[9] = "custom";
 static char *port = "7471";
 static char *dst_addr;
@@ -353,17 +354,19 @@ static void set_options(int rs)
 	long long bytes;
 	socklen_t size;
 
-	bytes = transfer_size * transfer_count * iterations;
+	bytes = transfer_size * transfer_count;
 	for (optname = SO_SNDBUF; ; optname = SO_RCVBUF) {
 		size = sizeof val;
 		ret = rs_getsockopt(rs, SOL_SOCKET, optname, (void *) &val, &size);
 		if (ret)
 			break;
 
-		if (val < bytes) {
-			size = sizeof val;
-			val = ((val << 2) > bytes) ? bytes : (val << 2);
-			rs_setsockopt(rs, SOL_SOCKET, optname, (void *) &val, size);
+		if (val < bytes || buffer_size) {
+			size = sizeof buffer_size;
+			if (!buffer_size)
+				buffer_size = ((val << 2) > bytes) ? bytes : (val << 2);
+			rs_setsockopt(rs, SOL_SOCKET, optname,
+				      (void *) &buffer_size, size);
 		}
 
 		if (optname == SO_RCVBUF)
@@ -586,13 +589,16 @@ int main(int argc, char **argv)
 {
 	int op, ret;
 
-	while ((op = getopt(argc, argv, "s:b:I:C:S:p:T:")) != -1) {
+	while ((op = getopt(argc, argv, "s:b:B:I:C:S:p:T:")) != -1) {
 		switch (op) {
 		case 's':
 			dst_addr = optarg;
 			break;
 		case 'b':
 			src_addr = optarg;
+			break;
+		case 'B':
+			buffer_size = atoi(optarg);
 			break;
 		case 'I':
 			custom = 1;
@@ -621,6 +627,7 @@ int main(int argc, char **argv)
 			printf("usage: %s\n", argv[0]);
 			printf("\t[-s server_address]\n");
 			printf("\t[-b bind_address]\n");
+			printf("\t[-B buffer_size]\n");
 			printf("\t[-I iterations]\n");
 			printf("\t[-C transfer_count]\n");
 			printf("\t[-S transfer_size or all]\n");
