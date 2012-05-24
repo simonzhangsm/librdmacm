@@ -104,6 +104,7 @@ static inline void fastlock_release(fastlock_t *lock)
 }
 #endif /* DEFINE_ATOMICS */
 
+int ucma_max_qpsize(struct rdma_cm_id *id);
 int ucma_complete(struct rdma_cm_id *id);
 static inline int ERR(int err)
 {

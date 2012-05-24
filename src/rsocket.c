@@ -259,12 +259,9 @@ static int rs_set_nonblocking(struct rsocket *rs, long arg)
 
 static void rs_set_qp_size(struct rsocket *rs)
 {
-	struct ibv_device_attr attr;
 	uint16_t max_size;
 
-	attr.max_qp_wr = RS_QP_SIZE;
-	ibv_query_device(rs->cm_id->verbs, &attr);
-	max_size = min(attr.max_qp_wr, RS_QP_MAX_SIZE);
+	max_size = min(ucma_max_qpsize(rs->cm_id), RS_QP_MAX_SIZE);
 
 	if (rs->sq_size > max_size)
 		rs->sq_size = max_size;
