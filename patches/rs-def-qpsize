@@ -1,5 +1,5 @@
-Bottom: ea39c1575dbd9b6e9ba0aa37cb522ab1e588ebd9
-Top:    2a4a39a2e04ce447a930ae1428a06c65427fb3e3
+Bottom: 57f202420842a955995f9ec68fd2199b5bb29847
+Top:    898e03e1e730ec10d43db04f09a0325a524b9862
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-24 14:31:12 -0700
 
@@ -16,7 +16,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index b2ffeef..cd362cd 100644
+index 7107328..5bfe80d 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -54,7 +54,7 @@

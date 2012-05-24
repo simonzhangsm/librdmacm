@@ -1,6 +1,6 @@
 Version: 1
-Previous: 5c5b5f05673ffe176790675c8b4544b645e6bab6
-Head: 5d7bad8100e49be6a8002f6182023236927bbd02
+Previous: 897e7e5a824ef36f0502fd4cd1e175eecbd2b20a
+Head: b46c3ac2b3c667eb4f19eeaf210823800e624414
 Applied:
   destroy_cqs: 66410c265b2661e16b7f6126bcc4ea5c7e1af1bd
   conn-err: ac46465ae6061b06f005ba9b49b371c9eb0d2325
@@ -10,7 +10,7 @@ Applied:
   rs-opt-inline: 64d166dca8e66607f8835b43fc5d12e0ceb72d0c
   pre-qpsize: 0a9536ed345456e2bc570eba246c96a588e96ee6
   rstream-bufsize: 5d7bad8100e49be6a8002f6182023236927bbd02
+  rs-def-qpsize: b46c3ac2b3c667eb4f19eeaf210823800e624414
 Unapplied:
-  rs-def-qpsize: eff2656ded3b453944a62763ff272f0561ff7080
   rs-1sge: a16017e7efab77b492af4cc9848cc0cbef1c7aa8
 Hidden:
