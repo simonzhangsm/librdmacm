@@ -1,5 +1,5 @@
 Bottom: f1dcc179b934b653b4de6f28bbbed627b9fc6acd
-Top:    b9ce68c6e1cb0fcfe7357714e1ebfef12bcdb15d
+Top:    e59c7d297d75ab32441e4182b0c9e524692ce2c2
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-18 17:07:11 -0700
 
@@ -29,7 +29,7 @@ index 7703fe8..669b681 100644
  /*
   * Fast synchronization for low contention locking.
 diff --git a/src/rsocket.c b/src/rsocket.c
-index 01b7248..6cf492a 100644
+index 01b7248..388cf90 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -55,6 +55,8 @@
@@ -137,7 +137,7 @@ index 01b7248..6cf492a 100644
  	ret = rs_init_bufs(rs);
  	if (ret)
  		return ret;
-@@ -327,17 +359,18 @@ static int rs_create_ep(struct rsocket *rs)
+@@ -327,8 +359,8 @@ static int rs_create_ep(struct rsocket *rs)
  	qp_attr.recv_cq = rs->cm_id->recv_cq;
  	qp_attr.qp_type = IBV_QPT_RC;
  	qp_attr.sq_sig_all = 1;
@@ -148,9 +148,7 @@ index 01b7248..6cf492a 100644
  	qp_attr.cap.max_send_sge = 2;
  	qp_attr.cap.max_recv_sge = 1;
  	qp_attr.cap.max_inline_data = RS_INLINE;
- 
- 	ret = rdma_create_qp(rs->cm_id, NULL, &qp_attr);
-+printf("create qp %d sq %d rq %d\n", ret, rs->sq_size, rs->rq_size);
+@@ -337,7 +369,7 @@ static int rs_create_ep(struct rsocket *rs)
  	if (ret)
  		return ret;
  
@@ -159,7 +157,7 @@ index 01b7248..6cf492a 100644
  		ret = rdma_post_recvv(rs->cm_id, NULL, NULL, 0);
  		if (ret)
  			return ret;
-@@ -350,6 +383,9 @@ static void rs_free(struct rsocket *rs)
+@@ -350,6 +382,9 @@ static void rs_free(struct rsocket *rs)
  	if (rs->index >= 0)
  		rs_remove(rs);
  
@@ -169,7 +167,7 @@ index 01b7248..6cf492a 100644
  	if (rs->sbuf) {
  		if (rs->smr)
  			rdma_dereg_mr(rs->smr);
-@@ -383,7 +419,7 @@ static void rs_set_conn_data(struct rsocket *rs, struct rdma_conn_param *param,
+@@ -383,7 +418,7 @@ static void rs_set_conn_data(struct rsocket *rs, struct rdma_conn_param *param,
  {
  	conn->version = 1;
  	conn->flags = rs_host_is_net() ? RS_CONN_FLAG_NET : 0;
@@ -178,7 +176,7 @@ index 01b7248..6cf492a 100644
  	conn->reserved2 = 0;
  
  	conn->target_sgl.addr = htonll((uintptr_t) rs->target_sgl);
-@@ -703,7 +739,7 @@ static void rs_send_credits(struct rsocket *rs)
+@@ -703,7 +738,7 @@ static void rs_send_credits(struct rsocket *rs)
  	struct rs_sge sge;
  
  	rs->ctrl_avail--;
@@ -187,7 +185,7 @@ index 01b7248..6cf492a 100644
  	if (rs->rbuf_bytes_avail >= (rs->rbuf_size >> 1)) {
  		if (!(rs->opts & RS_OPT_SWAP_SGL)) {
  			sge.addr = (uintptr_t) &rs->rbuf[rs->rbuf_free_offset];
-@@ -720,7 +756,7 @@ static void rs_send_credits(struct rsocket *rs)
+@@ -720,7 +755,7 @@ static void rs_send_credits(struct rsocket *rs)
  		ibsge.length = sizeof(sge);
  
  		rs_post_write(rs, 0, &ibsge, 1,
@@ -196,7 +194,7 @@ index 01b7248..6cf492a 100644
  			      IBV_SEND_INLINE,
  			      rs->remote_sgl.addr +
  			      rs->remote_sge * sizeof(struct rs_sge),
-@@ -734,7 +770,7 @@ static void rs_send_credits(struct rsocket *rs)
+@@ -734,7 +769,7 @@ static void rs_send_credits(struct rsocket *rs)
  			rs->remote_sge = 0;
  	} else {
  		rs_post_write(rs, 0, NULL, 0,
@@ -205,7 +203,7 @@ index 01b7248..6cf492a 100644
  	}
  }
  
-@@ -778,7 +814,7 @@ static int rs_poll_cq(struct rsocket *rs)
+@@ -778,7 +813,7 @@ static int rs_poll_cq(struct rsocket *rs)
  			default:
  				rs->rmsg[rs->rmsg_tail].op = rs_msg_op(imm_data);
  				rs->rmsg[rs->rmsg_tail].data = rs_msg_data(imm_data);
@@ -214,7 +212,7 @@ index 01b7248..6cf492a 100644
  					rs->rmsg_tail = 0;
  				break;
  			}
-@@ -920,7 +956,7 @@ static int rs_have_rdata(struct rsocket *rs)
+@@ -920,7 +955,7 @@ static int rs_have_rdata(struct rsocket *rs)
  
  static int rs_all_sends_done(struct rsocket *rs)
  {
@@ -223,7 +221,7 @@ index 01b7248..6cf492a 100644
  }
  
  static ssize_t rs_peek(struct rsocket *rs, void *buf, size_t len)
-@@ -937,7 +973,7 @@ static ssize_t rs_peek(struct rsocket *rs, void *buf, size_t len)
+@@ -937,7 +972,7 @@ static ssize_t rs_peek(struct rsocket *rs, void *buf, size_t len)
  			rsize = left;
  		} else {
  			rsize = rs->rmsg[rmsg_head].data;
@@ -232,7 +230,7 @@ index 01b7248..6cf492a 100644
  				rmsg_head = 0;
  		}
  
-@@ -998,7 +1034,7 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
+@@ -998,7 +1033,7 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
  		} else {
  			rs->rseq_no++;
  			rsize = rs->rmsg[rs->rmsg_head].data;
