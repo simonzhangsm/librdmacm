@@ -1,0 +1,20 @@
+Bottom: b9ce68c6e1cb0fcfe7357714e1ebfef12bcdb15d
+Top:    e59c7d297d75ab32441e4182b0c9e524692ce2c2
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-24 14:24:55 -0700
+
+Refresh of rs-qpsize
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 6cf492a..388cf90 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -366,7 +366,6 @@ static int rs_create_ep(struct rsocket *rs)
+ 	qp_attr.cap.max_inline_data = RS_INLINE;
+ 
+ 	ret = rdma_create_qp(rs->cm_id, NULL, &qp_attr);
+-printf("create qp %d sq %d rq %d\n", ret, rs->sq_size, rs->rq_size);
+ 	if (ret)
+ 		return ret;
