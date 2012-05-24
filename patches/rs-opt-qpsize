@@ -1,4 +1,4 @@
-Bottom: a56e016c539a26a00f6719ca5ac0b7574ce02b22
+Bottom: 720643e5aab06d22102e65d1e8b2d0dda9a83c98
 Top:    a49d0e144acdded02c6f0d1bcaf6b39d0f7c3965
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-18 16:56:15 -0700
@@ -49,7 +49,7 @@ index 669b681..fc97ad5 100644
  
  /*
 diff --git a/src/rsocket.c b/src/rsocket.c
-index 9d373b9..527c0dc 100644
+index 9efdbfa..527c0dc 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -268,8 +268,15 @@ static void rs_set_qp_size(struct rsocket *rs)
@@ -68,15 +68,7 @@ index 9d373b9..527c0dc 100644
  }
  
  static int rs_init_bufs(struct rsocket *rs)
-@@ -366,7 +373,6 @@ static int rs_create_ep(struct rsocket *rs)
- 	qp_attr.cap.max_inline_data = RS_INLINE;
- 
- 	ret = rdma_create_qp(rs->cm_id, NULL, &qp_attr);
--printf("create qp %d sq %d rq %d\n", ret, rs->sq_size, rs->rq_size);
- 	if (ret)
- 		return ret;
- 
-@@ -1695,12 +1701,27 @@ int rsetsockopt(int socket, int level, int optname,
+@@ -1694,12 +1701,27 @@ int rsetsockopt(int socket, int level, int optname,
  		}
  		break;
  	case SOL_RDMA:
@@ -105,7 +97,7 @@ index 9d373b9..527c0dc 100644
  		if (opt_on)
  			*opts |= (1 << optname);
  		else
-@@ -1762,7 +1783,19 @@ int rgetsockopt(int socket, int level, int optname,
+@@ -1761,7 +1783,19 @@ int rgetsockopt(int socket, int level, int optname,
  		}
  		break;
  	case SOL_RDMA:
