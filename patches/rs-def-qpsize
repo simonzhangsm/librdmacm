@@ -1,5 +1,5 @@
 Bottom: ea39c1575dbd9b6e9ba0aa37cb522ab1e588ebd9
-Top:    ea39c1575dbd9b6e9ba0aa37cb522ab1e588ebd9
+Top:    2a4a39a2e04ce447a930ae1428a06c65427fb3e3
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-24 14:31:12 -0700
 
@@ -15,4 +15,16 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 ---
 
-
+diff --git a/src/rsocket.c b/src/rsocket.c
+index b2ffeef..cd362cd 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -54,7 +54,7 @@
+ #define RS_INLINE 64
+ #define RS_OLAP_START_SIZE 2048
+ #define RS_MAX_TRANSFER 65536
+-#define RS_QP_SIZE 512
++#define RS_QP_SIZE 384
+ #define RS_QP_MAX_SIZE 0xFFFE
+ #define RS_QP_MIN_SIZE 8
+ #define RS_QP_CTRL_SIZE 4
