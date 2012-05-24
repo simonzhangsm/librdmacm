@@ -1,0 +1,21 @@
+Bottom: 2a4a39a2e04ce447a930ae1428a06c65427fb3e3
+Top:    2a4a39a2e04ce447a930ae1428a06c65427fb3e3
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-24 14:36:41 -0700
+
+rsocket: Reduce SQ from 2 SGE per WR to 1 SGE
+
+We currently request 2 SGEs per WR when allocating a QP.  The
+second SGE is only used when sending data at the end of
+the circular send buffer and the start.  All other sends are
+restricted to a single SGE.
+
+Reduce the size of the SQ by only requesting 1 SGE per WR.  The
+resulting performance is basically unaffected.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
