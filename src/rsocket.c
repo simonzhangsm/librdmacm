@@ -90,6 +90,10 @@ enum {
 #define rs_msg_op(imm_data)   (imm_data >> 29)
 #define rs_msg_data(imm_data) (imm_data & 0x1FFFFFFF)
 
+#define rs_wrid_set(sqe, length) ((((uint64_t) sqe) << 32) | ((uint64_t) length))
+#define rs_wrid_len(wrid)        ((uint32_t) wrid)
+#define rs_wrid_sqe(wrid)        1
+
 enum {
 	RS_CTRL_DISCONNECT
 };
@@ -115,14 +119,6 @@ struct rs_conn_data {
 	uint32_t	  reserved2;
 	struct rs_sge	  target_sgl;
 	struct rs_sge	  data_buf;
-};
-
-union rs_wr_id {
-	uint64_t	  wr_id;
-	struct {
-		uint32_t  reserved; /* sqe_count; */
-		uint32_t  length;
-	};
 };
 
 enum rs_state {
@@ -192,16 +188,6 @@ struct rsocket {
 	uint8_t		  *sbuf;
 };
 
-/*
- * We currently generate a completion per send.  sqe_count = 1
- */
-static union rs_wr_id rs_wrid(uint32_t sqe_count, uint32_t length)
-{
-	union rs_wr_id wrid;
-	/* wrid.reserved = sqe_count; */
-	wrid.length = length;
-	return wrid;
-}
 
 static int rs_insert(struct rsocket *rs)
 {
@@ -729,7 +715,7 @@ static int rs_write_data(struct rsocket *rs, struct ibv_sge *sge, int flags)
 			rs->target_sge = 0;
 	}
 
-	return rs_post_write(rs, rs_wrid(1, len), sge, 1,
+	return rs_post_write(rs, rs_wrid_set(1, len), sge, 1,
 			     rs_msg_set(RS_OP_DATA, len), flags, addr, rkey);
 }
 
@@ -796,7 +782,6 @@ static void rs_update_credits(struct rsocket *rs)
 static int rs_poll_cq(struct rsocket *rs)
 {
 	struct ibv_wc wc;
-	union rs_wr_id *wr_id;
 	uint32_t imm_data;
 	int ret, rcnt = 0;
 
@@ -826,9 +811,8 @@ static int rs_poll_cq(struct rsocket *rs)
 			}
 		} else {
 			if (wc.wr_id) {
-				wr_id = (union rs_wr_id *) &wc.wr_id;
-				rs->sqe_avail++; /* += wr_id->sqe_count; */
-				rs->sbuf_bytes_avail += wr_id->length;
+				rs->sqe_avail += rs_wrid_sqe(wc.wr_id);
+				rs->sbuf_bytes_avail += rs_wrid_len(wc.wr_id);
 			} else {
 				rs->ctrl_avail++;
 			}
