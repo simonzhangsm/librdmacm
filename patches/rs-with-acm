@@ -1,0 +1,33 @@
+Bottom: caec06cc45592384f2a93faf3ca4f4571b1481ff
+Top:    caec06cc45592384f2a93faf3ca4f4571b1481ff
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-25 10:48:47 -0700
+
+librdmacm: Delay ACM connection until resolving an address
+
+When ACM support is enabled, the librdmacm will attempt to connect
+to the ACM service during startup.  This results in the library
+hanging when rsockets are being used with the rs-preload library.
+The code path ends up as:
+
+socket() -> rs-preload redirects to rsocket()
+rsocket() -> rdma_create_id() -> ucma_init()
+ucma_init() acquires mutex -> calls socket()
+rs-preload() redirects call to rsocket()
+rsocket() -> rdma_create_id() -> ucma_init()
+ucma_init() hangs trying to acquire mutex
+
+This problem was pointed out by Chet Murthy <chet@watson.ibm.com>.
+
+To fix this, delay connecting to the ACM service until it's
+actually needed.  This not only avoids the hang described above,
+but also avoids creating a connection to the ACM service when
+it's not needed.  For example, if the user of the librdmacm
+is a server application, it will not use ACM services.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
