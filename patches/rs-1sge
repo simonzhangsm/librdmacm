@@ -1,5 +1,5 @@
-Bottom: 61815c9c6be5c0fd87efa33cd65cf62d617d31ce
-Top:    caec06cc45592384f2a93faf3ca4f4571b1481ff
+Bottom: 2a51ba0fed23a52fb97016bff7c9cc4709161669
+Top:    d9f71663831d923b2f7d378703d0d3d42669945e
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-24 14:36:41 -0700
 
@@ -19,7 +19,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index 8a3fc60..6bc02f7 100644
+index 5c3567c..378afd7 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -90,6 +90,10 @@ enum {
