@@ -1,5 +1,5 @@
 Bottom: 22dba9ff4798f0e5dc6b0a6098d085802709dc9b
-Top:    b2f7b658fae5c5c1a2c58c096c1807cee9423a00
+Top:    5199b5ada6f1b889fa1fc1adcf706f7763463556
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-25 10:48:47 -0700
 
@@ -15,10 +15,10 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/acm.c b/src/acm.c
-index 9c65919..d59efcf 100755
+index 9c65919..e9733c6 100755
 --- a/src/acm.c
 +++ b/src/acm.c
-@@ -86,15 +86,20 @@ static void ucma_set_server_port(void)
+@@ -86,29 +86,33 @@ static void ucma_set_server_port(void)
  	}
  }
  
@@ -37,26 +37,26 @@ index 9c65919..d59efcf 100755
  	sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
  	if (sock < 0)
 -		return;
-+		goto err1;
++		goto out;
  
  	memset(&addr, 0, sizeof addr);
  	addr.sin_family = AF_INET;
-@@ -102,13 +107,18 @@ void ucma_ib_init(void)
+ 	addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
  	addr.sin_port = htons(server_port);
  	ret = connect(sock, (struct sockaddr *) &addr, sizeof(addr));
- 	if (ret)
+-	if (ret)
 -		goto err;
-+		goto err2;
- 
-+	init = 1;
-+	pthread_mutex_unlock(&acm_lock);
- 	return;
- 
+-
+-	return;
+-
 -err:
-+err2:
- 	close(sock);
- 	sock = -1;
-+err1:
+-	close(sock);
+-	sock = -1;
++	if (ret) {
++		close(sock);
++		sock = -1;
++	}
++out:
 +	init = 1;
 +	pthread_mutex_unlock(&acm_lock);
  }
