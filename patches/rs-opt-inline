@@ -1,5 +1,5 @@
 Bottom: 16a8e9dc8e491e8a1acc2dd1277c10368616ae9b
-Top:    20d0bff459590313535e98a0130a647140ecec97
+Top:    91bc251274c1981812043d3cd8e2e72a431611d3
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-22 11:39:21 -0700
 
@@ -29,14 +29,14 @@ index 9fd9929..65feda9 100644
  
  int rsetsockopt(int socket, int level, int optname,
 diff --git a/src/rsocket.c b/src/rsocket.c
-index 9c90d18..7802ef5 100644
+index 9c90d18..5845ca9 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -105,6 +105,7 @@ struct rs_sge {
  	uint32_t length;
  };
  
-+#define RS_INLINE_MIN    (sizeof(struct rs_sge))
++#define RS_MIN_INLINE    (sizeof(struct rs_sge))
  #define rs_host_is_net() (1 == htonl(1))
  #define RS_CONN_FLAG_NET 1
  
@@ -104,8 +104,8 @@ index 9c90d18..7802ef5 100644
  			break;
 +		case RDMA_INLINE:
 +			rs->sq_inline = min(*(uint32_t *) optval, RS_QP_MAX_SIZE);
-+			if (rs->sq_inline < RS_INLINE_MIN)
-+				rs->sq_inline = RS_INLINE_MIN;
++			if (rs->sq_inline < RS_MIN_INLINE)
++				rs->sq_inline = RS_MIN_INLINE;
 +			break;
  		default:
  			break;
