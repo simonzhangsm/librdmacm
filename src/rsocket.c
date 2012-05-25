@@ -105,7 +105,7 @@ struct rs_sge {
 	uint32_t length;
 };
 
-#define RS_INLINE_MIN    (sizeof(struct rs_sge))
+#define RS_MIN_INLINE    (sizeof(struct rs_sge))
 #define rs_host_is_net() (1 == htonl(1))
 #define RS_CONN_FLAG_NET 1
 
@@ -1716,8 +1716,8 @@ int rsetsockopt(int socket, int level, int optname,
 			break;
 		case RDMA_INLINE:
 			rs->sq_inline = min(*(uint32_t *) optval, RS_QP_MAX_SIZE);
-			if (rs->sq_inline < RS_INLINE_MIN)
-				rs->sq_inline = RS_INLINE_MIN;
+			if (rs->sq_inline < RS_MIN_INLINE)
+				rs->sq_inline = RS_MIN_INLINE;
 			break;
 		default:
 			break;
