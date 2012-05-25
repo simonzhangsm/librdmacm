@@ -99,24 +99,18 @@ void ucma_acm_init(void)
 	ucma_set_server_port();
 	sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (sock < 0)
-		goto err1;
+		goto out;
 
 	memset(&addr, 0, sizeof addr);
 	addr.sin_family = AF_INET;
 	addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 	addr.sin_port = htons(server_port);
 	ret = connect(sock, (struct sockaddr *) &addr, sizeof(addr));
-	if (ret)
-		goto err2;
-
-	init = 1;
-	pthread_mutex_unlock(&acm_lock);
-	return;
-
-err2:
-	close(sock);
-	sock = -1;
-err1:
+	if (ret) {
+		close(sock);
+		sock = -1;
+	}
+out:
 	init = 1;
 	pthread_mutex_unlock(&acm_lock);
 }
