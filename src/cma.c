@@ -128,7 +128,7 @@ int af_ib_support;
 
 static void ucma_cleanup(void)
 {
-	ucma_acm_cleanup();
+	ucma_ib_cleanup();
 
 	if (cma_dev_cnt) {
 		while (cma_dev_cnt--) {

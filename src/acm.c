@@ -86,7 +86,7 @@ static void ucma_set_server_port(void)
 	}
 }
 
-void ucma_acm_init(void)
+void ucma_ib_init(void)
 {
 	struct sockaddr_in addr;
 	static int init;
