@@ -128,7 +128,7 @@ int af_ib_support;
 
 static void ucma_cleanup(void)
 {
-	ucma_ib_cleanup();
+	ucma_acm_cleanup();
 
 	if (cma_dev_cnt) {
 		while (cma_dev_cnt--) {
@@ -274,8 +274,6 @@ int ucma_init(void)
 		ib += (cma_dev->verbs->device->transport_type == IBV_TRANSPORT_IB);
 	}
 
-	if (ib)
-		ucma_ib_init();
 	cma_dev_cnt = dev_cnt;
 	ucma_set_af_ib_support();
 	pthread_mutex_unlock(&mut);
