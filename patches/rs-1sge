@@ -1,5 +1,5 @@
-Bottom: 898e03e1e730ec10d43db04f09a0325a524b9862
-Top:    4366b7bab4d145e235350bffd2e1ce8ab60b8485
+Bottom: 61815c9c6be5c0fd87efa33cd65cf62d617d31ce
+Top:    caec06cc45592384f2a93faf3ca4f4571b1481ff
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-24 14:36:41 -0700
 
@@ -19,7 +19,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index 5bfe80d..5dff5df 100644
+index 8a3fc60..6bc02f7 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -90,6 +90,10 @@ enum {
@@ -33,7 +33,7 @@ index 5bfe80d..5dff5df 100644
  enum {
  	RS_CTRL_DISCONNECT
  };
-@@ -117,14 +121,6 @@ struct rs_conn_data {
+@@ -118,14 +122,6 @@ struct rs_conn_data {
  	struct rs_sge	  data_buf;
  };
  
@@ -48,7 +48,7 @@ index 5bfe80d..5dff5df 100644
  enum rs_state {
  	rs_init,
  	rs_bound,
-@@ -188,20 +184,10 @@ struct rsocket {
+@@ -189,20 +185,10 @@ struct rsocket {
  
  	uint32_t	  sbuf_size;
  	struct ibv_mr	 *smr;
@@ -70,7 +70,7 @@ index 5bfe80d..5dff5df 100644
  
  static int rs_insert(struct rsocket *rs)
  {
-@@ -306,9 +292,9 @@ static int rs_init_bufs(struct rsocket *rs)
+@@ -307,9 +293,9 @@ static int rs_init_bufs(struct rsocket *rs)
  	if (!rs->rmr)
  		return -1;
  
@@ -82,7 +82,7 @@ index 5bfe80d..5dff5df 100644
  
  	rs->rbuf_free_offset = rs->rbuf_size >> 1;
  	rs->rbuf_bytes_avail = rs->rbuf_size >> 1;
-@@ -368,7 +354,7 @@ static int rs_create_ep(struct rsocket *rs)
+@@ -369,7 +355,7 @@ static int rs_create_ep(struct rsocket *rs)
  	qp_attr.sq_sig_all = 1;
  	qp_attr.cap.max_send_wr = rs->sq_size;
  	qp_attr.cap.max_recv_wr = rs->rq_size;
@@ -91,7 +91,7 @@ index 5bfe80d..5dff5df 100644
  	qp_attr.cap.max_recv_sge = 1;
  	qp_attr.cap.max_inline_data = rs->sq_inline;
  
-@@ -708,35 +694,35 @@ static int rs_post_write(struct rsocket *rs, uint64_t wr_id,
+@@ -709,35 +695,35 @@ static int rs_post_write(struct rsocket *rs, uint64_t wr_id,
   * Update target SGE before sending data.  Otherwise the remote side may
   * update the entry before we do.
   */
@@ -135,7 +135,7 @@ index 5bfe80d..5dff5df 100644
  }
  
  static void rs_send_credits(struct rsocket *rs)
-@@ -796,7 +782,6 @@ static void rs_update_credits(struct rsocket *rs)
+@@ -797,7 +783,6 @@ static void rs_update_credits(struct rsocket *rs)
  static int rs_poll_cq(struct rsocket *rs)
  {
  	struct ibv_wc wc;
@@ -143,7 +143,7 @@ index 5bfe80d..5dff5df 100644
  	uint32_t imm_data;
  	int ret, rcnt = 0;
  
-@@ -826,9 +811,8 @@ static int rs_poll_cq(struct rsocket *rs)
+@@ -827,9 +812,8 @@ static int rs_poll_cq(struct rsocket *rs)
  			}
  		} else {
  			if (wc.wr_id) {
@@ -155,7 +155,7 @@ index 5bfe80d..5dff5df 100644
  			} else {
  				rs->ctrl_avail++;
  			}
-@@ -1143,34 +1127,22 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
+@@ -1144,34 +1128,22 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
  			xfer_size = rs->sbuf_bytes_avail;
  		if (xfer_size > rs->target_sgl[rs->target_sge].length)
  			xfer_size = rs->target_sgl[rs->target_sge].length;
@@ -199,7 +199,7 @@ index 5bfe80d..5dff5df 100644
  		}
  		if (ret)
  			break;
-@@ -1252,33 +1224,21 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
+@@ -1253,33 +1225,21 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
  			xfer_size = rs->sbuf_bytes_avail;
  		if (xfer_size > rs->target_sgl[rs->target_sge].length)
  			xfer_size = rs->target_sgl[rs->target_sge].length;
