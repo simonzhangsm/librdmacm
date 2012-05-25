@@ -1,0 +1,16 @@
+Bottom: caec06cc45592384f2a93faf3ca4f4571b1481ff
+Top:    caec06cc45592384f2a93faf3ca4f4571b1481ff
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-25 12:23:10 -0700
+
+acm: Use -1 to indicate an invalid socket rather than 0
+
+socket() can return 0 as a valid socket.  This can happen
+when using a daemon that closes stdin/out/err.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
