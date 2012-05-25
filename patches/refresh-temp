@@ -1,0 +1,68 @@
+Bottom: 5199b5ada6f1b889fa1fc1adcf706f7763463556
+Top:    5d0cd1d6fe30d4be6e9911b62dee6a220b010988
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-25 12:32:48 -0700
+
+Refresh of rs-with-acm
+
+---
+
+diff --git a/src/acm.c b/src/acm.c
+index e9733c6..5bdeb88 100755
+--- a/src/acm.c
++++ b/src/acm.c
+@@ -86,7 +86,7 @@ static void ucma_set_server_port(void)
+ 	}
+ }
+ 
+-void ucma_acm_init(void)
++void ucma_ib_init(void)
+ {
+ 	struct sockaddr_in addr;
+ 	static int init;
+diff --git a/src/addrinfo.c b/src/addrinfo.c
+index 573fb42..2da35f0 100755
+--- a/src/addrinfo.c
++++ b/src/addrinfo.c
+@@ -231,7 +231,7 @@ int rdma_getaddrinfo(char *node, char *service,
+ 	}
+ 
+ 	if (!(rai->ai_flags & RAI_PASSIVE))
+-		ucma_acm_resolve(&rai, hints);
++		ucma_ib_resolve(&rai, hints);
+ 
+ 	*res = rai;
+ 	return 0;
+diff --git a/src/cma.c b/src/cma.c
+index c0cd407..f688c4c 100755
+--- a/src/cma.c
++++ b/src/cma.c
+@@ -128,7 +128,7 @@ int af_ib_support;
+ 
+ static void ucma_cleanup(void)
+ {
+-	ucma_acm_cleanup();
++	ucma_ib_cleanup();
+ 
+ 	if (cma_dev_cnt) {
+ 		while (cma_dev_cnt--) {
+diff --git a/src/cma.h b/src/cma.h
+index c673bda..2ee4767 100644
+--- a/src/cma.h
++++ b/src/cma.h
+@@ -119,11 +119,11 @@ extern int af_ib_support;
+ #define RAI_ROUTEONLY		0x01000000
+ 
+ #ifdef USE_IB_ACM
+-void ucma_acm_cleanup();
+-void ucma_acm_resolve(struct rdma_addrinfo **rai, struct rdma_addrinfo *hints);
++void ucma_ib_cleanup();
++void ucma_ib_resolve(struct rdma_addrinfo **rai, struct rdma_addrinfo *hints);
+ #else
+-#define ucma_acm_cleanup()
+-#define ucma_acm_resolve(x, y)
++#define ucma_ib_cleanup()
++#define ucma_ib_resolve(x, y)
+ #endif
+ 
+ /* Define path record definition if using older version of libibverbs */
