@@ -1,4 +1,4 @@
-Bottom: c58ea3b37fe60b0c5e9428c832a1471dfb999868
+Bottom: 22dba9ff4798f0e5dc6b0a6098d085802709dc9b
 Top:    b2f7b658fae5c5c1a2c58c096c1807cee9423a00
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-25 10:48:47 -0700
@@ -119,44 +119,3 @@ index 2f5215c..c673bda 100644
  #endif
  
  /* Define path record definition if using older version of libibverbs */
-diff --git a/src/rsocket.c b/src/rsocket.c
-index 6bc02f7..5eec5d9 100644
---- a/src/rsocket.c
-+++ b/src/rsocket.c
-@@ -51,7 +51,6 @@
- #include "cma.h"
- #include "indexer.h"
- 
--#define RS_INLINE 64
- #define RS_OLAP_START_SIZE 2048
- #define RS_MAX_TRANSFER 65536
- #define RS_QP_SIZE 384
-@@ -109,7 +108,7 @@ struct rs_sge {
- 	uint32_t length;
- };
- 
--#define RS_INLINE_MIN    (sizeof(struct rs_sge))
-+#define RS_MIN_INLINE    (sizeof(struct rs_sge))
- #define rs_host_is_net() (1 == htonl(1))
- #define RS_CONN_FLAG_NET 1
- 
-@@ -223,7 +222,7 @@ static struct rsocket *rs_alloc(struct rsocket *inherited_rs)
- 		rs->ctrl_avail = inherited_rs->ctrl_avail;
- 	} else {
- 		rs->sbuf_size = rs->rbuf_size = RS_BUF_SIZE;
--		rs->sq_inline = RS_INLINE;
-+		rs->sq_inline = RS_MIN_INLINE;
- 		rs->sq_size = rs->rq_size = RS_QP_SIZE;
- 		rs->ctrl_avail = RS_QP_CTRL_SIZE;
- 	}
-@@ -1676,8 +1675,8 @@ int rsetsockopt(int socket, int level, int optname,
- 			break;
- 		case RDMA_INLINE:
- 			rs->sq_inline = min(*(uint32_t *) optval, RS_QP_MAX_SIZE);
--			if (rs->sq_inline < RS_INLINE_MIN)
--				rs->sq_inline = RS_INLINE_MIN;
-+			if (rs->sq_inline < RS_MIN_INLINE)
-+				rs->sq_inline = RS_MIN_INLINE;
- 			break;
- 		default:
- 			break;
