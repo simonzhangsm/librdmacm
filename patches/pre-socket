@@ -1,5 +1,5 @@
 Bottom: 5d0cd1d6fe30d4be6e9911b62dee6a220b010988
-Top:    5d0cd1d6fe30d4be6e9911b62dee6a220b010988
+Top:    28282e93e467479cf3f579a318609dcce14734ca
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-25 12:42:12 -0700
 
@@ -30,4 +30,39 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 ---
 
-
+diff --git a/src/preload.c b/src/preload.c
+index a3ef488..d21389f 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -325,22 +325,28 @@ void set_rsocket_options(int rsocket)
+ 
+ int socket(int domain, int type, int protocol)
+ {
++	static __thread int recursive;
+ 	int index, ret;
+ 
++	if (recursive)
++		goto real;
++
+ 	init_preload();
+ 	index = fd_open();
+ 	if (index < 0)
+ 		return index;
+ 
++	recursive = 1;
+ 	ret = rsocket(domain, type, protocol);
++	recursive = 0;
+ 	if (ret >= 0) {
+ 		fd_store(index, ret, fd_rsocket);
+ 		set_rsocket_options(ret);
+ 		return index;
+-	} else {
+-		fd_close(index, &ret);
+-		return real_socket(domain, type, protocol);
+ 	}
++	fd_close(index, &ret);
++real:
++	return real_socket(domain, type, protocol);
+ }
+ 
+ int bind(int socket, const struct sockaddr *addr, socklen_t addrlen)
