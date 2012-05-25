@@ -51,7 +51,6 @@
 #include "cma.h"
 #include "indexer.h"
 
-#define RS_INLINE 64
 #define RS_OLAP_START_SIZE 2048
 #define RS_MAX_TRANSFER 65536
 #define RS_QP_SIZE 384
@@ -223,7 +222,7 @@ static struct rsocket *rs_alloc(struct rsocket *inherited_rs)
 		rs->ctrl_avail = inherited_rs->ctrl_avail;
 	} else {
 		rs->sbuf_size = rs->rbuf_size = RS_BUF_SIZE;
-		rs->sq_inline = RS_INLINE;
+		rs->sq_inline = RS_MIN_INLINE;
 		rs->sq_size = rs->rq_size = RS_QP_SIZE;
 		rs->ctrl_avail = RS_QP_CTRL_SIZE;
 	}
