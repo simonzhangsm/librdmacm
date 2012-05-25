@@ -1,0 +1,28 @@
+Bottom: caec06cc45592384f2a93faf3ca4f4571b1481ff
+Top:    caec06cc45592384f2a93faf3ca4f4571b1481ff
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-24 18:18:43 -0700
+
+rsockets: Reduce the default inline size
+
+Inline data consumes the same space used by the SGL.  Since
+we reduced the default number of SGEs per SQ entry to 1,
+also reduce the default inline data size to 16 bytes.
+Otherwise, the SQ size won't actually be reduced.
+
+Although this increases the latency of small messages over
+16 bytes, tests show that decreasing the inline data size
+from 64 bytes to 32 or 16 bytes improves large message
+bandwidth 8-10%.
+
+Sample rstream 64k_bw test results:
+
+inline size 64: 24.85 Gbps
+inline size 16: 26.5  Gbps
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
