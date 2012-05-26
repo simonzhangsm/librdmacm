@@ -1,0 +1,13 @@
+Bottom: 28282e93e467479cf3f579a318609dcce14734ca
+Top:    28282e93e467479cf3f579a318609dcce14734ca
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-25 17:28:44 -0700
+
+rsockets: Simplify state checks
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
