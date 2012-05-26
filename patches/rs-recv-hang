@@ -1,5 +1,5 @@
 Bottom: 28282e93e467479cf3f579a318609dcce14734ca
-Top:    28282e93e467479cf3f579a318609dcce14734ca
+Top:    2cbfe934aee51df6666ab0f513aab62c0aeaff98
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-25 17:24:08 -0700
 
@@ -16,4 +16,37 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 ---
 
-
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 5eec5d9..dc6fc70 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -121,6 +121,9 @@ struct rs_conn_data {
+ 	struct rs_sge	  data_buf;
+ };
+ 
++/*
++ * rsocket states are ordered as connecting, connected, disconnected.
++ */
+ enum rs_state {
+ 	rs_init,
+ 	rs_bound,
+@@ -994,9 +997,7 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
+ 	int ret;
+ 
+ 	rs = idm_at(&idm, socket);
+-	if (rs->state != rs_connected &&
+-	    (rs->state == rs_resolving_addr || rs->state == rs_resolving_route ||
+-	     rs->state == rs_connecting || rs->state ==	rs_accepting)) {
++	if (rs->state < rs_connected) {
+ 		ret = rs_do_connect(rs);
+ 		if (ret) {
+ 			if (errno == EINPROGRESS)
+@@ -1098,7 +1099,7 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
+ 	int ret = 0;
+ 
+ 	rs = idm_at(&idm, socket);
+-	if (rs->state != rs_connected) {
++	if (rs->state < rs_connected) {
+ 		ret = rs_do_connect(rs);
+ 		if (ret) {
+ 			if (errno == EINPROGRESS)
