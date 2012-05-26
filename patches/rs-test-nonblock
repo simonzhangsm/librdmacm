@@ -1,5 +1,5 @@
 Bottom: 21cab4e0e2179a70e55cee483fbfdabf4510108a
-Top:    b452542d870c8ae024fd480fbe6360287817d32e
+Top:    86e5e112853183811513580d4dcba4fa3747c32e
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-26 00:02:47 -0700
 
@@ -25,7 +25,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index 70d0c46..c8332fe 100644
+index 70d0c46..8cffc66 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -871,24 +871,29 @@ static int rs_get_cq_event(struct rsocket *rs)
@@ -68,8 +68,20 @@ index 70d0c46..c8332fe 100644
  			rs->cq_armed = 1;
  		} else {
  			rs_update_credits(rs);
-@@ -939,7 +944,7 @@ static int rs_can_send(struct rsocket *rs)
+@@ -937,9 +942,19 @@ static int rs_can_send(struct rsocket *rs)
+ 	       (rs->target_sgl[rs->target_sge].length != 0);
+ }
  
++static int rs_cq_can_send(struct rsocket *rs)
++{
++	if (rs_can_send(rs))
++		return 0;
++	else if (rs_nonblocking(rs))
++		return ERR(EWOULDBLOCK);
++	else
++		return 1;
++}
++
  static int rs_can_send_ctrl(struct rsocket *rs)
  {
 -	return rs->ctrl_avail;
@@ -77,7 +89,55 @@ index 70d0c46..c8332fe 100644
  }
  
  static int rs_have_rdata(struct rsocket *rs)
-@@ -1537,8 +1542,8 @@ int rshutdown(int socket, int how)
+@@ -947,9 +962,19 @@ static int rs_have_rdata(struct rsocket *rs)
+ 	return (rs->rmsg_head != rs->rmsg_tail);
+ }
+ 
++static int rs_cq_have_rdata(struct rsocket *rs)
++{
++	if (rs_have_rdata(rs))
++		return 0;
++	else if (rs_nonblocking(rs))
++		return ERR(EWOULDBLOCK);
++	else
++		return 1;
++}
++
+ static int rs_all_sends_done(struct rsocket *rs)
+ {
+-	return (rs->sqe_avail + rs->ctrl_avail) == rs->sq_size;
++	return (rs->sqe_avail + rs->ctrl_avail) != rs->sq_size;
+ }
+ 
+ static ssize_t rs_peek(struct rsocket *rs, void *buf, size_t len)
+@@ -1007,7 +1032,7 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
+ 	}
+ 	fastlock_acquire(&rs->rlock);
+ 	if (!rs_have_rdata(rs)) {
+-		ret = rs_process_cq(rs, rs_nonblocking(rs, flags), rs_have_rdata);
++		ret = rs_process_cq(rs, rs_cq_have_rdata);
+ 		if (ret && errno != ECONNRESET)
+ 			goto out;
+ 	}
+@@ -1111,7 +1136,7 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
+ 	fastlock_acquire(&rs->slock);
+ 	for (left = len; left; left -= xfer_size, buf += xfer_size) {
+ 		if (!rs_can_send(rs)) {
+-			ret = rs_process_cq(rs, rs_nonblocking(rs, flags), rs_can_send);
++			ret = rs_process_cq(rs, rs_cq_can_send);
+ 			if (ret)
+ 				break;
+ 		}
+@@ -1208,7 +1233,7 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
+ 	fastlock_acquire(&rs->slock);
+ 	for (left = len; left; left -= xfer_size) {
+ 		if (!rs_can_send(rs)) {
+-			ret = rs_process_cq(rs, rs_nonblocking(rs, flags), rs_can_send);
++			ret = rs_process_cq(rs, rs_cq_can_send);
+ 			if (ret)
+ 				break;
+ 		}
+@@ -1537,8 +1562,8 @@ int rshutdown(int socket, int how)
  
  	if (rs->state == rs_connected) {
  		rs->state = rs_disconnected;
@@ -88,3 +148,14 @@ index 70d0c46..c8332fe 100644
  			if (ret)
  				return ret;
  		}
+@@ -1549,8 +1574,8 @@ int rshutdown(int socket, int how)
+ 				    0, 0, 0);
+ 	}
+ 
+-	if (!rs_all_sends_done(rs) && rs->state != rs_error)
+-		rs_process_cq(rs, 0, rs_all_sends_done);
++	if (rs_all_sends_done(rs) && rs->state != rs_error)
++		rs_process_cq(rs, rs_all_sends_done);
+ 
+ 	return 0;
+ }
