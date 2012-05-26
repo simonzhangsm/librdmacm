@@ -3,14 +3,15 @@ Top:    a9bac6f88801ea442e2b5d0736b252bd4e10d3f7
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-25 17:24:08 -0700
 
-rsocket: Fix hang in rrecv() after disconnecting
+rsocket: Fix hang in rrecv/rsend after disconnecting
 
 If a user calls rrecv() after a blocking rsocket has been disconnected,
-it will hang.  This problem was reported by Sirdhar Samudrala
+it will hang.  This problem and the cause was reported by Sirdhar Samudrala
 <samudrala@us.ibm.com>.  It can be reproduced by running netserver -f -D
-using the rs-preload library.
+using the rs-preload library.  A similar issue exists with rsend().
 
-Signed-off-by: Pradeep Satyanarayana <pradeeps@linux.vnet.ibm.com>
+Fix this by not blocking on a CQ unless we're connected.
+
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
