@@ -1,0 +1,73 @@
+Bottom: 21cab4e0e2179a70e55cee483fbfdabf4510108a
+Top:    b452542d870c8ae024fd480fbe6360287817d32e
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-26 00:26:21 -0700
+
+Refresh of rs-test-nonblock
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 70d0c46..c8332fe 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -871,24 +871,29 @@ static int rs_get_cq_event(struct rsocket *rs)
+  * We handle this by using two locks.  The cq_lock protects against polling
+  * the CQ and processing completions.  The cq_wait_lock serializes access to
+  * waiting on the CQ.
++ *
++ * test() should return 0 on success, < 0 on error to abort, and > 0 to
++ * indicate that processing should continue.
+  */
+-static int rs_process_cq(struct rsocket *rs, int nonblock, int (*test)(struct rsocket *rs))
++static int rs_process_cq(struct rsocket *rs, int (*test)(struct rsocket *rs))
+ {
+-	int ret;
++	int ret, err;
+ 
+ 	fastlock_acquire(&rs->cq_lock);
+ 	do {
+ 		rs_update_credits(rs);
+-		ret = rs_poll_cq(rs);
+-		if (test(rs)) {
+-			ret = 0;
++		err = rs_poll_cq(rs);
++		ret = test(rs);
++		if (ret <= 0)
+ 			break;
+-		} else if (ret) {
++
++		if (err) {
++			ret = err;
+ 			break;
+-		} else if (nonblock) {
+-			ret = ERR(EWOULDBLOCK);
+-		} else if (!rs->cq_armed) {
+-			ibv_req_notify_cq(rs->cm_id->recv_cq, 0);
++		}
++
++		if (!rs->cq_armed) {
++			ret = ibv_req_notify_cq(rs->cm_id->recv_cq, 0);
+ 			rs->cq_armed = 1;
+ 		} else {
+ 			rs_update_credits(rs);
+@@ -939,7 +944,7 @@ static int rs_can_send(struct rsocket *rs)
+ 
+ static int rs_can_send_ctrl(struct rsocket *rs)
+ {
+-	return rs->ctrl_avail;
++	return !rs->ctrl_avail;
+ }
+ 
+ static int rs_have_rdata(struct rsocket *rs)
+@@ -1537,8 +1542,8 @@ int rshutdown(int socket, int how)
+ 
+ 	if (rs->state == rs_connected) {
+ 		rs->state = rs_disconnected;
+-		if (!rs_can_send_ctrl(rs)) {
+-			ret = rs_process_cq(rs, 0, rs_can_send_ctrl);
++		if (rs_can_send_ctrl(rs)) {
++			ret = rs_process_cq(rs, rs_can_send_ctrl);
+ 			if (ret)
+ 				return ret;
+ 		}
