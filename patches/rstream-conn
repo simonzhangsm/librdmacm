@@ -1,0 +1,16 @@
+Bottom: a9bac6f88801ea442e2b5d0736b252bd4e10d3f7
+Top:    a9bac6f88801ea442e2b5d0736b252bd4e10d3f7
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-27 14:07:42 -0700
+
+rstream: Use separate connections for latency/bw tests
+
+Optimize each connection for either latency or bandwidth
+results.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
