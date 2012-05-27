@@ -1,5 +1,5 @@
 Bottom: 0da8f3e659527977d6e1ca59cdaa0c341bbccb25
-Top:    e102d5fd0fd35632eeafc6f3d2b1ffea21873167
+Top:    c9a2a77be772b959e4810744bb170212d1c48274
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-25 17:28:44 -0700
 
@@ -11,7 +11,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index e591116..9beeddc 100644
+index e591116..8cbd425 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -121,6 +121,9 @@ struct rs_conn_data {
@@ -19,7 +19,7 @@ index e591116..9beeddc 100644
  };
  
 +/*
-+ * rsocket states are ordered as connecting, connected, disconnected.
++ * rsocket states are ordered as passive, connecting, connected, disconnected.
 + */
  enum rs_state {
  	rs_init,
