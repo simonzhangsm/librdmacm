@@ -1,5 +1,5 @@
-Bottom: 16a8e9dc8e491e8a1acc2dd1277c10368616ae9b
-Top:    91bc251274c1981812043d3cd8e2e72a431611d3
+Bottom: 802cf3a8498258b521ee1e4f058de10033261d48
+Top:    92d3cde2ac0d83630c3f7f2c7e438da3bc5daa28
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-22 11:39:21 -0700
 
@@ -29,7 +29,7 @@ index 9fd9929..65feda9 100644
  
  int rsetsockopt(int socket, int level, int optname,
 diff --git a/src/rsocket.c b/src/rsocket.c
-index 9c90d18..5845ca9 100644
+index 78d7338..d68cb56 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -105,6 +105,7 @@ struct rs_sge {
