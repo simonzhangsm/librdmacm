@@ -1698,7 +1698,7 @@ int rsetsockopt(int socket, int level, int optname,
 		}
 		break;
 	case SOL_RDMA:
-		if (rs->state != rs_init && rs->state != rs_bound) {
+		if (rs->state > rs_listening) {
 			ret = ERR(EINVAL);
 			break;
 		}
