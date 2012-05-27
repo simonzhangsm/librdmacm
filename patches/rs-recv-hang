@@ -1,5 +1,5 @@
-Bottom: e102d5fd0fd35632eeafc6f3d2b1ffea21873167
-Top:    4e57522ff607a81366ad0e90a019aa2646141a0e
+Bottom: c9a2a77be772b959e4810744bb170212d1c48274
+Top:    c3b90ff21e5e632593f3673fbd16a7837412dc67
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-25 17:24:08 -0700
 
@@ -18,7 +18,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index 9beeddc..80f3ff7 100644
+index 8cbd425..1fcc4af 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -937,6 +937,11 @@ static int rs_can_send(struct rsocket *rs)
