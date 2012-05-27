@@ -1,5 +1,5 @@
 Bottom: f33552f90d8a633f18fafcbe74fcba702da0d5c4
-Top:    3a6e6bad134ceba45a624da7f3012fed4d54f573
+Top:    2a9ddfcac427ec14b8ced1791fd0a106156b6812
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-23 11:32:46 -0700
 
@@ -11,7 +11,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/rstream.c b/examples/rstream.c
-index c440f04..7fa537e 100644
+index c440f04..757a0f6 100644
 --- a/examples/rstream.c
 +++ b/examples/rstream.c
 @@ -81,6 +81,7 @@ static int size_option;
@@ -22,32 +22,47 @@ index c440f04..7fa537e 100644
  static char test_name[9] = "custom";
  static char *port = "7471";
  static char *dst_addr;
-@@ -353,17 +354,19 @@ static void set_options(int rs)
- 	long long bytes;
+@@ -349,33 +350,20 @@ out:
+ 
+ static void set_options(int rs)
+ {
+-	int val, optname, ret;
+-	long long bytes;
++	int val, ret;
  	socklen_t size;
  
 -	bytes = transfer_size * transfer_count * iterations;
-+	bytes = transfer_size * transfer_count;
- 	for (optname = SO_SNDBUF; ; optname = SO_RCVBUF) {
- 		size = sizeof val;
- 		ret = rs_getsockopt(rs, SOL_SOCKET, optname, (void *) &val, &size);
- 		if (ret)
- 			break;
- 
+-	for (optname = SO_SNDBUF; ; optname = SO_RCVBUF) {
+-		size = sizeof val;
+-		ret = rs_getsockopt(rs, SOL_SOCKET, optname, (void *) &val, &size);
+-		if (ret)
+-			break;
+-
 -		if (val < bytes) {
 -			size = sizeof val;
 -			val = ((val << 2) > bytes) ? bytes : (val << 2);
 -			rs_setsockopt(rs, SOL_SOCKET, optname, (void *) &val, size);
-+		if (val < bytes || buffer_size) {
-+			size = sizeof buffer_size;
-+			if (!buffer_size)
-+				buffer_size = ((val << 2) > bytes) ? bytes : (val << 2);
-+			rs_setsockopt(rs, SOL_SOCKET, optname,
-+				      (void *) &buffer_size, size);
- 		}
+-		}
+-
+-		if (optname == SO_RCVBUF)
+-			break;
++	if (buffer_size) {
++		size = sizeof buffer_size;
++		rs_setsockopt(rs, SOL_SOCKET, SO_SNDBUF, (void *) &buffer_size, size);
++		rs_setsockopt(rs, SOL_SOCKET, SO_RCVBUF, (void *) &buffer_size, size);
+ 	}
  
- 		if (optname == SO_RCVBUF)
-@@ -586,7 +589,7 @@ int main(int argc, char **argv)
+ 	val = 1;
+ 	rs_setsockopt(rs, IPPROTO_TCP, TCP_NODELAY, (void *) &val, sizeof(val));
+ 
+-	if (flags & MSG_DONTWAIT) {
++	if (flags & MSG_DONTWAIT)
+ 		rs_fcntl(rs, F_SETFL, O_NONBLOCK);
+-	}
+ }
+ 
+ static int server_connect(void)
+@@ -586,7 +574,7 @@ int main(int argc, char **argv)
  {
  	int op, ret;
  
@@ -56,7 +71,7 @@ index c440f04..7fa537e 100644
  		switch (op) {
  		case 's':
  			dst_addr = optarg;
-@@ -594,6 +597,9 @@ int main(int argc, char **argv)
+@@ -594,6 +582,9 @@ int main(int argc, char **argv)
  		case 'b':
  			src_addr = optarg;
  			break;
@@ -66,7 +81,7 @@ index c440f04..7fa537e 100644
  		case 'I':
  			custom = 1;
  			iterations = atoi(optarg);
-@@ -621,6 +627,7 @@ int main(int argc, char **argv)
+@@ -621,6 +612,7 @@ int main(int argc, char **argv)
  			printf("usage: %s\n", argv[0]);
  			printf("\t[-s server_address]\n");
  			printf("\t[-b bind_address]\n");
