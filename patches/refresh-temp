@@ -1,0 +1,22 @@
+Bottom: 16a8e9dc8e491e8a1acc2dd1277c10368616ae9b
+Top:    802cf3a8498258b521ee1e4f058de10033261d48
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-27 14:48:10 -0700
+
+Refresh of rs-opt-qpsize
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 9c90d18..78d7338 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -1698,7 +1698,7 @@ int rsetsockopt(int socket, int level, int optname,
+ 		}
+ 		break;
+ 	case SOL_RDMA:
+-		if (rs->state != rs_init && rs->state != rs_bound) {
++		if (rs->state > rs_listening) {
+ 			ret = ERR(EINVAL);
+ 			break;
+ 		}
