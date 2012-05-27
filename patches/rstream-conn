@@ -1,5 +1,5 @@
 Bottom: c3b90ff21e5e632593f3673fbd16a7837412dc67
-Top:    030d1e2873e6a83256b30cc08db81505fba45366
+Top:    b5c2a779072ac43912983f2422c7c3e5bea7f396
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-27 14:07:42 -0700
 
@@ -14,7 +14,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/rstream.c b/examples/rstream.c
-index 7fa537e..4ecd2ce 100644
+index 7fa537e..428b273 100644
 --- a/examples/rstream.c
 +++ b/examples/rstream.c
 @@ -71,12 +71,20 @@ static struct test_size_param test_size[] = {
@@ -56,7 +56,7 @@ index 7fa537e..4ecd2ce 100644
  {
  	struct pollfd fds;
  	int offset, ret;
-@@ -305,7 +313,7 @@ static int recv_xfer(int rs, int size)
+@@ -305,37 +313,37 @@ static int recv_xfer(int rs, int size)
  	return 0;
  }
  
@@ -65,8 +65,13 @@ index 7fa537e..4ecd2ce 100644
  {
  	int ret;
  
-@@ -316,26 +324,26 @@ static int sync_test(int rs)
- 	return dst_addr ? recv_xfer(rs, 4) : send_xfer(rs, 4);
+-	ret = dst_addr ? send_xfer(rs, 4) : recv_xfer(rs, 4);
++	ret = dst_addr ? send_xfer(4) : recv_xfer(4);
+ 	if (ret)
+ 		return ret;
+ 
+-	return dst_addr ? recv_xfer(rs, 4) : send_xfer(rs, 4);
++	return dst_addr ? recv_xfer(4) : send_xfer(4);
  }
  
 -static int run_test(int rs)
