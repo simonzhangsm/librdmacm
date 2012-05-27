@@ -1,6 +1,6 @@
 Version: 1
-Previous: d87dcad507d03140b4b36c0345fc57fde87212ca
-Head: b9e71caf603fbed7f5bdcdad0adcafeaec70dbbf
+Previous: 6a5b00252ece1e322f4fdd8ff313ad10f9f7c236
+Head: c5943b3ea4c22cade19dbbb35d898b0fad866c7a
 Applied:
   destroy_cqs: 66410c265b2661e16b7f6126bcc4ea5c7e1af1bd
   conn-err: ac46465ae6061b06f005ba9b49b371c9eb0d2325
@@ -13,8 +13,8 @@ Applied:
   rs-def-qpsize: ad243d6e5bb1542438fe4469dceafc77754de276
   rs-1sge: 5dd00c78d7a4687b90a02874ff77a9133c493a24
   rs-def-inline: b9e71caf603fbed7f5bdcdad0adcafeaec70dbbf
+  acm-sock: c5943b3ea4c22cade19dbbb35d898b0fad866c7a
 Unapplied:
-  acm-sock: 0a80aa658097b29b5c5126b23b1fa881bcd96c1a
   rs-with-acm: fadeaad64ff2d89580b571bee92bf9ecfa7b7396
   pre-socket: 8cb5871f6da8f40d9315e4dc57fdbeb9c3ae6de7
   rs-states: b6f44cc4d1cce1b5580696e1fa60245b83c9382c
