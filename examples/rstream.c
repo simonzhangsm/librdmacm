@@ -350,35 +350,20 @@ out:
 
 static void set_options(int rs)
 {
-	int val, optname, ret;
-	long long bytes;
+	int val, ret;
 	socklen_t size;
 
-	bytes = transfer_size * transfer_count;
-	for (optname = SO_SNDBUF; ; optname = SO_RCVBUF) {
-		size = sizeof val;
-		ret = rs_getsockopt(rs, SOL_SOCKET, optname, (void *) &val, &size);
-		if (ret)
-			break;
-
-		if (val < bytes || buffer_size) {
-			size = sizeof buffer_size;
-			if (!buffer_size)
-				buffer_size = ((val << 2) > bytes) ? bytes : (val << 2);
-			rs_setsockopt(rs, SOL_SOCKET, optname,
-				      (void *) &buffer_size, size);
-		}
-
-		if (optname == SO_RCVBUF)
-			break;
+	if (buffer_size) {
+		size = sizeof buffer_size;
+		rs_setsockopt(rs, SOL_SOCKET, SO_SNDBUF, (void *) &buffer_size, size);
+		rs_setsockopt(rs, SOL_SOCKET, SO_RCVBUF, (void *) &buffer_size, size);
 	}
 
 	val = 1;
 	rs_setsockopt(rs, IPPROTO_TCP, TCP_NODELAY, (void *) &val, sizeof(val));
 
-	if (flags & MSG_DONTWAIT) {
+	if (flags & MSG_DONTWAIT)
 		rs_fcntl(rs, F_SETFL, O_NONBLOCK);
-	}
 }
 
 static int server_connect(void)
