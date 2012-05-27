@@ -122,7 +122,7 @@ struct rs_conn_data {
 };
 
 /*
- * rsocket states are ordered as connecting, connected, disconnected.
+ * rsocket states are ordered as passive, connecting, connected, disconnected.
  */
 enum rs_state {
 	rs_init,
