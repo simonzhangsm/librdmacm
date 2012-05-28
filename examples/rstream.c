@@ -379,12 +379,12 @@ static void set_options(int rs)
 
 	if (use_rs) {
 		/* Inline size based on experimental data */
-//		if (optimization == opt_latency)
-//			val = 384;
-//		else if (optimization == opt_bandwidth)
-			val = 32; // 0;
-//		else
-//			val = 64;
+		if (optimization == opt_latency)
+			val = 384;
+		else if (optimization == opt_bandwidth)
+			val = 0;
+		else
+			val = 64;
 
 		rs_setsockopt(rs, SOL_RDMA, RDMA_INLINE, &val, sizeof val);
 	}
