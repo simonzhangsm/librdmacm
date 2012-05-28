@@ -1,5 +1,5 @@
-Bottom: 5762ea9f26bec43ae89d7dd2fded0b8cbe158a35
-Top:    a7ddec5b59a3e440d30c927ad2c1249b74e8b753
+Bottom: 18e2adc2e12c49c653badf14585eaed48bfce64f
+Top:    3b60eb70feeded17994cd32df1b27035bf66f44b
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-27 14:07:42 -0700
 
@@ -14,7 +14,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/rstream.c b/examples/rstream.c
-index 6ff4f1c..6641bc2 100644
+index df36e34..ae4574b 100644
 --- a/examples/rstream.c
 +++ b/examples/rstream.c
 @@ -71,12 +71,20 @@ static struct test_size_param test_size[] = {
