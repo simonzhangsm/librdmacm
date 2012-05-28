@@ -365,7 +365,7 @@ static void set_options(int rs)
 			      sizeof buffer_size);
 		rs_setsockopt(rs, SOL_SOCKET, SO_RCVBUF, (void *) &buffer_size,
 			      sizeof buffer_size);
-	} else if (optimization == opt_bandwidth) {
+	} else {
 		val = 1 << 19;
 		rs_setsockopt(rs, SOL_SOCKET, SO_SNDBUF, (void *) &val, sizeof val);
 		rs_setsockopt(rs, SOL_SOCKET, SO_RCVBUF, (void *) &val, sizeof val);
@@ -379,14 +379,14 @@ static void set_options(int rs)
 
 	if (use_rs) {
 		/* Inline size based on experimental data */
-		if (optimization == opt_latency)
-			val = 384;
-		else if (optimization == opt_bandwidth)
+//		if (optimization == opt_latency)
+//			val = 384;
+//		else if (optimization == opt_bandwidth)
 			val = 32; // 0;
-		else
-			val = 64;
+//		else
+//			val = 64;
 
-//		rs_setsockopt(rs, SOL_RDMA, RDMA_INLINE, &val, sizeof val);
+		rs_setsockopt(rs, SOL_RDMA, RDMA_INLINE, &val, sizeof val);
 	}
 }
 
@@ -549,11 +549,11 @@ static int run(void)
 			init_latency_test(test_size[i].size);
 			run_test();
 		}
-//		rs_shutdown(rs, SHUT_RDWR);
-//		rs_close(rs);
+		rs_shutdown(rs, SHUT_RDWR);
+		rs_close(rs);
 
 		optimization = opt_bandwidth;
-//		ret = dst_addr ? client_connect() : server_connect();
+		ret = dst_addr ? client_connect() : server_connect();
 		if (ret)
 			goto free;
 		for (i = 0; i < TEST_CNT; i++) {
