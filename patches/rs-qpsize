@@ -1,5 +1,5 @@
-Bottom: dbe6733eee8ec766ba73d02b7ae6f014b50b846a
-Top:    918eb94303796cba3dd40c4a754a411eb19992a9
+Bottom: ffc4f684b77f0da6b71d94dd50cbfd77140892ec
+Top:    54969dd5cadb4809451a5469fc6fd15e6bf7e1ff
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-18 17:07:11 -0700
 
@@ -16,7 +16,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/cma.c b/src/cma.c
-index 9cd34cf..753612c 100755
+index 2121d06..f688c4c 100755
 --- a/src/cma.c
 +++ b/src/cma.c
 @@ -76,6 +76,7 @@ struct cma_device {
@@ -35,7 +35,7 @@ index 9cd34cf..753612c 100755
  		cma_dev->max_initiator_depth = (uint8_t) attr.max_qp_init_rd_atom;
  		cma_dev->max_responder_resources = (uint8_t) attr.max_qp_rd_atom;
  		ib += (cma_dev->verbs->device->transport_type == IBV_TRANSPORT_IB);
-@@ -2217,3 +2219,11 @@ void rdma_destroy_ep(struct rdma_cm_id *id)
+@@ -2215,3 +2217,11 @@ void rdma_destroy_ep(struct rdma_cm_id *id)
  
  	rdma_destroy_id(id);
  }
@@ -48,7 +48,7 @@ index 9cd34cf..753612c 100755
 +	return id_priv->cma_dev->max_qpsize;
 +}
 diff --git a/src/cma.h b/src/cma.h
-index 7703fe8..f28eaf3 100644
+index 0d94e8b..ffbcbf2 100644
 --- a/src/cma.h
 +++ b/src/cma.h
 @@ -67,7 +67,7 @@ static inline uint64_t htonll(uint64_t x) { return x; }
