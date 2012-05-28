@@ -1,5 +1,5 @@
 Bottom: 87ab98f3bddaca811ce2dc2b7920287c23686a20
-Top:    87ab98f3bddaca811ce2dc2b7920287c23686a20
+Top:    82e13151ae7719d96c8c400a99918961bc514175
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-25 17:28:44 -0700
 
@@ -10,4 +10,86 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 ---
 
-
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 1140975..9ce58d5 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -126,6 +126,9 @@ union rs_wr_id {
+ 	};
+ };
+ 
++/*
++ * rsocket states are ordered as passive, connecting, connected, disconnected.
++ */
+ enum rs_state {
+ 	rs_init,
+ 	rs_bound,
+@@ -134,9 +137,9 @@ enum rs_state {
+ 	rs_resolving_route,
+ 	rs_connecting,
+ 	rs_accepting,
++	rs_connect_error,
+ 	rs_connected,
+ 	rs_disconnected,
+-	rs_connect_error,
+ 	rs_error
+ };
+ 
+@@ -1011,9 +1014,7 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
+ 	int ret;
+ 
+ 	rs = idm_at(&idm, socket);
+-	if (rs->state != rs_connected &&
+-	    (rs->state == rs_resolving_addr || rs->state == rs_resolving_route ||
+-	     rs->state == rs_connecting || rs->state ==	rs_accepting)) {
++	if (rs->state < rs_connected) {
+ 		ret = rs_do_connect(rs);
+ 		if (ret) {
+ 			if (errno == EINPROGRESS)
+@@ -1115,7 +1116,7 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
+ 	int ret = 0;
+ 
+ 	rs = idm_at(&idm, socket);
+-	if (rs->state != rs_connected) {
++	if (rs->state < rs_connected) {
+ 		ret = rs_do_connect(rs);
+ 		if (ret) {
+ 			if (errno == EINPROGRESS)
+@@ -1219,7 +1220,7 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
+ 	int i, ret = 0;
+ 
+ 	rs = idm_at(&idm, socket);
+-	if (rs->state != rs_connected) {
++	if (rs->state < rs_connected) {
+ 		ret = rs_do_connect(rs);
+ 		if (ret) {
+ 			if (errno == EINPROGRESS)
+@@ -1360,7 +1361,7 @@ static int rs_poll_rs(struct rsocket *rs, int events,
+ 			revents |= POLLOUT;
+ 		if (rs->state == rs_disconnected)
+ 			revents |= POLLHUP;
+-		if (rs->state == rs_error)
++		else if (rs->state == rs_error)
+ 			revents |= POLLERR;
+ 
+ 		return revents;
+@@ -1401,16 +1402,11 @@ static int rs_poll_arm(struct pollfd *rfds, struct pollfd *fds, nfds_t nfds)
+ 			if (fds[i].revents)
+ 				return 1;
+ 
+-			switch (rs->state) {
+-			case rs_connected:
+-			case rs_disconnected:
+-			case rs_error:
++			if (rs->state >= rs_connected)
+ 				rfds[i].fd = rs->cm_id->recv_cq_channel->fd;
+-				break;
+-			default:
++			else
+ 				rfds[i].fd = rs->cm_id->channel->fd;
+-				break;
+-			}
++
+ 			rfds[i].events = POLLIN;
+ 		} else {
+ 			rfds[i].fd = fds[i].fd;
