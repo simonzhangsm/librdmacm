@@ -1128,8 +1128,12 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
 			xfer_size = rs->sbuf_bytes_avail;
 		if (xfer_size > rs->target_sgl[rs->target_sge].length)
 			xfer_size = rs->target_sgl[rs->target_sge].length;
-		if (xfer_size > rs_sbuf_left(rs))
-			xfer_size = rs_sbuf_left(rs);
+		if (xfer_size > rs_sbuf_left(rs)) {
+			if (xfer_size <= rs->sbuf_bytes_avail - rs_sbuf(left(rs)))
+				rs->ssge.addr = (uintptr_t) rs->sbuf;
+			else
+				xfer_size = rs_sbuf_left(rs);
+		}
 
 		if (xfer_size <= rs->sq_inline) {
 			sge.addr = (uintptr_t) buf;
