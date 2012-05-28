@@ -1,0 +1,37 @@
+Bottom: bd11f606feed611373ef6b7818eefe33c92cc6f5
+Top:    7a9b77c7fedfe1b34f7874a39a043318ae2506de
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-28 02:01:58 -0700
+
+Refresh of rstream-opt
+
+---
+
+diff --git a/examples/rstream.c b/examples/rstream.c
+index 65529ab..2a2e937 100644
+--- a/examples/rstream.c
++++ b/examples/rstream.c
+@@ -386,7 +386,7 @@ static void set_options(int rs)
+ 		else
+ 			val = 64;
+ 
+-		rs_setsockopt(rs, SOL_RDMA, RDMA_INLINE, &val, sizeof val);
++//		rs_setsockopt(rs, SOL_RDMA, RDMA_INLINE, &val, sizeof val);
+ 	}
+ }
+ 
+@@ -549,11 +549,11 @@ static int run(void)
+ 			init_latency_test(test_size[i].size);
+ 			run_test();
+ 		}
+-		rs_shutdown(rs, SHUT_RDWR);
+-		rs_close(rs);
++//		rs_shutdown(rs, SHUT_RDWR);
++//		rs_close(rs);
+ 
+ 		optimization = opt_bandwidth;
+-		ret = dst_addr ? client_connect() : server_connect();
++//		ret = dst_addr ? client_connect() : server_connect();
+ 		if (ret)
+ 			goto free;
+ 		for (i = 0; i < TEST_CNT; i++) {
