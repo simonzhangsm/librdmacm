@@ -1,5 +1,5 @@
 Bottom: 1f4b9e8b1201e5fac58e29366786f53b07faf3f1
-Top:    35f06996bb17d5d8e54f3fc37c82713e479fd8c8
+Top:    5a85db9c7f7a5745fbf5b24189f0dcd3d7434c9b
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-27 14:07:42 -0700
 
@@ -14,7 +14,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/rstream.c b/examples/rstream.c
-index 757a0f6..90980b6 100644
+index 757a0f6..a96a5a4 100644
 --- a/examples/rstream.c
 +++ b/examples/rstream.c
 @@ -71,12 +71,20 @@ static struct test_size_param test_size[] = {
@@ -103,7 +103,17 @@ index 757a0f6..90980b6 100644
  			if (ret)
  				goto out;
  		}
-@@ -364,13 +372,24 @@ static void set_options(int rs)
+@@ -357,6 +365,9 @@ static void set_options(int rs)
+ 		size = sizeof buffer_size;
+ 		rs_setsockopt(rs, SOL_SOCKET, SO_SNDBUF, (void *) &buffer_size, size);
+ 		rs_setsockopt(rs, SOL_SOCKET, SO_RCVBUF, (void *) &buffer_size, size);
++	} else {
++		if (optimization == opt_bandwidth) {
++			rs_setsockopt(rs, SOL_SOCKET, SO_SNDBUF, &val, sizeof val)
+ 	}
+ 
+ 	val = 1;
+@@ -364,13 +375,24 @@ static void set_options(int rs)
  
  	if (flags & MSG_DONTWAIT)
  		rs_fcntl(rs, F_SETFL, O_NONBLOCK);
@@ -131,7 +141,7 @@ index 757a0f6..90980b6 100644
  
  	memset(&hints, 0, sizeof hints);
  	hints.ai_flags = RAI_PASSIVE;
-@@ -383,30 +402,41 @@ static int server_connect(void)
+@@ -383,30 +405,41 @@ static int server_connect(void)
  	lrs = rs_socket(res->ai_family, res->ai_socktype, res->ai_protocol);
  	if (lrs < 0) {
  		perror("rsocket");
@@ -184,7 +194,7 @@ index 757a0f6..90980b6 100644
  	do {
  		if (use_async) {
  			fds.fd = lrs;
-@@ -415,28 +445,26 @@ static int server_connect(void)
+@@ -415,28 +448,26 @@ static int server_connect(void)
  			ret = do_poll(&fds);
  			if (ret) {
  				perror("rpoll");
@@ -219,7 +229,7 @@ index 757a0f6..90980b6 100644
  	socklen_t len;
  
   	ret = getaddrinfo(dst_addr, port, NULL, &res);
-@@ -448,6 +476,7 @@ static int client_connect(void)
+@@ -448,6 +479,7 @@ static int client_connect(void)
  	rs = rs_socket(res->ai_family, res->ai_socktype, res->ai_protocol);
  	if (rs < 0) {
  		perror("rsocket");
@@ -227,7 +237,7 @@ index 757a0f6..90980b6 100644
  		goto free;
  	}
  
-@@ -457,40 +486,38 @@ static int client_connect(void)
+@@ -457,40 +489,38 @@ static int client_connect(void)
  	ret = rs_connect(rs, res->ai_addr, res->ai_addrlen);
  	if (ret && (errno != EINPROGRESS)) {
  		perror("rconnect");
@@ -276,7 +286,7 @@ index 757a0f6..90980b6 100644
  
  	buf = malloc(!custom ? test_size[TEST_CNT - 1].size : transfer_size);
  	if (!buf) {
-@@ -498,29 +525,45 @@ static int run(void)
+@@ -498,29 +528,45 @@ static int run(void)
  		return -1;
  	}
  
