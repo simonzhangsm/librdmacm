@@ -1,5 +1,5 @@
-Bottom: 802cf3a8498258b521ee1e4f058de10033261d48
-Top:    92d3cde2ac0d83630c3f7f2c7e438da3bc5daa28
+Bottom: 72f7a43b64f1274756d81e397fc2c110bf58532b
+Top:    8741a1d852238e29ca2c917ec275c4bdc651f38f
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-22 11:39:21 -0700
 
@@ -29,7 +29,7 @@ index 9fd9929..65feda9 100644
  
  int rsetsockopt(int socket, int level, int optname,
 diff --git a/src/rsocket.c b/src/rsocket.c
-index 78d7338..d68cb56 100644
+index f94e48a..ef070a8 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -105,6 +105,7 @@ struct rs_sge {
@@ -71,7 +71,7 @@ index 78d7338..d68cb56 100644
  
  	ret = rdma_create_qp(rs->cm_id, NULL, &qp_attr);
  	if (ret)
-@@ -1141,7 +1145,7 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
+@@ -1156,7 +1160,7 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
  		if (xfer_size > rs->target_sgl[rs->target_sge].length)
  			xfer_size = rs->target_sgl[rs->target_sge].length;
  
@@ -80,7 +80,7 @@ index 78d7338..d68cb56 100644
  			sge.addr = (uintptr_t) buf;
  			sge.length = xfer_size;
  			sge.lkey = 0;
-@@ -1257,7 +1261,7 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
+@@ -1277,7 +1281,7 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
  			ret = rs_write_data(rs, rs_wrid(1, xfer_size),
  					    rs->ssgl, 1,
  					    rs_msg_set(RS_OP_DATA, xfer_size),
@@ -89,7 +89,7 @@ index 78d7338..d68cb56 100644
  			if (xfer_size < rs_sbuf_left(rs))
  				rs->ssgl[0].addr += xfer_size;
  			else
-@@ -1271,7 +1275,7 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
+@@ -1291,7 +1295,7 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
  			ret = rs_write_data(rs, rs_wrid(1, xfer_size),
  					    rs->ssgl, 2,
  					    rs_msg_set(RS_OP_DATA, xfer_size),
@@ -98,7 +98,7 @@ index 78d7338..d68cb56 100644
  			rs->ssgl[0].addr = (uintptr_t) rs->sbuf + rs->ssgl[1].length;
  		}
  		if (ret)
-@@ -1710,6 +1714,11 @@ int rsetsockopt(int socket, int level, int optname,
+@@ -1730,6 +1734,11 @@ int rsetsockopt(int socket, int level, int optname,
  		case RDMA_RQSIZE:
  			rs->rq_size = min((*(uint32_t *) optval), RS_QP_MAX_SIZE);
  			break;
@@ -110,7 +110,7 @@ index 78d7338..d68cb56 100644
  		default:
  			break;
  		}
-@@ -1789,6 +1798,10 @@ int rgetsockopt(int socket, int level, int optname,
+@@ -1809,6 +1818,10 @@ int rgetsockopt(int socket, int level, int optname,
  			*((int *) optval) = rs->rq_size;
  			*optlen = sizeof(int);
  			break;
