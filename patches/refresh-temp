@@ -1,0 +1,30 @@
+Bottom: 2a9ddfcac427ec14b8ced1791fd0a106156b6812
+Top:    0661b1e6af0fde76e36f815c48515f3ef47f9044
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-27 17:01:24 -0700
+
+Refresh of rstream-bufsize
+
+---
+
+diff --git a/examples/rstream.c b/examples/rstream.c
+index 757a0f6..6ff4f1c 100644
+--- a/examples/rstream.c
++++ b/examples/rstream.c
+@@ -351,12 +351,12 @@ out:
+ static void set_options(int rs)
+ {
+ 	int val, ret;
+-	socklen_t size;
+ 
+ 	if (buffer_size) {
+-		size = sizeof buffer_size;
+-		rs_setsockopt(rs, SOL_SOCKET, SO_SNDBUF, (void *) &buffer_size, size);
+-		rs_setsockopt(rs, SOL_SOCKET, SO_RCVBUF, (void *) &buffer_size, size);
++		rs_setsockopt(rs, SOL_SOCKET, SO_SNDBUF, (void *) &buffer_size,
++			      sizeof buffer_size);
++		rs_setsockopt(rs, SOL_SOCKET, SO_RCVBUF, (void *) &buffer_size,
++			      sizeof buffer_size);
+ 	}
+ 
+ 	val = 1;
