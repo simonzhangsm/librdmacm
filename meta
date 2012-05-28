@@ -1,6 +1,6 @@
 Version: 1
-Previous: a86087efcfd056aaecfce09a7a778bbd7a0f75d2
-Head: aaca54f9c8fbc522a62c8abd86cc7fc28a551389
+Previous: c451321c8e909bbd8870c656f913d40ca006c7fb
+Head: dd89287ce678fa211e3f427497f42e447c48b56d
 Applied:
   destroy_cqs: 66410c265b2661e16b7f6126bcc4ea5c7e1af1bd
   conn-err: ac46465ae6061b06f005ba9b49b371c9eb0d2325
@@ -16,8 +16,8 @@ Applied:
   pre-socket: 659f605c2d6bdba067651138aa5ffc01f14465d6
   rs-states: 94e4650160dd8b32efd7e1befe3b179487bd7cac
   rs-recv-hang: aaca54f9c8fbc522a62c8abd86cc7fc28a551389
+  rstream-opt: dd89287ce678fa211e3f427497f42e447c48b56d
 Unapplied:
   rs-1sge: 85e4c4a0da0b501b60a1035d7a003ee20a749511
   rs-def-inline: 6ad70d3b80178e40fea97f662a6b31e51cddc0af
-  rstream-opt: e7db81a741c83da0739c078351abcc730465404a
 Hidden:
