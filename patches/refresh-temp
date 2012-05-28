@@ -1,0 +1,36 @@
+Bottom: d6059001f0d2f622720ad871c89e3c1ef4410125
+Top:    e9e6fbdeef17d4c02f8c8aa86981e6965cd2d120
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-28 00:59:49 -0700
+
+Refresh of rs-1sge
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 5be242f..bd4c8dd 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -1128,18 +1128,16 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
+ 			xfer_size = rs->sbuf_bytes_avail;
+ 		if (xfer_size > rs->target_sgl[rs->target_sge].length)
+ 			xfer_size = rs->target_sgl[rs->target_sge].length;
+-		if (xfer_size > rs_sbuf_left(rs)) {
+-			if (xfer_size <= rs->sbuf_bytes_avail - rs_sbuf_left(rs))
+-				rs->ssge.addr = (uintptr_t) rs->sbuf;
+-			else
+-				xfer_size = rs_sbuf_left(rs);
+-		}
++		if (xfer_size > rs_sbuf_left(rs))
++			xfer_size = rs_sbuf_left(rs);
+ 
+ 		if (xfer_size <= rs->sq_inline) {
+ 			sge.addr = (uintptr_t) buf;
+ 			sge.length = xfer_size;
+ 			sge.lkey = 0;
+ 			ret = rs_write_data(rs, &sge, IBV_SEND_INLINE);
++			if (xfer_size == rs_sbuf_left(rs))
++				rs->ssge.addr = (uintptr_t) rs->sbuf;
+ 		} else {
+ 			memcpy((void *) (uintptr_t) rs->ssge.addr, buf, xfer_size);
+ 			rs->ssge.length = xfer_size;
