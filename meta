@@ -1,9 +1,10 @@
 Version: 1
-Previous: e5bffca9b430393771c67ecc43ff7e985bb5a510
-Head: ac46465ae6061b06f005ba9b49b371c9eb0d2325
+Previous: 05ddb625360a9e931ea608f734ec8487d148d4fa
+Head: 9fe16d42109fffc021dce5a12e072815d7487b96
 Applied:
   destroy_cqs: 66410c265b2661e16b7f6126bcc4ea5c7e1af1bd
   conn-err: ac46465ae6061b06f005ba9b49b371c9eb0d2325
+  rs-recv-hang: 9fe16d42109fffc021dce5a12e072815d7487b96
 Unapplied:
   rs-qpsize: 742f75282720fc80c028108daba43b3680d72d52
   rs-opts: b8f05919dd1522e7298c6e94ea100671c4fb2f17
@@ -16,7 +17,6 @@ Unapplied:
   acm-init: 666fa02d8f18ac2e98008cd3d57a90a864203548
   pre-socket: 659f605c2d6bdba067651138aa5ffc01f14465d6
   rs-states: 94e4650160dd8b32efd7e1befe3b179487bd7cac
-  rs-recv-hang: aaca54f9c8fbc522a62c8abd86cc7fc28a551389
   rstream-opt: dd89287ce678fa211e3f427497f42e447c48b56d
   rs-1sge: 85e4c4a0da0b501b60a1035d7a003ee20a749511
   rs-def-inline: 6ad70d3b80178e40fea97f662a6b31e51cddc0af

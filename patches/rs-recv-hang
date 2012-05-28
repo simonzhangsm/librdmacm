@@ -1,5 +1,5 @@
-Bottom: 82e13151ae7719d96c8c400a99918961bc514175
-Top:    fdfaeba03cd72a5fb2f57a5316f270c905d4dc15
+Bottom: f1dcc179b934b653b4de6f28bbbed627b9fc6acd
+Top:    dbe6733eee8ec766ba73d02b7ae6f014b50b846a
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-25 17:24:08 -0700
 
@@ -18,10 +18,10 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index 9ce58d5..c111797 100644
+index 01b7248..8c96dc1 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
-@@ -954,6 +954,11 @@ static int rs_can_send(struct rsocket *rs)
+@@ -908,6 +908,11 @@ static int rs_can_send(struct rsocket *rs)
  	       (rs->target_sgl[rs->target_sge].length != 0);
  }
  
@@ -33,7 +33,7 @@ index 9ce58d5..c111797 100644
  static int rs_can_send_ctrl(struct rsocket *rs)
  {
  	return rs->ctrl_avail;
-@@ -964,6 +969,11 @@ static int rs_have_rdata(struct rsocket *rs)
+@@ -918,6 +923,11 @@ static int rs_have_rdata(struct rsocket *rs)
  	return (rs->rmsg_head != rs->rmsg_tail);
  }
  
@@ -44,8 +44,8 @@ index 9ce58d5..c111797 100644
 +
  static int rs_all_sends_done(struct rsocket *rs)
  {
- 	return (rs->sqe_avail + rs->ctrl_avail) == rs->sq_size;
-@@ -1024,7 +1034,7 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
+ 	return (rs->sqe_avail + rs->ctrl_avail) == RS_QP_SIZE;
+@@ -980,7 +990,7 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
  	}
  	fastlock_acquire(&rs->rlock);
  	if (!rs_have_rdata(rs)) {
@@ -54,7 +54,7 @@ index 9ce58d5..c111797 100644
  		if (ret && errno != ECONNRESET)
  			goto out;
  	}
-@@ -1128,9 +1138,14 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
+@@ -1084,9 +1094,14 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
  	fastlock_acquire(&rs->slock);
  	for (left = len; left; left -= xfer_size, buf += xfer_size) {
  		if (!rs_can_send(rs)) {
@@ -70,7 +70,7 @@ index 9ce58d5..c111797 100644
  		}
  
  		if (olen < left) {
-@@ -1237,9 +1252,14 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
+@@ -1193,9 +1208,14 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
  	fastlock_acquire(&rs->slock);
  	for (left = len; left; left -= xfer_size) {
  		if (!rs_can_send(rs)) {
