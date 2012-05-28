@@ -1,5 +1,5 @@
 Version: 1
-Previous: b8f188c5442dfd0baa122152192d7696a1379870
+Previous: af37bbeb5b96f083538b1912a3ad2099d59af0b7
 Head: 1176abc686ada043ea9adb51219d45c945faa711
 Applied:
   destroy_cqs: 66410c265b2661e16b7f6126bcc4ea5c7e1af1bd
@@ -18,6 +18,6 @@ Applied:
   pre-socket: b65c54063459dcfedd74529aaa8571b77698acea
   rs-states: 91edc2c3d92307144d82c22b5928ebd3ef6f21e8
   rs-recv-hang: 87f678725a461861b9453cc205ae91a800630c14
+  rstream-opt: 1176abc686ada043ea9adb51219d45c945faa711
 Unapplied:
-  rstream-opt: f5bae827622b3754f27b3df3066943efd7181c07
 Hidden:
