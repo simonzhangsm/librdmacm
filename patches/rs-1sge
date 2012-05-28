@@ -1,5 +1,5 @@
 Bottom: 40360dccfdc90246ade8113c0fc63bee52ca7731
-Top:    e8c78258fd1389fa7012b47fe14a62c9d0472281
+Top:    dbf2268a62da8784c6ab9033fc297c6d57babbda
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-24 14:36:41 -0700
 
@@ -19,7 +19,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index 1140975..529c3b0 100644
+index 1140975..e480bfd 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -90,6 +90,10 @@ enum {
@@ -155,12 +155,16 @@ index 1140975..529c3b0 100644
  			} else {
  				rs->ctrl_avail++;
  			}
-@@ -1144,34 +1128,22 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
+@@ -1144,34 +1128,26 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
  			xfer_size = rs->sbuf_bytes_avail;
  		if (xfer_size > rs->target_sgl[rs->target_sge].length)
  			xfer_size = rs->target_sgl[rs->target_sge].length;
-+		if (xfer_size > rs_sbuf_left(rs))
-+			xfer_size = rs_sbuf_left(rs);
++		if (xfer_size > rs_sbuf_left(rs)) {
++			if (xfer_size <= rs->sbuf_bytes_avail - rs_sbuf(left(rs)))
++				rs->ssge.addr = (uintptr_t) rs->sbuf;
++			else
++				xfer_size = rs_sbuf_left(rs);
++		}
  
  		if (xfer_size <= rs->sq_inline) {
  			sge.addr = (uintptr_t) buf;
@@ -199,7 +203,7 @@ index 1140975..529c3b0 100644
  		}
  		if (ret)
  			break;
-@@ -1253,33 +1225,21 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
+@@ -1253,33 +1229,21 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
  			xfer_size = rs->sbuf_bytes_avail;
  		if (xfer_size > rs->target_sgl[rs->target_sge].length)
  			xfer_size = rs->target_sgl[rs->target_sge].length;
