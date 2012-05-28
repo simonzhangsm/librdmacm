@@ -1,5 +1,5 @@
-Bottom: 87ab98f3bddaca811ce2dc2b7920287c23686a20
-Top:    82e13151ae7719d96c8c400a99918961bc514175
+Bottom: 4b2610b05b4530b8bac8ed3c4f6cb13318ba63ae
+Top:    53ca16769d700d40a9cc9ff9550f5261e5354ea0
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-25 17:28:44 -0700
 
@@ -11,7 +11,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index 1140975..9ce58d5 100644
+index ef070a8..b89ef42 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -126,6 +126,9 @@ union rs_wr_id {
@@ -35,7 +35,7 @@ index 1140975..9ce58d5 100644
  	rs_error
  };
  
-@@ -1011,9 +1014,7 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
+@@ -1021,9 +1024,7 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
  	int ret;
  
  	rs = idm_at(&idm, socket);
@@ -46,7 +46,7 @@ index 1140975..9ce58d5 100644
  		ret = rs_do_connect(rs);
  		if (ret) {
  			if (errno == EINPROGRESS)
-@@ -1115,7 +1116,7 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
+@@ -1125,7 +1126,7 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
  	int ret = 0;
  
  	rs = idm_at(&idm, socket);
@@ -55,7 +55,7 @@ index 1140975..9ce58d5 100644
  		ret = rs_do_connect(rs);
  		if (ret) {
  			if (errno == EINPROGRESS)
-@@ -1219,7 +1220,7 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
+@@ -1234,7 +1235,7 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
  	int i, ret = 0;
  
  	rs = idm_at(&idm, socket);
@@ -64,7 +64,7 @@ index 1140975..9ce58d5 100644
  		ret = rs_do_connect(rs);
  		if (ret) {
  			if (errno == EINPROGRESS)
-@@ -1360,7 +1361,7 @@ static int rs_poll_rs(struct rsocket *rs, int events,
+@@ -1380,7 +1381,7 @@ static int rs_poll_rs(struct rsocket *rs, int events,
  			revents |= POLLOUT;
  		if (rs->state == rs_disconnected)
  			revents |= POLLHUP;
@@ -73,7 +73,7 @@ index 1140975..9ce58d5 100644
  			revents |= POLLERR;
  
  		return revents;
-@@ -1401,16 +1402,11 @@ static int rs_poll_arm(struct pollfd *rfds, struct pollfd *fds, nfds_t nfds)
+@@ -1421,16 +1422,11 @@ static int rs_poll_arm(struct pollfd *rfds, struct pollfd *fds, nfds_t nfds)
  			if (fds[i].revents)
  				return 1;
  
