@@ -1,5 +1,5 @@
 Bottom: 40360dccfdc90246ade8113c0fc63bee52ca7731
-Top:    d6059001f0d2f622720ad871c89e3c1ef4410125
+Top:    e9e6fbdeef17d4c02f8c8aa86981e6965cd2d120
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-24 14:36:41 -0700
 
@@ -19,7 +19,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index 1140975..5be242f 100644
+index 1140975..bd4c8dd 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -90,6 +90,10 @@ enum {
@@ -155,16 +155,12 @@ index 1140975..5be242f 100644
  			} else {
  				rs->ctrl_avail++;
  			}
-@@ -1144,34 +1128,26 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
+@@ -1144,34 +1128,24 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
  			xfer_size = rs->sbuf_bytes_avail;
  		if (xfer_size > rs->target_sgl[rs->target_sge].length)
  			xfer_size = rs->target_sgl[rs->target_sge].length;
-+		if (xfer_size > rs_sbuf_left(rs)) {
-+			if (xfer_size <= rs->sbuf_bytes_avail - rs_sbuf_left(rs))
-+				rs->ssge.addr = (uintptr_t) rs->sbuf;
-+			else
-+				xfer_size = rs_sbuf_left(rs);
-+		}
++		if (xfer_size > rs_sbuf_left(rs))
++			xfer_size = rs_sbuf_left(rs);
  
  		if (xfer_size <= rs->sq_inline) {
  			sge.addr = (uintptr_t) buf;
@@ -180,6 +176,8 @@ index 1140975..5be242f 100644
 -					    rs->ssgl, 1,
 -					    rs_msg_set(RS_OP_DATA, xfer_size), 0);
 +			ret = rs_write_data(rs, &sge, IBV_SEND_INLINE);
++			if (xfer_size == rs_sbuf_left(rs))
++				rs->ssge.addr = (uintptr_t) rs->sbuf;
 +		} else {
 +			memcpy((void *) (uintptr_t) rs->ssge.addr, buf, xfer_size);
 +			rs->ssge.length = xfer_size;
@@ -203,7 +201,7 @@ index 1140975..5be242f 100644
  		}
  		if (ret)
  			break;
-@@ -1253,33 +1229,21 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
+@@ -1253,33 +1227,21 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
  			xfer_size = rs->sbuf_bytes_avail;
  		if (xfer_size > rs->target_sgl[rs->target_sge].length)
  			xfer_size = rs->target_sgl[rs->target_sge].length;
