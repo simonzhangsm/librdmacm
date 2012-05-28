@@ -1,5 +1,5 @@
-Bottom: 25d50cd3051d3f2dd1864415bb489d3f72afdb61
-Top:    802cf3a8498258b521ee1e4f058de10033261d48
+Bottom: 193d740232bd38b1fe0cecf8d619b84d9bb49e39
+Top:    72f7a43b64f1274756d81e397fc2c110bf58532b
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-18 16:56:15 -0700
 
@@ -49,7 +49,7 @@ index f28eaf3..2f5215c 100644
  
  /*
 diff --git a/src/rsocket.c b/src/rsocket.c
-index 15e28de..78d7338 100644
+index ee31e0c..f94e48a 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -265,8 +265,15 @@ static void rs_set_qp_size(struct rsocket *rs)
@@ -68,7 +68,7 @@ index 15e28de..78d7338 100644
  }
  
  static int rs_init_bufs(struct rsocket *rs)
-@@ -1691,12 +1698,27 @@ int rsetsockopt(int socket, int level, int optname,
+@@ -1711,12 +1718,27 @@ int rsetsockopt(int socket, int level, int optname,
  		}
  		break;
  	case SOL_RDMA:
@@ -97,7 +97,7 @@ index 15e28de..78d7338 100644
  		if (opt_on)
  			*opts |= (1 << optname);
  		else
-@@ -1758,7 +1780,19 @@ int rgetsockopt(int socket, int level, int optname,
+@@ -1778,7 +1800,19 @@ int rgetsockopt(int socket, int level, int optname,
  		}
  		break;
  	case SOL_RDMA:
