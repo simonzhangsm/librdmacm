@@ -1,5 +1,5 @@
-Bottom: f1dcc179b934b653b4de6f28bbbed627b9fc6acd
-Top:    46615b7edd3b4a8561c0e4419d89bdeb88db2e30
+Bottom: dbe6733eee8ec766ba73d02b7ae6f014b50b846a
+Top:    918eb94303796cba3dd40c4a754a411eb19992a9
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-18 17:07:11 -0700
 
@@ -69,7 +69,7 @@ index 7703fe8..f28eaf3 100644
  static inline int ERR(int err)
  {
 diff --git a/src/rsocket.c b/src/rsocket.c
-index 01b7248..4e0671f 100644
+index 8c96dc1..59cc13c 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -55,6 +55,8 @@
@@ -249,7 +249,7 @@ index 01b7248..4e0671f 100644
  					rs->rmsg_tail = 0;
  				break;
  			}
-@@ -920,7 +952,7 @@ static int rs_have_rdata(struct rsocket *rs)
+@@ -930,7 +962,7 @@ static int rs_conn_have_rdata(struct rsocket *rs)
  
  static int rs_all_sends_done(struct rsocket *rs)
  {
@@ -258,7 +258,7 @@ index 01b7248..4e0671f 100644
  }
  
  static ssize_t rs_peek(struct rsocket *rs, void *buf, size_t len)
-@@ -937,7 +969,7 @@ static ssize_t rs_peek(struct rsocket *rs, void *buf, size_t len)
+@@ -947,7 +979,7 @@ static ssize_t rs_peek(struct rsocket *rs, void *buf, size_t len)
  			rsize = left;
  		} else {
  			rsize = rs->rmsg[rmsg_head].data;
@@ -267,7 +267,7 @@ index 01b7248..4e0671f 100644
  				rmsg_head = 0;
  		}
  
-@@ -998,7 +1030,7 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
+@@ -1008,7 +1040,7 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
  		} else {
  			rs->rseq_no++;
  			rsize = rs->rmsg[rs->rmsg_head].data;
