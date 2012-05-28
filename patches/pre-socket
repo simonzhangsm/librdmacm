@@ -1,5 +1,5 @@
-Bottom: ed5b3cf23ac01acbc57d249c7083577a19d344ce
-Top:    87ab98f3bddaca811ce2dc2b7920287c23686a20
+Bottom: 7d082b248d215ee4c87c6a5c68d9aef9dbc46174
+Top:    ffc4f684b77f0da6b71d94dd50cbfd77140892ec
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-25 12:42:12 -0700
 
@@ -31,10 +31,10 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index a3ef488..d21389f 100644
+index 87778eb..99afd26 100644
 --- a/src/preload.c
 +++ b/src/preload.c
-@@ -325,22 +325,28 @@ void set_rsocket_options(int rsocket)
+@@ -287,21 +287,27 @@ err:
  
  int socket(int domain, int type, int protocol)
  {
@@ -54,7 +54,6 @@ index a3ef488..d21389f 100644
 +	recursive = 0;
  	if (ret >= 0) {
  		fd_store(index, ret, fd_rsocket);
- 		set_rsocket_options(ret);
  		return index;
 -	} else {
 -		fd_close(index, &ret);
