@@ -5,10 +5,11 @@ Date:   2012-05-24 14:31:12 -0700
 
 rsockets: Change the default QP size from 512 to 384
 
-Simple bandwidth tests using rstream showed no difference in
-performance between using a QP sized to 384 entries versus 512.
-Reduce the overhead of a default rsocket by using 384 entries.
-A user can request a larger size by calling rsetsockopt.
+Simple latency/bandwidth tests using rstream showed minimal
+difference in performance between using a QP sized to 384
+entries versus 512.  Reduce the overhead of a default rsocket
+by using 384 entries.  A user can request a larger size by
+calling rsetsockopt.
 
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
