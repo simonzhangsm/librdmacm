@@ -1,5 +1,5 @@
 Bottom: fdfaeba03cd72a5fb2f57a5316f270c905d4dc15
-Top:    bd11f606feed611373ef6b7818eefe33c92cc6f5
+Top:    7a9b77c7fedfe1b34f7874a39a043318ae2506de
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-27 14:07:42 -0700
 
@@ -14,7 +14,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/rstream.c b/examples/rstream.c
-index df36e34..65529ab 100644
+index df36e34..2a2e937 100644
 --- a/examples/rstream.c
 +++ b/examples/rstream.c
 @@ -71,12 +71,20 @@ static struct test_size_param test_size[] = {
@@ -129,7 +129,7 @@ index df36e34..65529ab 100644
 +		else
 +			val = 64;
 +
-+		rs_setsockopt(rs, SOL_RDMA, RDMA_INLINE, &val, sizeof val);
++//		rs_setsockopt(rs, SOL_RDMA, RDMA_INLINE, &val, sizeof val);
 +	}
  }
  
@@ -317,11 +317,11 @@ index df36e34..65529ab 100644
 -			run_test(rs);
 +			run_test();
  		}
-+		rs_shutdown(rs, SHUT_RDWR);
-+		rs_close(rs);
++//		rs_shutdown(rs, SHUT_RDWR);
++//		rs_close(rs);
 +
 +		optimization = opt_bandwidth;
-+		ret = dst_addr ? client_connect() : server_connect();
++//		ret = dst_addr ? client_connect() : server_connect();
 +		if (ret)
 +			goto free;
  		for (i = 0; i < TEST_CNT; i++) {
