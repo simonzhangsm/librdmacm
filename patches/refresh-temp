@@ -1,0 +1,28 @@
+Bottom: e8c78258fd1389fa7012b47fe14a62c9d0472281
+Top:    dbf2268a62da8784c6ab9033fc297c6d57babbda
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-27 23:55:11 -0700
+
+Refresh of rs-1sge
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 529c3b0..e480bfd 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -1128,8 +1128,12 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
+ 			xfer_size = rs->sbuf_bytes_avail;
+ 		if (xfer_size > rs->target_sgl[rs->target_sge].length)
+ 			xfer_size = rs->target_sgl[rs->target_sge].length;
+-		if (xfer_size > rs_sbuf_left(rs))
+-			xfer_size = rs_sbuf_left(rs);
++		if (xfer_size > rs_sbuf_left(rs)) {
++			if (xfer_size <= rs->sbuf_bytes_avail - rs_sbuf(left(rs)))
++				rs->ssge.addr = (uintptr_t) rs->sbuf;
++			else
++				xfer_size = rs_sbuf_left(rs);
++		}
+ 
+ 		if (xfer_size <= rs->sq_inline) {
+ 			sge.addr = (uintptr_t) buf;
