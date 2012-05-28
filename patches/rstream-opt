@@ -1,5 +1,5 @@
 Bottom: fdfaeba03cd72a5fb2f57a5316f270c905d4dc15
-Top:    dbb24b900018a9627ea7ad901c186abcabb5229a
+Top:    18854afb6b2fef4d972541319707eef7cabe0229
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-27 14:07:42 -0700
 
@@ -14,7 +14,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/rstream.c b/examples/rstream.c
-index df36e34..067b746 100644
+index df36e34..6577fe1 100644
 --- a/examples/rstream.c
 +++ b/examples/rstream.c
 @@ -71,12 +71,20 @@ static struct test_size_param test_size[] = {
@@ -121,12 +121,12 @@ index df36e34..067b746 100644
 +
 +	if (use_rs) {
 +		/* Inline size based on experimental data */
-+//		if (optimization == opt_latency)
-+//			val = 384;
-+//		else if (optimization == opt_bandwidth)
-+			val = 32; // 0;
-+//		else
-+//			val = 64;
++		if (optimization == opt_latency)
++			val = 384;
++		else if (optimization == opt_bandwidth)
++			val = 0;
++		else
++			val = 64;
 +
 +		rs_setsockopt(rs, SOL_RDMA, RDMA_INLINE, &val, sizeof val);
 +	}
