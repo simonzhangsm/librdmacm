@@ -1,0 +1,23 @@
+Bottom: 35f06996bb17d5d8e54f3fc37c82713e479fd8c8
+Top:    5a85db9c7f7a5745fbf5b24189f0dcd3d7434c9b
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-27 17:00:28 -0700
+
+Refresh of rstream-opt
+
+---
+
+diff --git a/examples/rstream.c b/examples/rstream.c
+index 90980b6..a96a5a4 100644
+--- a/examples/rstream.c
++++ b/examples/rstream.c
+@@ -365,6 +365,9 @@ static void set_options(int rs)
+ 		size = sizeof buffer_size;
+ 		rs_setsockopt(rs, SOL_SOCKET, SO_SNDBUF, (void *) &buffer_size, size);
+ 		rs_setsockopt(rs, SOL_SOCKET, SO_RCVBUF, (void *) &buffer_size, size);
++	} else {
++		if (optimization == opt_bandwidth) {
++			rs_setsockopt(rs, SOL_SOCKET, SO_SNDBUF, &val, sizeof val)
+ 	}
+ 
+ 	val = 1;
