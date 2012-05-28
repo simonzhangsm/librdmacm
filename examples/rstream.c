@@ -365,6 +365,9 @@ static void set_options(int rs)
 		size = sizeof buffer_size;
 		rs_setsockopt(rs, SOL_SOCKET, SO_SNDBUF, (void *) &buffer_size, size);
 		rs_setsockopt(rs, SOL_SOCKET, SO_RCVBUF, (void *) &buffer_size, size);
+	} else {
+		if (optimization == opt_bandwidth) {
+			rs_setsockopt(rs, SOL_SOCKET, SO_SNDBUF, &val, sizeof val)
 	}
 
 	val = 1;
