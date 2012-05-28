@@ -386,7 +386,7 @@ static void set_options(int rs)
 		else
 			val = 64;
 
-		rs_setsockopt(rs, SOL_RDMA, RDMA_INLINE, &val, sizeof val);
+//		rs_setsockopt(rs, SOL_RDMA, RDMA_INLINE, &val, sizeof val);
 	}
 }
 
@@ -549,11 +549,11 @@ static int run(void)
 			init_latency_test(test_size[i].size);
 			run_test();
 		}
-		rs_shutdown(rs, SHUT_RDWR);
-		rs_close(rs);
+//		rs_shutdown(rs, SHUT_RDWR);
+//		rs_close(rs);
 
 		optimization = opt_bandwidth;
-		ret = dst_addr ? client_connect() : server_connect();
+//		ret = dst_addr ? client_connect() : server_connect();
 		if (ret)
 			goto free;
 		for (i = 0; i < TEST_CNT; i++) {
