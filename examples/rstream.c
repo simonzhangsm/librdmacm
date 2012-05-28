@@ -350,7 +350,7 @@ out:
 
 static void set_options(int rs)
 {
-	int val, ret;
+	int val;
 
 	if (buffer_size) {
 		rs_setsockopt(rs, SOL_SOCKET, SO_SNDBUF, (void *) &buffer_size,
