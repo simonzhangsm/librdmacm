@@ -136,13 +136,13 @@ static void size_str(char *str, size_t ssize, long long size)
 static void cnt_str(char *str, size_t ssize, long long cnt)
 {
 	if (cnt >= 1000000000)
-		sprintf(str, ssize, "%lldb", cnt / 1000000000);
+		snprintf(str, ssize, "%lldb", cnt / 1000000000);
 	else if (cnt >= 1000000)
-		sprintf(str, ssize, "%lldm", cnt / 1000000);
+		snprintf(str, ssize, "%lldm", cnt / 1000000);
 	else if (cnt >= 1000)
-		sprintf(str, ssize, "%lldk", cnt / 1000);
+		snprintf(str, ssize, "%lldk", cnt / 1000);
 	else
-		sprintf(str, ssize, "%lld", cnt);
+		snprintf(str, ssize, "%lld", cnt);
 }
 
 static void show_perf(void)
