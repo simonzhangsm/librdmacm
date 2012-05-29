@@ -1,5 +1,5 @@
-Bottom: fdfaeba03cd72a5fb2f57a5316f270c905d4dc15
-Top:    0f38d28509b44fda4a5750eb5407bb2ff67c5ba6
+Bottom: 1f76609aa8aa4120f7fe73b2989a93125320762c
+Top:    1f9d8842f5755ce5d759fc64d75318d16d1172d8
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-27 14:07:42 -0700
 
@@ -14,7 +14,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/rstream.c b/examples/rstream.c
-index df36e34..78f3c28 100644
+index 054d11e..123f1a1 100644
 --- a/examples/rstream.c
 +++ b/examples/rstream.c
 @@ -71,12 +71,20 @@ static struct test_size_param test_size[] = {
@@ -38,7 +38,7 @@ index df36e34..78f3c28 100644
  static int size_option;
  static int iterations = 1;
  static int transfer_size = 1000;
-@@ -238,7 +246,7 @@ static int do_poll(struct pollfd *fds)
+@@ -242,7 +250,7 @@ static int do_poll(struct pollfd *fds)
  	return ret == 1 ? 0 : ret;
  }
  
@@ -47,7 +47,7 @@ index df36e34..78f3c28 100644
  {
  	struct pollfd fds;
  	int offset, ret;
-@@ -270,7 +278,7 @@ static int send_xfer(int rs, int size)
+@@ -274,7 +282,7 @@ static int send_xfer(int rs, int size)
  	return 0;
  }
  
@@ -56,7 +56,7 @@ index df36e34..78f3c28 100644
  {
  	struct pollfd fds;
  	int offset, ret;
-@@ -305,37 +313,37 @@ static int recv_xfer(int rs, int size)
+@@ -309,37 +317,37 @@ static int recv_xfer(int rs, int size)
  	return 0;
  }
  
@@ -103,7 +103,7 @@ index df36e34..78f3c28 100644
  			if (ret)
  				goto out;
  		}
-@@ -357,6 +365,10 @@ static void set_options(int rs)
+@@ -361,6 +369,10 @@ static void set_options(int rs)
  			      sizeof buffer_size);
  		rs_setsockopt(rs, SOL_SOCKET, SO_RCVBUF, (void *) &buffer_size,
  			      sizeof buffer_size);
@@ -114,7 +114,7 @@ index df36e34..78f3c28 100644
  	}
  
  	val = 1;
-@@ -364,13 +376,24 @@ static void set_options(int rs)
+@@ -368,13 +380,24 @@ static void set_options(int rs)
  
  	if (flags & MSG_DONTWAIT)
  		rs_fcntl(rs, F_SETFL, O_NONBLOCK);
@@ -142,7 +142,7 @@ index df36e34..78f3c28 100644
  
  	memset(&hints, 0, sizeof hints);
  	hints.ai_flags = RAI_PASSIVE;
-@@ -383,30 +406,41 @@ static int server_connect(void)
+@@ -387,30 +410,41 @@ static int server_connect(void)
  	lrs = rs_socket(res->ai_family, res->ai_socktype, res->ai_protocol);
  	if (lrs < 0) {
  		perror("rsocket");
@@ -195,7 +195,7 @@ index df36e34..78f3c28 100644
  	do {
  		if (use_async) {
  			fds.fd = lrs;
-@@ -415,28 +449,26 @@ static int server_connect(void)
+@@ -419,28 +453,26 @@ static int server_connect(void)
  			ret = do_poll(&fds);
  			if (ret) {
  				perror("rpoll");
@@ -230,7 +230,7 @@ index df36e34..78f3c28 100644
  	socklen_t len;
  
   	ret = getaddrinfo(dst_addr, port, NULL, &res);
-@@ -448,6 +480,7 @@ static int client_connect(void)
+@@ -452,6 +484,7 @@ static int client_connect(void)
  	rs = rs_socket(res->ai_family, res->ai_socktype, res->ai_protocol);
  	if (rs < 0) {
  		perror("rsocket");
@@ -238,7 +238,7 @@ index df36e34..78f3c28 100644
  		goto free;
  	}
  
-@@ -457,40 +490,38 @@ static int client_connect(void)
+@@ -461,40 +494,38 @@ static int client_connect(void)
  	ret = rs_connect(rs, res->ai_addr, res->ai_addrlen);
  	if (ret && (errno != EINPROGRESS)) {
  		perror("rconnect");
@@ -287,7 +287,7 @@ index df36e34..78f3c28 100644
  
  	buf = malloc(!custom ? test_size[TEST_CNT - 1].size : transfer_size);
  	if (!buf) {
-@@ -498,29 +529,48 @@ static int run(void)
+@@ -502,29 +533,48 @@ static int run(void)
  		return -1;
  	}
  
