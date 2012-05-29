@@ -539,6 +539,7 @@ static int run(void)
 	       "name", "bytes", "xfers", "iters", "total", "time", "Gb/sec", "usec/xfer");
 	if (!custom) {
 		optimization = opt_latency;
+optimization = opt_bandwidth;
 		ret = dst_addr ? client_connect() : server_connect();
 		if (ret)
 			goto free;
@@ -547,11 +548,13 @@ static int run(void)
 			if (test_size[i].option > size_option)
 				continue;
 			init_latency_test(test_size[i].size);
+init_bandwidth_test(test_size[i].size);
 			run_test();
 		}
 		rs_shutdown(rs, SHUT_RDWR);
 		rs_close(rs);
 
+sleep(1);
 		optimization = opt_bandwidth;
 		ret = dst_addr ? client_connect() : server_connect();
 		if (ret)
