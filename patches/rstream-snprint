@@ -1,5 +1,5 @@
 Bottom: fdfaeba03cd72a5fb2f57a5316f270c905d4dc15
-Top:    9fdb1c4ce072fef5c70660420a0d46c1004c5d7c
+Top:    1f76609aa8aa4120f7fe73b2989a93125320762c
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-29 14:15:57 -0700
 
@@ -13,7 +13,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/rstream.c b/examples/rstream.c
-index df36e34..83f9404 100644
+index df36e34..054d11e 100644
 --- a/examples/rstream.c
 +++ b/examples/rstream.c
 @@ -82,7 +82,7 @@ static int iterations = 1;
@@ -51,16 +51,16 @@ index df36e34..83f9404 100644
  {
  	if (cnt >= 1000000000)
 -		sprintf(str, "%lldb", cnt / 1000000000);
-+		sprintf(str, ssize, "%lldb", cnt / 1000000000);
++		snprintf(str, ssize, "%lldb", cnt / 1000000000);
  	else if (cnt >= 1000000)
 -		sprintf(str, "%lldm", cnt / 1000000);
-+		sprintf(str, ssize, "%lldm", cnt / 1000000);
++		snprintf(str, ssize, "%lldm", cnt / 1000000);
  	else if (cnt >= 1000)
 -		sprintf(str, "%lldk", cnt / 1000);
-+		sprintf(str, ssize, "%lldk", cnt / 1000);
++		snprintf(str, ssize, "%lldk", cnt / 1000);
  	else
 -		sprintf(str, "%lld", cnt);
-+		sprintf(str, ssize, "%lld", cnt);
++		snprintf(str, ssize, "%lld", cnt);
  }
  
  static void show_perf(void)
