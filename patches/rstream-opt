@@ -1,12 +1,14 @@
 Bottom: 1f76609aa8aa4120f7fe73b2989a93125320762c
-Top:    b9c594d9bbfc506656292dd037f3b1a6c80ab33a
+Top:    fb5c50d700cf9e8f2bb0c4c4b3f904538806581e
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-27 14:07:42 -0700
 
 rstream: Use separate connections for latency/bw tests
 
 Optimize each connection for either latency or bandwidth
-results.
+results.  This improves small message latency under 384
+bytes by .5 - 1 us, while increasing bandwidth by
+1 - 1.5 Gbps.
 
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
@@ -14,7 +16,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/rstream.c b/examples/rstream.c
-index 054d11e..1c3d235 100644
+index 054d11e..c77eaf3 100644
 --- a/examples/rstream.c
 +++ b/examples/rstream.c
 @@ -71,12 +71,20 @@ static struct test_size_param test_size[] = {
@@ -66,12 +68,12 @@ index 054d11e..1c3d235 100644
  	int ret;
  
 -	ret = dst_addr ? send_xfer(rs, 4) : recv_xfer(rs, 4);
-+	ret = dst_addr ? send_xfer(16) : recv_xfer(16);
++	ret = dst_addr ? send_xfer(8) : recv_xfer(8);
  	if (ret)
  		return ret;
  
 -	return dst_addr ? recv_xfer(rs, 4) : send_xfer(rs, 4);
-+	return dst_addr ? recv_xfer(16) : send_xfer(16);
++	return dst_addr ? recv_xfer(8) : send_xfer(8);
  }
  
 -static int run_test(int rs)
@@ -114,21 +116,20 @@ index 054d11e..1c3d235 100644
  	}
  
  	val = 1;
-@@ -368,13 +380,24 @@ static void set_options(int rs)
+@@ -368,13 +380,23 @@ static void set_options(int rs)
  
  	if (flags & MSG_DONTWAIT)
  		rs_fcntl(rs, F_SETFL, O_NONBLOCK);
 +
 +	if (use_rs) {
 +		/* Inline size based on experimental data */
-+		if (optimization == opt_latency)
++		if (optimization == opt_latency) {
 +			val = 384;
-+		else if (optimization == opt_bandwidth)
++			rs_setsockopt(rs, SOL_RDMA, RDMA_INLINE, &val, sizeof val);
++		} else if (optimization == opt_bandwidth) {
 +			val = 0;
-+		else
-+			val = 64;
-+
-+		rs_setsockopt(rs, SOL_RDMA, RDMA_INLINE, &val, sizeof val);
++			rs_setsockopt(rs, SOL_RDMA, RDMA_INLINE, &val, sizeof val);
++		}
 +	}
  }
  
@@ -142,7 +143,7 @@ index 054d11e..1c3d235 100644
  
  	memset(&hints, 0, sizeof hints);
  	hints.ai_flags = RAI_PASSIVE;
-@@ -387,30 +410,41 @@ static int server_connect(void)
+@@ -387,30 +409,41 @@ static int server_connect(void)
  	lrs = rs_socket(res->ai_family, res->ai_socktype, res->ai_protocol);
  	if (lrs < 0) {
  		perror("rsocket");
@@ -195,7 +196,7 @@ index 054d11e..1c3d235 100644
  	do {
  		if (use_async) {
  			fds.fd = lrs;
-@@ -419,28 +453,26 @@ static int server_connect(void)
+@@ -419,28 +452,26 @@ static int server_connect(void)
  			ret = do_poll(&fds);
  			if (ret) {
  				perror("rpoll");
@@ -230,7 +231,7 @@ index 054d11e..1c3d235 100644
  	socklen_t len;
  
   	ret = getaddrinfo(dst_addr, port, NULL, &res);
-@@ -452,6 +484,7 @@ static int client_connect(void)
+@@ -452,6 +483,7 @@ static int client_connect(void)
  	rs = rs_socket(res->ai_family, res->ai_socktype, res->ai_protocol);
  	if (rs < 0) {
  		perror("rsocket");
@@ -238,7 +239,7 @@ index 054d11e..1c3d235 100644
  		goto free;
  	}
  
-@@ -461,40 +494,38 @@ static int client_connect(void)
+@@ -461,40 +493,38 @@ static int client_connect(void)
  	ret = rs_connect(rs, res->ai_addr, res->ai_addrlen);
  	if (ret && (errno != EINPROGRESS)) {
  		perror("rconnect");
@@ -287,7 +288,7 @@ index 054d11e..1c3d235 100644
  
  	buf = malloc(!custom ? test_size[TEST_CNT - 1].size : transfer_size);
  	if (!buf) {
-@@ -502,29 +533,45 @@ static int run(void)
+@@ -502,29 +532,45 @@ static int run(void)
  		return -1;
  	}
  
