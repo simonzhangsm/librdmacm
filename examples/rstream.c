@@ -321,11 +321,11 @@ static int sync_test(void)
 {
 	int ret;
 
-	ret = dst_addr ? send_xfer(4) : recv_xfer(4);
+	ret = dst_addr ? send_xfer(16) : recv_xfer(16);
 	if (ret)
 		return ret;
 
-	return dst_addr ? recv_xfer(4) : send_xfer(4);
+	return dst_addr ? recv_xfer(16) : send_xfer(16);
 }
 
 static int run_test(void)
