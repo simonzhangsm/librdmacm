@@ -1,0 +1,27 @@
+Bottom: 58cbb60f51d474551a64162d8fcb6c01df074eb3
+Top:    b9c594d9bbfc506656292dd037f3b1a6c80ab33a
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-05-30 09:19:12 -0700
+
+Refresh of rstream-opt
+
+---
+
+diff --git a/examples/rstream.c b/examples/rstream.c
+index a863819..1c3d235 100644
+--- a/examples/rstream.c
++++ b/examples/rstream.c
+@@ -321,11 +321,11 @@ static int sync_test(void)
+ {
+ 	int ret;
+ 
+-	ret = dst_addr ? send_xfer(4) : recv_xfer(4);
++	ret = dst_addr ? send_xfer(16) : recv_xfer(16);
+ 	if (ret)
+ 		return ret;
+ 
+-	return dst_addr ? recv_xfer(4) : send_xfer(4);
++	return dst_addr ? recv_xfer(16) : send_xfer(16);
+ }
+ 
+ static int run_test(void)
