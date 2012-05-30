@@ -1,5 +1,5 @@
 Bottom: 1f76609aa8aa4120f7fe73b2989a93125320762c
-Top:    fb5c50d700cf9e8f2bb0c4c4b3f904538806581e
+Top:    64c551789aa853d05acd75b729034cd785582eac
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-05-27 14:07:42 -0700
 
@@ -16,7 +16,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/rstream.c b/examples/rstream.c
-index 054d11e..c77eaf3 100644
+index 054d11e..48e2771 100644
 --- a/examples/rstream.c
 +++ b/examples/rstream.c
 @@ -71,12 +71,20 @@ static struct test_size_param test_size[] = {
@@ -68,12 +68,12 @@ index 054d11e..c77eaf3 100644
  	int ret;
  
 -	ret = dst_addr ? send_xfer(rs, 4) : recv_xfer(rs, 4);
-+	ret = dst_addr ? send_xfer(8) : recv_xfer(8);
++	ret = dst_addr ? send_xfer(16) : recv_xfer(16);
  	if (ret)
  		return ret;
  
 -	return dst_addr ? recv_xfer(rs, 4) : send_xfer(rs, 4);
-+	return dst_addr ? recv_xfer(8) : send_xfer(8);
++	return dst_addr ? recv_xfer(16) : send_xfer(16);
  }
  
 -static int run_test(int rs)
