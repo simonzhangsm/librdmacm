@@ -321,11 +321,11 @@ static int sync_test(void)
 {
 	int ret;
 
-	ret = dst_addr ? send_xfer(16) : recv_xfer(16);
+	ret = dst_addr ? send_xfer(8) : recv_xfer(8);
 	if (ret)
 		return ret;
 
-	return dst_addr ? recv_xfer(16) : send_xfer(16);
+	return dst_addr ? recv_xfer(8) : send_xfer(8);
 }
 
 static int run_test(void)
@@ -383,14 +383,13 @@ static void set_options(int rs)
 
 	if (use_rs) {
 		/* Inline size based on experimental data */
-		if (optimization == opt_latency)
+		if (optimization == opt_latency) {
 			val = 384;
-		else if (optimization == opt_bandwidth)
+			rs_setsockopt(rs, SOL_RDMA, RDMA_INLINE, &val, sizeof val);
+		} else if (optimization == opt_bandwidth) {
 			val = 0;
-		else
-			val = 64;
-
-		rs_setsockopt(rs, SOL_RDMA, RDMA_INLINE, &val, sizeof val);
+			rs_setsockopt(rs, SOL_RDMA, RDMA_INLINE, &val, sizeof val);
+		}
 	}
 }
 
