@@ -1,6 +1,6 @@
 Bottom: 64c551789aa853d05acd75b729034cd785582eac
 Top:    d79d5464622c07a1ee7c42051fee5fca02c52207
-Author: Sean Hefty <sean.hefty@intel.com>
+Author: Hal Rosenstock <hal@mellanox.com>
 Date:   2012-06-01 10:52:03 -0700
 
 man: List RDMA_PS_IB as a supported port space in rdma_getaddrinfo man page

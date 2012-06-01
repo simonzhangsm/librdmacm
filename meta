@@ -1,9 +1,8 @@
 Version: 1
-Previous: 953191dd2281de255b6283fc40ad1741405697fa
-Head: f0c86f3c7a2e76b7f85b678447be3a9cbcbe9a53
+Previous: cc7abb84312637cf36dc07054a8fbff0ebe2c7b8
+Head: c6663b8beca52500bd665a8487d3edc6388e912c
 Applied:
-  mans: d52a9869097812dc9a6958ba5fdeafe90b6fa19e
-  refresh-temp: f0c86f3c7a2e76b7f85b678447be3a9cbcbe9a53
+  mans: c6663b8beca52500bd665a8487d3edc6388e912c
 Unapplied:
   rs-1sge: 85e4c4a0da0b501b60a1035d7a003ee20a749511
   rs-def-inline: 6ad70d3b80178e40fea97f662a6b31e51cddc0af
