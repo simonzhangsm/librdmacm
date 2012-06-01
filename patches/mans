@@ -1,0 +1,14 @@
+Bottom: 64c551789aa853d05acd75b729034cd785582eac
+Top:    64c551789aa853d05acd75b729034cd785582eac
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-06-01 10:52:03 -0700
+
+man: List RDMA_PS_IB as a supported port space in rdma_getaddrinfo man page
+
+Signed-off-by: Hal Rosenstock <hal@mellanox.com>
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
