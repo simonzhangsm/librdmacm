@@ -531,6 +531,7 @@ static int run(void)
 		perror("malloc");
 		return -1;
 	}
+printf("rstream buf %p\n", buf);
 
 	if (!dst_addr) {
 		ret = server_listen();

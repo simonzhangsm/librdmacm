@@ -305,6 +305,7 @@ static int rs_init_bufs(struct rsocket *rs)
 	rs->rbuf = calloc(rs->rbuf_size, sizeof(*rs->rbuf));
 	if (!rs->rbuf)
 		return -1;
+printf("rsocket sbuf %p rbuf %p\n", rs->sbuf, rs->rbuf);
 
 	rs->rmr = rdma_reg_write(rs->cm_id, rs->rbuf, rs->rbuf_size);
 	if (!rs->rmr)
