@@ -1,5 +1,5 @@
 Bottom: d79d5464622c07a1ee7c42051fee5fca02c52207
-Top:    d79d5464622c07a1ee7c42051fee5fca02c52207
+Top:    df4a104300fda6912a1a9fe31d7d35050f32e0cd
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-06-01 16:31:00 -0700
 
@@ -8,4 +8,27 @@ print buffer addresses
 
 ---
 
-
+diff --git a/examples/rstream.c b/examples/rstream.c
+index 48e2771..b2560e1 100644
+--- a/examples/rstream.c
++++ b/examples/rstream.c
+@@ -531,6 +531,7 @@ static int run(void)
+ 		perror("malloc");
+ 		return -1;
+ 	}
++printf("rstream buf %p\n", buf);
+ 
+ 	if (!dst_addr) {
+ 		ret = server_listen();
+diff --git a/src/rsocket.c b/src/rsocket.c
+index c111797..2e460df 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -305,6 +305,7 @@ static int rs_init_bufs(struct rsocket *rs)
+ 	rs->rbuf = calloc(rs->rbuf_size, sizeof(*rs->rbuf));
+ 	if (!rs->rbuf)
+ 		return -1;
++printf("rsocket sbuf %p rbuf %p\n", rs->sbuf, rs->rbuf);
+ 
+ 	rs->rmr = rdma_reg_write(rs->cm_id, rs->rbuf, rs->rbuf_size);
+ 	if (!rs->rmr)
