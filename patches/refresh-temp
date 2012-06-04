@@ -1,0 +1,39 @@
+Bottom: 684e21cf3e81b4f5bd740456e0fea103e52d7d1f
+Top:    1b0eda45b6430ad1ba50d03aa1beddc8a628aa65
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-06-04 14:28:22 -0700
+
+Refresh of rs-maxseg
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index a1679f1..f5ebae4 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -1717,6 +1717,9 @@ int rsetsockopt(int socket, int level, int optname,
+ 			opt_on = *(int *) optval;
+ 			ret = 0;
+ 			break;
++		case TCP_MAXSEG:
++			ret = 0;
++			break;
+ 		default:
+ 			break;
+ 		}
+@@ -1814,6 +1817,15 @@ int rgetsockopt(int socket, int level, int optname,
+ 			*((int *) optval) = !!(rs->tcp_opts & (1 << optname));
+ 			*optlen = sizeof(int);
+ 			break;
++		case TCP_MAXSEG:
++			if (rs->cm_id && rs->cm_id->route &&
++			    rs->cm_id->route.num_paths) {
++				*((int *) optval) = 1 << (7 + rs->cm_id->route.path_rec->mtu);
++			} else {
++				*((int *) optval) = 2048;
++			}
++			*optlen = sizeof(int);
++			break;
+ 		default:
+ 			ret = ENOTSUP;
+ 			break;
