@@ -1,5 +1,5 @@
 Bottom: 684e21cf3e81b4f5bd740456e0fea103e52d7d1f
-Top:    b1ad32563972d70c7a93d5dfe1e6de9eee4512e0
+Top:    729b947f8c52c96a11c4a33ff4ef447cd22cc5d1
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-06-04 13:22:10 -0700
 
@@ -14,7 +14,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index a1679f1..90502d3 100644
+index a1679f1..e899e8a 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -1717,6 +1717,9 @@ int rsetsockopt(int socket, int level, int optname,
@@ -27,13 +27,12 @@ index a1679f1..90502d3 100644
  		default:
  			break;
  		}
-@@ -1814,6 +1817,13 @@ int rgetsockopt(int socket, int level, int optname,
+@@ -1814,6 +1817,12 @@ int rgetsockopt(int socket, int level, int optname,
  			*((int *) optval) = !!(rs->tcp_opts & (1 << optname));
  			*optlen = sizeof(int);
  			break;
 +		case TCP_MAXSEG:
-+			*((int *) optval) = (rs->cm_id && rs->cm_id->route &&
-+					     rs->cm_id->route.num_paths) ?
++			*((int *) optval) = (rs->cm_id && rs->cm_id->route.num_paths) ?
 +					    1 << (7 + rs->cm_id->route.path_rec->mtu) :
 +					    2048;
 +			*optlen = sizeof(int);
