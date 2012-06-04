@@ -1,9 +1,10 @@
 Version: 1
-Previous: 49d377c9fc165b44036487a3cfd795bd63d4eb53
-Head: ce64f74204d2407dd9bdc340f97ed7aeeb9e5032
+Previous: 39ecda70e1e731701904e612a7efcbffa3805ba6
+Head: 9aecc52adb535570d911d2343b094ab167265437
 Applied:
   ip6-opt: a459c228426c4d25684dcfd2a4203f013f0b454e
   rs-shutdown: ce64f74204d2407dd9bdc340f97ed7aeeb9e5032
+  refresh-temp: 9aecc52adb535570d911d2343b094ab167265437
 Unapplied:
   buf-addr: eb70620389ced3c0c705d44b69e691a47cd3e4fd
   rs-1sge: 85e4c4a0da0b501b60a1035d7a003ee20a749511
