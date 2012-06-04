@@ -1,5 +1,5 @@
 Bottom: 0c5a0c24885960bf61c5afe1b2ef070808c1f084
-Top:    0c5a0c24885960bf61c5afe1b2ef070808c1f084
+Top:    684e21cf3e81b4f5bd740456e0fea103e52d7d1f
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-06-04 13:14:42 -0700
 
@@ -22,4 +22,17 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 ---
 
-
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 8b1e930..a1679f1 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -1593,6 +1593,9 @@ int rshutdown(int socket, int how)
+ 	struct rsocket *rs;
+ 	int ret = 0;
+ 
++	if (how != SHUT_RDWR)
++		return 0;
++
+ 	rs = idm_at(&idm, socket);
+ 	if (rs->fd_flags & O_NONBLOCK)
+ 		rs_set_nonblocking(rs, 0);
