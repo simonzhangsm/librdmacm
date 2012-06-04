@@ -1592,6 +1592,9 @@ int rshutdown(int socket, int how)
 	struct rsocket *rs;
 	int ret = 0;
 
+	if (how != SHUT_RDWR)
+		return 0;
+
 	rs = idm_at(&idm, socket);
 	if (rs->fd_flags & O_NONBLOCK)
 		rs_set_nonblocking(rs, 0);
