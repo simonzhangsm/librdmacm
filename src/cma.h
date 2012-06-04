@@ -114,6 +114,7 @@ static inline int ERR(int err)
 }
 
 int ucma_init();
+void rs_configure();
 extern int af_ib_support;
 
 #define RAI_ROUTEONLY		0x01000000
@@ -165,5 +166,14 @@ struct ibv_path_data
 	struct ibv_path_record path;
 };
 #endif
+
+#ifndef SYSCONFDIR
+#define SYSCONFDIR "/etc"
+#endif
+#ifndef RDMADIR
+#define RDMADIR "rdma"
+#endif
+#define RDMA_CONF_DIR  SYSCONFDIR "/" RDMADIR
+#define RS_CONF_DIR RDMA_CONF_DIR "/rsocket"
 
 #endif /* CMA_H */
