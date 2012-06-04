@@ -1,0 +1,18 @@
+Bottom: d79d5464622c07a1ee7c42051fee5fca02c52207
+Top:    d79d5464622c07a1ee7c42051fee5fca02c52207
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-06-04 12:30:15 -0700
+
+rsocket: Return success for IPV6_V6ONLY option
+
+Jave Netpipe calls setsockopt for IPV6_V6ONLY.  Return success
+to work-around the lack of support.  The actual implementation
+is deferred.  Problem was reported by Chet Murthy
+<chet@watson.ibm.com>
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
