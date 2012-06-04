@@ -1,0 +1,25 @@
+Bottom: 0c5a0c24885960bf61c5afe1b2ef070808c1f084
+Top:    0c5a0c24885960bf61c5afe1b2ef070808c1f084
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-06-04 13:14:42 -0700
+
+rsocket: Handle SHUT_RD/WR shutdown flags
+
+Sridhar Samudrala <sri@us.ibm.com> reported an error (EOPNOTSUPP)
+after calling select().
+
+The issue is that rshutdown(SHUT_WR) was called before select().
+As part of shutdown, rsockets switches the underlying fd from
+nonblocking to blocking to ensure that previously sent data has
+completed.  shutdown(SHUT_WR) indicates that the socket should be
+kept open for receiving data.
+
+Delay handling the actual shutdown until both the read and write
+streams have been disconnected.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
