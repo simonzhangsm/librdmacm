@@ -1,0 +1,22 @@
+Bottom: 729b947f8c52c96a11c4a33ff4ef447cd22cc5d1
+Top:    729b947f8c52c96a11c4a33ff4ef447cd22cc5d1
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-06-04 14:51:41 -0700
+
+rsocket: Spin before blocking on an rsocket
+
+The latency cost of blocking is significant compared to round
+trip ping-pong time.  Spin briefly on rsockets before calling
+into the kernel and blocking.
+
+We calculate the time to delay blocking by timing the round
+trip ping-pong time on a QP configured for loopback traffic.  The
+delay time is a multiple of this time to include wire transfer
+time, plus minimal response time on the remote side.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
