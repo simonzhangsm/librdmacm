@@ -1818,8 +1818,7 @@ int rgetsockopt(int socket, int level, int optname,
 			*optlen = sizeof(int);
 			break;
 		case TCP_MAXSEG:
-			*((int *) optval) = (rs->cm_id && rs->cm_id->route &&
-					     rs->cm_id->route.num_paths) ?
+			*((int *) optval) = (rs->cm_id && rs->cm_id->route.num_paths) ?
 					    1 << (7 + rs->cm_id->route.path_rec->mtu) :
 					    2048;
 			*optlen = sizeof(int);
