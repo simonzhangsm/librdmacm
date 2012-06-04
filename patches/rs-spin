@@ -14,6 +14,9 @@ trip ping-pong time on a QP configured for loopback traffic.  The
 delay time is a multiple of this time to include wire transfer
 time, plus minimal response time on the remote side.
 
+As a completely unintentional side effect, this just happens to
+improve application performance in benchmarks, like netpipe.
+
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
