@@ -14,8 +14,8 @@ nonblocking to blocking to ensure that previously sent data has
 completed.  shutdown(SHUT_WR) indicates that the socket should be
 kept open for receiving data.
 
-Delay handling the actual shutdown until both the read and write
-streams have been disconnected.
+Delay handling the actual shutdown unless SHUT_RDWR is specified,
+or the socket is closed.
 
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
