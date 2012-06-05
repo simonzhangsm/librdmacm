@@ -1,0 +1,30 @@
+Bottom: f5d66eb10e9cf6e99e038c41afeec88f72f751b2
+Top:    f5d66eb10e9cf6e99e038c41afeec88f72f751b2
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-06-05 15:28:18 -0700
+
+rsocket: Use configuration files to specify default settings
+
+Give an administrator control over the maximum and default settings
+used by rsockets.  Use files under rdma/rsocket as shown:
+
+mem_default - default size of receive buffer
+mem_max - max size of the receive buffer (restricts setsockopt)
+wmem_default - default size of send buffer
+wmem_max - max size of the send buffer (restricts setsockopt)
+sqsize_default - default size of send queue
+sqsize_max - max size of send queue (restricts setsockopt)
+rqsize_default - default size of receive queue
+rqsize_max - max size of receive queue (restricts setsockopt)
+inline_default - default size of inline data
+inline_max - max size of inline data (restricts setsockopt)
+
+If configuration files are not available, rsockets will continue to
+use internal defaults, with maximums limited by hardware.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
