@@ -1,5 +1,5 @@
 Bottom: 729b947f8c52c96a11c4a33ff4ef447cd22cc5d1
-Top:    4f2f25ebd2e4c21e3ee1f3ea094cfe52c4eb2e0b
+Top:    86c76245825e622a785f2ad9fa1fbe45408a19c2
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-06-04 14:51:41 -0700
 
@@ -88,10 +88,10 @@ index 2ee4767..828c6aa 100644
 +
  #endif /* CMA_H */
 diff --git a/src/rsocket.c b/src/rsocket.c
-index e899e8a..ee1fd6c 100644
+index e899e8a..b8ae3b4 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
-@@ -37,6 +37,7 @@
+@@ -37,10 +37,12 @@
  
  #include <sys/types.h>
  #include <sys/socket.h>
@@ -99,16 +99,21 @@ index e899e8a..ee1fd6c 100644
  #include <stdarg.h>
  #include <netdb.h>
  #include <unistd.h>
-@@ -64,6 +65,8 @@
+ #include <fcntl.h>
++#include <stdio.h>
+ #include <string.h>
+ #include <netinet/in.h>
+ #include <netinet/tcp.h>
+@@ -64,6 +66,8 @@
  static struct index_map idm;
  static pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
  
-+static long long polling_time;
++static unsigned long long polling_time;
 +
  /*
   * Immediate data format is determined by the upper bits
   * bit 31: message type, 0 - data, 1 - control
-@@ -197,6 +200,16 @@ struct rsocket {
+@@ -197,6 +201,16 @@ struct rsocket {
  	uint8_t		  *sbuf;
  };
  
@@ -117,7 +122,7 @@ index e899e8a..ee1fd6c 100644
 +	FILE *f;
 +
 +	if ((f = fopen(RS_CONF_DIR "/polling_time", "r"))) {
-+		fscanf(f, "%L", &polling_time);
++		fscanf(f, "%Lu", &polling_time);
 +		fclose(f);
 +	}
 +}
@@ -125,14 +130,14 @@ index e899e8a..ee1fd6c 100644
  /*
   * We currently generate a completion per send.  sqe_count = 1
   */
-@@ -924,6 +937,29 @@ static int rs_process_cq(struct rsocket *rs, int nonblock, int (*test)(struct rs
+@@ -924,6 +938,29 @@ static int rs_process_cq(struct rsocket *rs, int nonblock, int (*test)(struct rs
  	return ret;
  }
  
 +static int rs_get_comp(struct rsocket *rs, int nonblock, int (*test)(struct rsocket *rs))
 +{
 +	struct timeval s, e;
-+	long long poll_time = 0;
++	unsigned long long poll_time = 0;
 +	int ret;
 +
 +	do {
@@ -155,7 +160,7 @@ index e899e8a..ee1fd6c 100644
  static int rs_nonblocking(struct rsocket *rs, int flags)
  {
  	return (rs->fd_flags & O_NONBLOCK) || (flags & MSG_DONTWAIT);
-@@ -1035,7 +1071,7 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
+@@ -1035,7 +1072,7 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
  	}
  	fastlock_acquire(&rs->rlock);
  	if (!rs_have_rdata(rs)) {
@@ -164,7 +169,7 @@ index e899e8a..ee1fd6c 100644
  		if (ret && errno != ECONNRESET)
  			goto out;
  	}
-@@ -1139,8 +1175,8 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
+@@ -1139,8 +1176,8 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
  	fastlock_acquire(&rs->slock);
  	for (left = len; left; left -= xfer_size, buf += xfer_size) {
  		if (!rs_can_send(rs)) {
@@ -175,7 +180,7 @@ index e899e8a..ee1fd6c 100644
  			if (ret)
  				break;
  			if (rs->state != rs_connected) {
-@@ -1253,8 +1289,8 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
+@@ -1253,8 +1290,8 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
  	fastlock_acquire(&rs->slock);
  	for (left = len; left; left -= xfer_size) {
  		if (!rs_can_send(rs)) {
@@ -186,13 +191,13 @@ index e899e8a..ee1fd6c 100644
  			if (ret)
  				break;
  			if (rs->state != rs_connected) {
-@@ -1469,12 +1505,23 @@ static int rs_poll_events(struct pollfd *rfds, struct pollfd *fds, nfds_t nfds)
+@@ -1469,12 +1506,23 @@ static int rs_poll_events(struct pollfd *rfds, struct pollfd *fds, nfds_t nfds)
   */
  int rpoll(struct pollfd *fds, nfds_t nfds, int timeout)
  {
 +	struct timeval s, e;
  	struct pollfd *rfds;
-+	long long poll_time = 0;
++	unsigned long long poll_time = 0;
  	int ret;
  
 -	ret = rs_poll_check(fds, nfds);
