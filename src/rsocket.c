@@ -197,6 +197,11 @@ struct rsocket {
 	uint8_t		  *sbuf;
 };
 
+void rs_configure(void)
+{
+
+}
+
 /*
  * We currently generate a completion per send.  sqe_count = 1
  */
