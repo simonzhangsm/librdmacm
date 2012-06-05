@@ -1,5 +1,5 @@
 Bottom: 729b947f8c52c96a11c4a33ff4ef447cd22cc5d1
-Top:    f5d66eb10e9cf6e99e038c41afeec88f72f751b2
+Top:    79b36b9ed22f77cfe81e888155e383bcf09e5e9f
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-06-04 14:51:41 -0700
 
@@ -88,7 +88,7 @@ index 2ee4767..828c6aa 100644
 +
  #endif /* CMA_H */
 diff --git a/src/rsocket.c b/src/rsocket.c
-index e899e8a..3619af4 100644
+index e899e8a..bb66503 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -37,10 +37,12 @@
@@ -108,7 +108,7 @@ index e899e8a..3619af4 100644
  static struct index_map idm;
  static pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
  
-+static unsigned long long polling_time;
++static uint32_t polling_time;
 +
  /*
   * Immediate data format is determined by the upper bits
@@ -122,7 +122,7 @@ index e899e8a..3619af4 100644
 +	FILE *f;
 +
 +	if ((f = fopen(RS_CONF_DIR "/polling_time", "r"))) {
-+		fscanf(f, "%Lu", &polling_time);
++		fscanf(f, "%u", &polling_time);
 +		fclose(f);
 +	}
 +}
@@ -137,7 +137,7 @@ index e899e8a..3619af4 100644
 +static int rs_get_comp(struct rsocket *rs, int nonblock, int (*test)(struct rsocket *rs))
 +{
 +	struct timeval s, e;
-+	unsigned long long poll_time = 0;
++	uint32_t poll_time = 0;
 +	int ret;
 +
 +	do {
@@ -197,7 +197,7 @@ index e899e8a..3619af4 100644
  {
 +	struct timeval s, e;
  	struct pollfd *rfds;
-+	unsigned long long poll_time = 0;
++	uint32_t poll_time = 0;
  	int ret;
  
 -	ret = rs_poll_check(fds, nfds);
