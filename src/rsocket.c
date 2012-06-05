@@ -955,7 +955,7 @@ static int rs_get_comp(struct rsocket *rs, int nonblock, int (*test)(struct rsoc
 		gettimeofday(&e, NULL);
 		poll_time = (e.tv_sec - s.tv_sec) * 1000000 +
 			    (e.tv_usec - s.tv_usec) + 1;
-	} while (poll_time < polling_time);
+	} while (poll_time <= polling_time);
 
 	ret = rs_process_cq(rs, 0, test);
 	return ret;
@@ -1522,7 +1522,7 @@ int rpoll(struct pollfd *fds, nfds_t nfds, int timeout)
 		gettimeofday(&e, NULL);
 		poll_time = (e.tv_sec - s.tv_sec) * 1000000 +
 			    (e.tv_usec - s.tv_usec) + 1;
-	} while (poll_time < polling_time);
+	} while (poll_time <= polling_time);
 
 	rfds = rs_fds_alloc(nfds);
 	if (!rfds)
