@@ -1071,7 +1071,7 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
 	}
 	fastlock_acquire(&rs->rlock);
 	if (!rs_have_rdata(rs)) {
-		ret = rs_process_cq(rs, rs_nonblocking(rs, flags), rs_conn_have_rdata);
+		ret = rs_get_comp(rs, rs_nonblocking(rs, flags), rs_conn_have_rdata);
 		if (ret && errno != ECONNRESET)
 			goto out;
 	}
@@ -1175,8 +1175,8 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
 	fastlock_acquire(&rs->slock);
 	for (left = len; left; left -= xfer_size, buf += xfer_size) {
 		if (!rs_can_send(rs)) {
-			ret = rs_process_cq(rs, rs_nonblocking(rs, flags),
-					    rs_conn_can_send);
+			ret = rs_get_comp(rs, rs_nonblocking(rs, flags),
+					  rs_conn_can_send);
 			if (ret)
 				break;
 			if (rs->state != rs_connected) {
@@ -1289,8 +1289,8 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
 	fastlock_acquire(&rs->slock);
 	for (left = len; left; left -= xfer_size) {
 		if (!rs_can_send(rs)) {
-			ret = rs_process_cq(rs, rs_nonblocking(rs, flags),
-					    rs_conn_can_send);
+			ret = rs_get_comp(rs, rs_nonblocking(rs, flags),
+					  rs_conn_can_send);
 			if (ret)
 				break;
 			if (rs->state != rs_connected) {
