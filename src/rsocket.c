@@ -53,20 +53,21 @@
 #include "cma.h"
 #include "indexer.h"
 
-#define RS_INLINE 64
 #define RS_OLAP_START_SIZE 2048
 #define RS_MAX_TRANSFER 65536
-#define RS_QP_SIZE 384
 #define RS_QP_MAX_SIZE 0xFFFE
-#define RS_QP_MIN_SIZE 8
 #define RS_QP_CTRL_SIZE 4
 #define RS_CONN_RETRIES 6
 #define RS_SGL_SIZE 2
-#define RS_BUF_SIZE (1 << 17)
 static struct index_map idm;
 static pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
 
-static unsigned long long polling_time;
+static uint16_t def_inline = 64;
+static uint16_t def_sqsize = 384;
+static uint16_t def_rqsize = 384;
+static uint32_t def_mem = (1 << 17);
+static uint32_t def_wmem = (1 << 17);
+static uint32_t polling_time = 8;
 
 /*
  * Immediate data format is determined by the upper bits
@@ -206,8 +207,42 @@ void rs_configure(void)
 	FILE *f;
 
 	if ((f = fopen(RS_CONF_DIR "/polling_time", "r"))) {
-		fscanf(f, "%Lu", &polling_time);
+		fscanf(f, "%u", &polling_time);
 		fclose(f);
+	}
+
+	if ((f = fopen(RS_CONF_DIR "/inline_default", "r"))) {
+		fscanf(f, "%hu", &def_inline);
+		fclose(f);
+
+		if (def_inline < RS_MIN_INLINE)
+			def_inline = RS_MIN_INLINE;
+	}
+
+	if ((f = fopen(RS_CONF_DIR "/sqsize_default", "r"))) {
+		fscanf(f, "%hu", &def_sqsize);
+		fclose(f);
+	}
+
+	if ((f = fopen(RS_CONF_DIR "/rqsize_default", "r"))) {
+		fscanf(f, "%hu", &def_rqsize);
+		fclose(f);
+	}
+
+	if ((f = fopen(RS_CONF_DIR "/mem_default", "r"))) {
+		fscanf(f, "%u", &def_mem);
+		fclose(f);
+
+		if (def_mem < 1)
+			def_mem = 1;
+	}
+
+	if ((f = fopen(RS_CONF_DIR "/wmem_default", "r"))) {
+		fscanf(f, "%u", &def_wmem);
+		fclose(f);
+
+		if (def_wmem < 1)
+			def_wmem = 1;
 	}
 }
 
@@ -254,9 +289,11 @@ static struct rsocket *rs_alloc(struct rsocket *inherited_rs)
 		rs->rq_size = inherited_rs->rq_size;
 		rs->ctrl_avail = inherited_rs->ctrl_avail;
 	} else {
-		rs->sbuf_size = rs->rbuf_size = RS_BUF_SIZE;
-		rs->sq_inline = RS_INLINE;
-		rs->sq_size = rs->rq_size = RS_QP_SIZE;
+		rs->sbuf_size = def_wmem;
+		rs->rbuf_size = def_mem;
+		rs->sq_inline = def_inline;
+		rs->sq_size = def_sqsize;
+		rs->rq_size = def_rqsize;
 		rs->ctrl_avail = RS_QP_CTRL_SIZE;
 	}
 	fastlock_init(&rs->slock);
@@ -941,7 +978,7 @@ static int rs_process_cq(struct rsocket *rs, int nonblock, int (*test)(struct rs
 static int rs_get_comp(struct rsocket *rs, int nonblock, int (*test)(struct rsocket *rs))
 {
 	struct timeval s, e;
-	unsigned long long poll_time = 0;
+	uint32_t poll_time = 0;
 	int ret;
 
 	do {
@@ -1508,7 +1545,7 @@ int rpoll(struct pollfd *fds, nfds_t nfds, int timeout)
 {
 	struct timeval s, e;
 	struct pollfd *rfds;
-	unsigned long long poll_time = 0;
+	uint32_t poll_time = 0;
 	int ret;
 
 	do {
