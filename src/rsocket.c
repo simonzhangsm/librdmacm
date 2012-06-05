@@ -207,7 +207,7 @@ void rs_configure(void)
 	FILE *f;
 
 	if ((f = fopen(RS_CONF_DIR "/polling_time", "r"))) {
-		fscanf(f, "%Lu", &polling_time);
+		fscanf(f, "%u", &polling_time);
 		fclose(f);
 	}
 
@@ -978,7 +978,7 @@ static int rs_process_cq(struct rsocket *rs, int nonblock, int (*test)(struct rs
 static int rs_get_comp(struct rsocket *rs, int nonblock, int (*test)(struct rsocket *rs))
 {
 	struct timeval s, e;
-	unsigned long long poll_time = 0;
+	uint32_t poll_time = 0;
 	int ret;
 
 	do {
@@ -1545,7 +1545,7 @@ int rpoll(struct pollfd *fds, nfds_t nfds, int timeout)
 {
 	struct timeval s, e;
 	struct pollfd *rfds;
-	unsigned long long poll_time = 0;
+	uint32_t poll_time = 0;
 	int ret;
 
 	do {
