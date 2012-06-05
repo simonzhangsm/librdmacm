@@ -1,5 +1,5 @@
 Bottom: 729b947f8c52c96a11c4a33ff4ef447cd22cc5d1
-Top:    79b36b9ed22f77cfe81e888155e383bcf09e5e9f
+Top:    9023ede0dfcb282ab90f7726e5c637c9ff842534
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-06-04 14:51:41 -0700
 
@@ -49,31 +49,11 @@ index dec6064..3ee7f9b 100644
 +
  AC_CONFIG_FILES([Makefile librdmacm.spec])
  AC_OUTPUT
-diff --git a/src/cma.c b/src/cma.c
-index f688c4c..140e22c 100755
---- a/src/cma.c
-+++ b/src/cma.c
-@@ -276,6 +276,7 @@ int ucma_init(void)
- 
- 	cma_dev_cnt = dev_cnt;
- 	ucma_set_af_ib_support();
-+	rs_configure();
- 	pthread_mutex_unlock(&mut);
- 	ibv_free_device_list(dev_list);
- 	return 0;
 diff --git a/src/cma.h b/src/cma.h
-index 2ee4767..828c6aa 100644
+index 2ee4767..cedc0c3 100644
 --- a/src/cma.h
 +++ b/src/cma.h
-@@ -114,6 +114,7 @@ static inline int ERR(int err)
- }
- 
- int ucma_init();
-+void rs_configure();
- extern int af_ib_support;
- 
- #define RAI_ROUTEONLY		0x01000000
-@@ -166,4 +167,13 @@ struct ibv_path_data
+@@ -166,4 +166,13 @@ struct ibv_path_data
  };
  #endif
  
@@ -88,7 +68,7 @@ index 2ee4767..828c6aa 100644
 +
  #endif /* CMA_H */
 diff --git a/src/rsocket.c b/src/rsocket.c
-index e899e8a..bb66503 100644
+index e899e8a..90f9a10 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -37,10 +37,12 @@
@@ -113,24 +93,43 @@ index e899e8a..bb66503 100644
  /*
   * Immediate data format is determined by the upper bits
   * bit 31: message type, 0 - data, 1 - control
-@@ -197,6 +201,16 @@ struct rsocket {
+@@ -197,6 +201,27 @@ struct rsocket {
  	uint8_t		  *sbuf;
  };
  
 +void rs_configure(void)
 +{
 +	FILE *f;
++	static int init;
++
++	if (init)
++		return;
++
++	pthread_mutex_lock(&mut);
++	if (init)
++		goto out;
 +
 +	if ((f = fopen(RS_CONF_DIR "/polling_time", "r"))) {
 +		fscanf(f, "%u", &polling_time);
 +		fclose(f);
 +	}
++	init = 1;
++out:
++	pthread_mutex_unlock(&mut);
 +}
 +
  /*
   * We currently generate a completion per send.  sqe_count = 1
   */
-@@ -924,6 +938,29 @@ static int rs_process_cq(struct rsocket *rs, int nonblock, int (*test)(struct rs
+@@ -471,6 +496,7 @@ int rsocket(int domain, int type, int protocol)
+ 	    (type != SOCK_STREAM) || (protocol && protocol != IPPROTO_TCP))
+ 		return ERR(ENOTSUP);
+ 
++	rs_configure();
+ 	rs = rs_alloc(NULL);
+ 	if (!rs)
+ 		return ERR(ENOMEM);
+@@ -924,6 +950,29 @@ static int rs_process_cq(struct rsocket *rs, int nonblock, int (*test)(struct rs
  	return ret;
  }
  
@@ -160,7 +159,7 @@ index e899e8a..bb66503 100644
  static int rs_nonblocking(struct rsocket *rs, int flags)
  {
  	return (rs->fd_flags & O_NONBLOCK) || (flags & MSG_DONTWAIT);
-@@ -1035,7 +1072,7 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
+@@ -1035,7 +1084,7 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
  	}
  	fastlock_acquire(&rs->rlock);
  	if (!rs_have_rdata(rs)) {
@@ -169,7 +168,7 @@ index e899e8a..bb66503 100644
  		if (ret && errno != ECONNRESET)
  			goto out;
  	}
-@@ -1139,8 +1176,8 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
+@@ -1139,8 +1188,8 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
  	fastlock_acquire(&rs->slock);
  	for (left = len; left; left -= xfer_size, buf += xfer_size) {
  		if (!rs_can_send(rs)) {
@@ -180,7 +179,7 @@ index e899e8a..bb66503 100644
  			if (ret)
  				break;
  			if (rs->state != rs_connected) {
-@@ -1253,8 +1290,8 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
+@@ -1253,8 +1302,8 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
  	fastlock_acquire(&rs->slock);
  	for (left = len; left; left -= xfer_size) {
  		if (!rs_can_send(rs)) {
@@ -191,7 +190,7 @@ index e899e8a..bb66503 100644
  			if (ret)
  				break;
  			if (rs->state != rs_connected) {
-@@ -1469,12 +1506,23 @@ static int rs_poll_events(struct pollfd *rfds, struct pollfd *fds, nfds_t nfds)
+@@ -1469,12 +1518,23 @@ static int rs_poll_events(struct pollfd *rfds, struct pollfd *fds, nfds_t nfds)
   */
  int rpoll(struct pollfd *fds, nfds_t nfds, int timeout)
  {
