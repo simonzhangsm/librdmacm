@@ -937,6 +937,29 @@ static int rs_process_cq(struct rsocket *rs, int nonblock, int (*test)(struct rs
 	return ret;
 }
 
+static int rs_get_comp(struct rsocket *rs, int nonblock, int (*test)(struct rsocket *rs))
+{
+	struct timeval s, e;
+	long long poll_time = 0;
+	int ret;
+
+	do {
+		ret = rs_process_cq(rs, 1, test);
+		if (!ret || nonblock || errno != EWOULDBLOCK)
+			return ret;
+
+		if (!poll_time)
+			gettimeofday(&s, NULL);
+
+		gettimeofday(&e, NULL);
+		poll_time = (e.tv_sec - s.tv_sec) * 1000000 +
+			    (e.tv_usec - s.tv_usec) + 1;
+	} while (poll_time < polling_time);
+
+	ret = rs_process_cq(rs, 0, test);
+	return ret;
+}
+
 static int rs_nonblocking(struct rsocket *rs, int flags)
 {
 	return (rs->fd_flags & O_NONBLOCK) || (flags & MSG_DONTWAIT);
