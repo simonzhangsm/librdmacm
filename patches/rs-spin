@@ -14,7 +14,7 @@ configuration file rdma/rsocket/polling_time.  This is user
 adjustable or may be set automatically by ibacm.
 
 As a completely unintentional side effect, this just happens to
-improve application performance in benchmarks, like netpipe.
+improve application performance in benchmarks, like netpipe. ;)
 
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
