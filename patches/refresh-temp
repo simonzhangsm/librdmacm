@@ -1,0 +1,40 @@
+Bottom: a47542217fa1351685a259df1aaa9c30fd75ca20
+Top:    1779fb10114ac58b8fec5784590ae492f83c745c
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-06-05 16:21:19 -0700
+
+Refresh of rs-defaults
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 06e597f..68316f9 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -207,7 +207,7 @@ void rs_configure(void)
+ 	FILE *f;
+ 
+ 	if ((f = fopen(RS_CONF_DIR "/polling_time", "r"))) {
+-		fscanf(f, "%Lu", &polling_time);
++		fscanf(f, "%u", &polling_time);
+ 		fclose(f);
+ 	}
+ 
+@@ -978,7 +978,7 @@ static int rs_process_cq(struct rsocket *rs, int nonblock, int (*test)(struct rs
+ static int rs_get_comp(struct rsocket *rs, int nonblock, int (*test)(struct rsocket *rs))
+ {
+ 	struct timeval s, e;
+-	unsigned long long poll_time = 0;
++	uint32_t poll_time = 0;
+ 	int ret;
+ 
+ 	do {
+@@ -1545,7 +1545,7 @@ int rpoll(struct pollfd *fds, nfds_t nfds, int timeout)
+ {
+ 	struct timeval s, e;
+ 	struct pollfd *rfds;
+-	unsigned long long poll_time = 0;
++	uint32_t poll_time = 0;
+ 	int ret;
+ 
+ 	do {
