@@ -1,0 +1,57 @@
+Bottom: 4f2f25ebd2e4c21e3ee1f3ea094cfe52c4eb2e0b
+Top:    86c76245825e622a785f2ad9fa1fbe45408a19c2
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-06-05 14:48:30 -0700
+
+Refresh of rs-spin
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index ee1fd6c..b8ae3b4 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -42,6 +42,7 @@
+ #include <netdb.h>
+ #include <unistd.h>
+ #include <fcntl.h>
++#include <stdio.h>
+ #include <string.h>
+ #include <netinet/in.h>
+ #include <netinet/tcp.h>
+@@ -65,7 +66,7 @@
+ static struct index_map idm;
+ static pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
+ 
+-static long long polling_time;
++static unsigned long long polling_time;
+ 
+ /*
+  * Immediate data format is determined by the upper bits
+@@ -205,7 +206,7 @@ void rs_configure(void)
+ 	FILE *f;
+ 
+ 	if ((f = fopen(RS_CONF_DIR "/polling_time", "r"))) {
+-		fscanf(f, "%L", &polling_time);
++		fscanf(f, "%Lu", &polling_time);
+ 		fclose(f);
+ 	}
+ }
+@@ -940,7 +941,7 @@ static int rs_process_cq(struct rsocket *rs, int nonblock, int (*test)(struct rs
+ static int rs_get_comp(struct rsocket *rs, int nonblock, int (*test)(struct rsocket *rs))
+ {
+ 	struct timeval s, e;
+-	long long poll_time = 0;
++	unsigned long long poll_time = 0;
+ 	int ret;
+ 
+ 	do {
+@@ -1507,7 +1508,7 @@ int rpoll(struct pollfd *fds, nfds_t nfds, int timeout)
+ {
+ 	struct timeval s, e;
+ 	struct pollfd *rfds;
+-	long long poll_time = 0;
++	unsigned long long poll_time = 0;
+ 	int ret;
+ 
+ 	do {
