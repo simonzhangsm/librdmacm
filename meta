@@ -1,13 +1,13 @@
 Version: 1
-Previous: fc2d8f8d5430d6c5000a2e6eb85ed2b636f4ae68
+Previous: 1891aa38773998b79dd6eb3ab08bee7b9f0eec81
 Head: 518f87c2c043a68d1d53206feb76b79586c97be0
 Applied:
   ip6-opt: a459c228426c4d25684dcfd2a4203f013f0b454e
   rs-shutdown: f16748cbaea650f19805ddc6652895ca88d36a45
   rs-maxseg: e7a519b8ae91403c8c0d29b2a86ae376b37a71c1
   rs-spin: 4b246948b989fe86f8243b48fc252a29f41c237c
+  rs-defaults: 518f87c2c043a68d1d53206feb76b79586c97be0
 Unapplied:
-  rs-defaults: fac7c2d790411baf560eed8bbfe8cc91b87e3b01
   buf-addr: eb70620389ced3c0c705d44b69e691a47cd3e4fd
   rs-1sge: 85e4c4a0da0b501b60a1035d7a003ee20a749511
   rs-def-inline: 6ad70d3b80178e40fea97f662a6b31e51cddc0af
