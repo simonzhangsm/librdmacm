@@ -1,5 +1,5 @@
 Bottom: 729b947f8c52c96a11c4a33ff4ef447cd22cc5d1
-Top:    86c76245825e622a785f2ad9fa1fbe45408a19c2
+Top:    f5d66eb10e9cf6e99e038c41afeec88f72f751b2
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-06-04 14:51:41 -0700
 
@@ -88,7 +88,7 @@ index 2ee4767..828c6aa 100644
 +
  #endif /* CMA_H */
 diff --git a/src/rsocket.c b/src/rsocket.c
-index e899e8a..b8ae3b4 100644
+index e899e8a..3619af4 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -37,10 +37,12 @@
@@ -151,7 +151,7 @@ index e899e8a..b8ae3b4 100644
 +		gettimeofday(&e, NULL);
 +		poll_time = (e.tv_sec - s.tv_sec) * 1000000 +
 +			    (e.tv_usec - s.tv_usec) + 1;
-+	} while (poll_time < polling_time);
++	} while (poll_time <= polling_time);
 +
 +	ret = rs_process_cq(rs, 0, test);
 +	return ret;
@@ -214,7 +214,7 @@ index e899e8a..b8ae3b4 100644
 +		gettimeofday(&e, NULL);
 +		poll_time = (e.tv_sec - s.tv_sec) * 1000000 +
 +			    (e.tv_usec - s.tv_usec) + 1;
-+	} while (poll_time < polling_time);
++	} while (poll_time <= polling_time);
  
  	rfds = rs_fds_alloc(nfds);
  	if (!rfds)
