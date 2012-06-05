@@ -276,7 +276,6 @@ int ucma_init(void)
 
 	cma_dev_cnt = dev_cnt;
 	ucma_set_af_ib_support();
-	rs_configure();
 	pthread_mutex_unlock(&mut);
 	ibv_free_device_list(dev_list);
 	return 0;

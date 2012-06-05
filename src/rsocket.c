@@ -204,11 +204,22 @@ struct rsocket {
 void rs_configure(void)
 {
 	FILE *f;
+	static int init;
+
+	if (init)
+		return;
+
+	pthread_mutex_lock(&mut);
+	if (init)
+		goto out;
 
 	if ((f = fopen(RS_CONF_DIR "/polling_time", "r"))) {
 		fscanf(f, "%u", &polling_time);
 		fclose(f);
 	}
+	init = 1;
+out:
+	pthread_mutex_unlock(&mut);
 }
 
 /*
@@ -485,6 +496,7 @@ int rsocket(int domain, int type, int protocol)
 	    (type != SOCK_STREAM) || (protocol && protocol != IPPROTO_TCP))
 		return ERR(ENOTSUP);
 
+	rs_configure();
 	rs = rs_alloc(NULL);
 	if (!rs)
 		return ERR(ENOMEM);
