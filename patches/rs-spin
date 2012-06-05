@@ -1,5 +1,5 @@
 Bottom: 729b947f8c52c96a11c4a33ff4ef447cd22cc5d1
-Top:    a06f8c30f5c3e2d91e8d356e1422281199aa4d70
+Top:    4f2f25ebd2e4c21e3ee1f3ea094cfe52c4eb2e0b
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-06-04 14:51:41 -0700
 
@@ -62,7 +62,7 @@ index f688c4c..140e22c 100755
  	ibv_free_device_list(dev_list);
  	return 0;
 diff --git a/src/cma.h b/src/cma.h
-index 2ee4767..7cd1f04 100644
+index 2ee4767..828c6aa 100644
 --- a/src/cma.h
 +++ b/src/cma.h
 @@ -114,6 +114,7 @@ static inline int ERR(int err)
@@ -84,11 +84,11 @@ index 2ee4767..7cd1f04 100644
 +#define RDMADIR "rdma"
 +#endif
 +#define RDMA_CONF_DIR  SYSCONFDIR "/" RDMADIR
-+#define RS_CONF_DIR RDMA_CONF_DIR "/rsockets"
++#define RS_CONF_DIR RDMA_CONF_DIR "/rsocket"
 +
  #endif /* CMA_H */
 diff --git a/src/rsocket.c b/src/rsocket.c
-index e899e8a..5776806 100644
+index e899e8a..ee1fd6c 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -37,6 +37,7 @@
@@ -155,6 +155,37 @@ index e899e8a..5776806 100644
  static int rs_nonblocking(struct rsocket *rs, int flags)
  {
  	return (rs->fd_flags & O_NONBLOCK) || (flags & MSG_DONTWAIT);
+@@ -1035,7 +1071,7 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
+ 	}
+ 	fastlock_acquire(&rs->rlock);
+ 	if (!rs_have_rdata(rs)) {
+-		ret = rs_process_cq(rs, rs_nonblocking(rs, flags), rs_conn_have_rdata);
++		ret = rs_get_comp(rs, rs_nonblocking(rs, flags), rs_conn_have_rdata);
+ 		if (ret && errno != ECONNRESET)
+ 			goto out;
+ 	}
+@@ -1139,8 +1175,8 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
+ 	fastlock_acquire(&rs->slock);
+ 	for (left = len; left; left -= xfer_size, buf += xfer_size) {
+ 		if (!rs_can_send(rs)) {
+-			ret = rs_process_cq(rs, rs_nonblocking(rs, flags),
+-					    rs_conn_can_send);
++			ret = rs_get_comp(rs, rs_nonblocking(rs, flags),
++					  rs_conn_can_send);
+ 			if (ret)
+ 				break;
+ 			if (rs->state != rs_connected) {
+@@ -1253,8 +1289,8 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
+ 	fastlock_acquire(&rs->slock);
+ 	for (left = len; left; left -= xfer_size) {
+ 		if (!rs_can_send(rs)) {
+-			ret = rs_process_cq(rs, rs_nonblocking(rs, flags),
+-					    rs_conn_can_send);
++			ret = rs_get_comp(rs, rs_nonblocking(rs, flags),
++					  rs_conn_can_send);
+ 			if (ret)
+ 				break;
+ 			if (rs->state != rs_connected) {
 @@ -1469,12 +1505,23 @@ static int rs_poll_events(struct pollfd *rfds, struct pollfd *fds, nfds_t nfds)
   */
  int rpoll(struct pollfd *fds, nfds_t nfds, int timeout)
