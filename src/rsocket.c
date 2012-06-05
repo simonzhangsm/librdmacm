@@ -37,6 +37,7 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <stdarg.h>
 #include <netdb.h>
 #include <unistd.h>
@@ -63,6 +64,8 @@
 #define RS_BUF_SIZE (1 << 17)
 static struct index_map idm;
 static pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
+
+static long long polling_time;
 
 /*
  * Immediate data format is determined by the upper bits
@@ -199,7 +202,12 @@ struct rsocket {
 
 void rs_configure(void)
 {
+	FILE *f;
 
+	if ((f = fopen(RS_CONF_DIR "/polling_time", "r"))) {
+		fscanf(f, "%L", &polling_time);
+		fclose(f);
+	}
 }
 
 /*
@@ -1474,12 +1482,23 @@ static int rs_poll_events(struct pollfd *rfds, struct pollfd *fds, nfds_t nfds)
  */
 int rpoll(struct pollfd *fds, nfds_t nfds, int timeout)
 {
+	struct timeval s, e;
 	struct pollfd *rfds;
+	long long poll_time = 0;
 	int ret;
 
-	ret = rs_poll_check(fds, nfds);
-	if (ret || !timeout)
-		return ret;
+	do {
+		ret = rs_poll_check(fds, nfds);
+		if (ret || !timeout)
+			return ret;
+
+		if (!poll_time)
+			gettimeofday(&s, NULL);
+
+		gettimeofday(&e, NULL);
+		poll_time = (e.tv_sec - s.tv_sec) * 1000000 +
+			    (e.tv_usec - s.tv_usec) + 1;
+	} while (poll_time < polling_time);
 
 	rfds = rs_fds_alloc(nfds);
 	if (!rfds)
