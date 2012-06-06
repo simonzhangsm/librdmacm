@@ -1,5 +1,5 @@
 Bottom: 729b947f8c52c96a11c4a33ff4ef447cd22cc5d1
-Top:    9023ede0dfcb282ab90f7726e5c637c9ff842534
+Top:    b81754028658b7a877798e12b2fd67dd9d2ae0be
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-06-04 14:51:41 -0700
 
@@ -68,7 +68,7 @@ index 2ee4767..cedc0c3 100644
 +
  #endif /* CMA_H */
 diff --git a/src/rsocket.c b/src/rsocket.c
-index e899e8a..90f9a10 100644
+index e899e8a..f53f1c8 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -37,10 +37,12 @@
@@ -88,7 +88,7 @@ index e899e8a..90f9a10 100644
  static struct index_map idm;
  static pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
  
-+static uint32_t polling_time;
++static uint32_t polling_time = 10;
 +
  /*
   * Immediate data format is determined by the upper bits
