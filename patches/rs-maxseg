@@ -1,5 +1,5 @@
-Bottom: 684e21cf3e81b4f5bd740456e0fea103e52d7d1f
-Top:    729b947f8c52c96a11c4a33ff4ef447cd22cc5d1
+Bottom: 5e0be3cec4b1092b15ffff22ce847641d572b180
+Top:    e8942df497cda9d853e5bbaa69226ad2ede0b3b9
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-06-04 13:22:10 -0700
 
@@ -14,10 +14,10 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index a1679f1..e899e8a 100644
+index 8f20b4a..2fd106a 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
-@@ -1717,6 +1717,9 @@ int rsetsockopt(int socket, int level, int optname,
+@@ -1716,6 +1716,9 @@ int rsetsockopt(int socket, int level, int optname,
  			opt_on = *(int *) optval;
  			ret = 0;
  			break;
@@ -27,7 +27,7 @@ index a1679f1..e899e8a 100644
  		default:
  			break;
  		}
-@@ -1814,6 +1817,12 @@ int rgetsockopt(int socket, int level, int optname,
+@@ -1802,6 +1805,12 @@ int rgetsockopt(int socket, int level, int optname,
  			*((int *) optval) = !!(rs->tcp_opts & (1 << optname));
  			*optlen = sizeof(int);
  			break;
