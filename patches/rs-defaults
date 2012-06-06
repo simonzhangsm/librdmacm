@@ -6,10 +6,10 @@ Date:   2012-06-05 15:28:18 -0700
 rsocket: Use configuration files to specify default settings
 
 Give an administrator control over the default settings
-used by rsockets.  Use files under rdma/rsocket as shown:
+used by rsockets.  Use files under %sysconfig%/rdma/rsocket as shown:
 
-mem_default - default size of receive buffer
-wmem_default - default size of send buffer
+mem_default - default size of receive buffer(s)
+wmem_default - default size of send buffer(s)
 sqsize_default - default size of send queue
 rqsize_default - default size of receive queue
 inline_default - default size of inline data
