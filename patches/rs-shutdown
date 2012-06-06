@@ -1,5 +1,5 @@
-Bottom: 0c5a0c24885960bf61c5afe1b2ef070808c1f084
-Top:    684e21cf3e81b4f5bd740456e0fea103e52d7d1f
+Bottom: d79d5464622c07a1ee7c42051fee5fca02c52207
+Top:    5e0be3cec4b1092b15ffff22ce847641d572b180
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-06-04 13:14:42 -0700
 
@@ -23,10 +23,10 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index 8b1e930..a1679f1 100644
+index c111797..8f20b4a 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
-@@ -1593,6 +1593,9 @@ int rshutdown(int socket, int how)
+@@ -1592,6 +1592,9 @@ int rshutdown(int socket, int how)
  	struct rsocket *rs;
  	int ret = 0;
  
