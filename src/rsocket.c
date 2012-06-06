@@ -66,7 +66,7 @@
 static struct index_map idm;
 static pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
 
-static uint32_t polling_time;
+static uint32_t polling_time = 10;
 
 /*
  * Immediate data format is determined by the upper bits
