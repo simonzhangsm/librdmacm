@@ -1,5 +1,5 @@
-Bottom: b81754028658b7a877798e12b2fd67dd9d2ae0be
-Top:    d90367263f5a974038034a311c40904c960afdff
+Bottom: 9a355c4fd6adc489cc0c3c07b3d436d25ff2cb0c
+Top:    12cda031f6e4027c6df650d4c84ed637ba93cdf8
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-06-05 15:28:18 -0700
 
@@ -23,7 +23,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index f53f1c8..f7a0fdd 100644
+index d7344c7..5e0e413 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -53,19 +53,20 @@
@@ -51,7 +51,7 @@ index f53f1c8..f7a0fdd 100644
  static uint32_t polling_time = 10;
  
  /*
-@@ -217,6 +218,40 @@ void rs_configure(void)
+@@ -216,6 +217,40 @@ void rs_configure(void)
  		fscanf(f, "%u", &polling_time);
  		fclose(f);
  	}
@@ -92,7 +92,7 @@ index f53f1c8..f7a0fdd 100644
  	init = 1;
  out:
  	pthread_mutex_unlock(&mut);
-@@ -265,9 +300,11 @@ static struct rsocket *rs_alloc(struct rsocket *inherited_rs)
+@@ -264,9 +299,11 @@ static struct rsocket *rs_alloc(struct rsocket *inherited_rs)
  		rs->rq_size = inherited_rs->rq_size;
  		rs->ctrl_avail = inherited_rs->ctrl_avail;
  	} else {
