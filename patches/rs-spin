@@ -10,8 +10,8 @@ trip ping-pong time.  Spin briefly on rsockets before calling
 into the kernel and blocking.
 
 The time to spin before blocking is read from an rsocket
-configuration file rdma/rsocket/polling_time.  This is user
-adjustable or may be set automatically by ibacm.
+configuration file %sysconfig%/rdma/rsocket/polling_time.  This
+is user adjustable or may be set automatically by ibacm.
 
 As a completely unintentional side effect, this just happens to
 improve application performance in benchmarks, like netpipe,
