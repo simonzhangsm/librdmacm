@@ -1,5 +1,5 @@
 Version: 1
-Previous: 736d4dfe2bf524bc9d965c3a3c229278333f6ea8
+Previous: 6b65f4b2e13fa8248b9a20712264c56fdef7486f
 Head: 5a39fae0e595b08ff2b5ca58896ee0ecd51ab66c
 Applied:
   rs-shutdown: 110fcad2ecce39d6888448c19b08791ea193e7f9
@@ -10,5 +10,4 @@ Unapplied:
   ip6-opt: 7e43a759255e9890d1e41f1edf71792836f53941
   buf-addr: eb70620389ced3c0c705d44b69e691a47cd3e4fd
   rs-1sge: 85e4c4a0da0b501b60a1035d7a003ee20a749511
-  rs-def-inline: 6ad70d3b80178e40fea97f662a6b31e51cddc0af
 Hidden:
