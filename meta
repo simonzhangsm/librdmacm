@@ -1,9 +1,8 @@
 Version: 1
-Previous: cf8056218aaf7a4a65b54894431ddccf7e4de645
-Head: 765f58fc6d1042e95bee071b0d34e6cc62eccc18
+Previous: 39e2490ea62b083a78c5fd2e79dcedd0d11efb3e
+Head: 7e43a759255e9890d1e41f1edf71792836f53941
 Applied:
-  ip6-opt: a459c228426c4d25684dcfd2a4203f013f0b454e
-  refresh-temp: 765f58fc6d1042e95bee071b0d34e6cc62eccc18
+  ip6-opt: 7e43a759255e9890d1e41f1edf71792836f53941
 Unapplied:
   rs-shutdown: f16748cbaea650f19805ddc6652895ca88d36a45
   rs-maxseg: e7a519b8ae91403c8c0d29b2a86ae376b37a71c1
