@@ -1,5 +1,5 @@
-Bottom: e8942df497cda9d853e5bbaa69226ad2ede0b3b9
-Top:    9a355c4fd6adc489cc0c3c07b3d436d25ff2cb0c
+Bottom: 69d5a78d671e7db0e0da70e3702c92eceac177a8
+Top:    e82c044cf309455824c63dc15e3d4af71448cf16
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-06-04 14:51:41 -0700
 
@@ -69,7 +69,7 @@ index 2ee4767..cedc0c3 100644
 +
  #endif /* CMA_H */
 diff --git a/src/rsocket.c b/src/rsocket.c
-index 2fd106a..d7344c7 100644
+index e906fd4..7692498 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -37,10 +37,12 @@
