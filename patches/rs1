@@ -1,0 +1,38 @@
+Bottom: d79d5464622c07a1ee7c42051fee5fca02c52207
+Top:    5e0be3cec4b1092b15ffff22ce847641d572b180
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-06-04 13:14:42 -0700
+
+rsocket: Handle SHUT_RD/WR shutdown flags
+
+Sridhar Samudrala <sri@us.ibm.com> reported an error (EOPNOTSUPP)
+after calling select().
+
+The issue is that rshutdown(SHUT_WR) was called before select().
+As part of shutdown, rsockets switches the underlying fd from
+nonblocking to blocking to ensure that previously sent data has
+completed.  shutdown(SHUT_WR) indicates that the socket should be
+kept open for receiving data.
+
+Delay handling the actual shutdown unless SHUT_RDWR is specified,
+or the socket is closed.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index c111797..8f20b4a 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -1592,6 +1592,9 @@ int rshutdown(int socket, int how)
+ 	struct rsocket *rs;
+ 	int ret = 0;
+ 
++	if (how != SHUT_RDWR)
++		return 0;
++
+ 	rs = idm_at(&idm, socket);
+ 	if (rs->fd_flags & O_NONBLOCK)
+ 		rs_set_nonblocking(rs, 0);
