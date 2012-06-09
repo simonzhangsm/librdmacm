@@ -1,0 +1,76 @@
+Bottom: 5e3e6b71c501cb8ea673381a8c35aabaa2c3c924
+Top:    5d8567651b8275bf1758541671b1945c62afa5d7
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-06-08 17:28:03 -0700
+
+Refresh of rs-1sge
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 4781e81..0f3bc91 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -765,6 +765,7 @@ static int rs_write_data(struct rsocket *rs, struct ibv_sge *sge, int flags)
+ 	uint64_t addr;
+ 	uint32_t rkey;
+ 	uint32_t len = sge->length;
++	int ret;
+ 
+ 	rs->sseq_no++;
+ 	rs->sqe_avail--;
+@@ -781,8 +782,13 @@ static int rs_write_data(struct rsocket *rs, struct ibv_sge *sge, int flags)
+ 			rs->target_sge = 0;
+ 	}
+ 
+-	return rs_post_write(rs, rs_wrid_set(1, len), sge, 1,
+-			     rs_msg_set(RS_OP_DATA, len), flags, addr, rkey);
++	ret = rs_post_write(rs, rs_wrid_set(1, len), sge, 1,
++			    rs_msg_set(RS_OP_DATA, len), flags, addr, rkey);
++	if (len < rs_sbuf_left(rs))
++		rs->ssge.addr += len;
++	else
++		rs->ssge.addr = (uintptr_t) rs->sbuf;
++	return ret;
+ }
+ 
+ static uint32_t rs_sbuf_left(struct rsocket *rs)
+@@ -1237,16 +1243,10 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
+ 			sge.length = xfer_size;
+ 			sge.lkey = 0;
+ 			ret = rs_write_data(rs, &sge, IBV_SEND_INLINE);
+-			if (xfer_size == rs_sbuf_left(rs))
+-				rs->ssge.addr = (uintptr_t) rs->sbuf;
+ 		} else {
+ 			memcpy((void *) (uintptr_t) rs->ssge.addr, buf, xfer_size);
+ 			rs->ssge.length = xfer_size;
+ 			ret = rs_write_data(rs, &rs->ssge, 0);
+-			if (xfer_size < rs_sbuf_left(rs))
+-				rs->ssge.addr += xfer_size;
+-			else
+-				rs->ssge.addr = (uintptr_t) rs->sbuf;
+ 		}
+ 		if (ret)
+ 			break;
+@@ -1309,7 +1309,7 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
+ 		len += iov[i].iov_len;
+ 
+ 	fastlock_acquire(&rs->slock);
+-	for (left = len; left; left -= xfer_size) {
++	for (left = len; left && !ret; left -= xfer_size) {
+ 		if (!rs_can_send(rs)) {
+ 			ret = rs_get_comp(rs, rs_nonblocking(rs, flags),
+ 					  rs_conn_can_send);
+@@ -1341,13 +1341,6 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
+ 		rs->ssge.length = xfer_size;
+ 		ret = rs_write_data(rs, &rs->ssge, xfer_size <= rs->sq_inline ?
+ 						   IBV_SEND_INLINE : 0);
+-		if (ret)
+-			break;
+-
+-		if (xfer_size < rs_sbuf_left(rs))
+-			rs->ssge.addr += xfer_size;
+-		else
+-			rs->ssge.addr = (uintptr_t) rs->sbuf;
+ 	}
+ 	fastlock_release(&rs->slock);
