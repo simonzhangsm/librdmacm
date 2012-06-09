@@ -756,6 +756,12 @@ static int rs_post_write(struct rsocket *rs, uint64_t wr_id,
 	return rdma_seterrno(ibv_post_send(rs->cm_id->qp, &wr, &bad));
 }
 
+static uint32_t rs_sbuf_left(struct rsocket *rs)
+{
+	return (uint32_t) (((uint64_t) (uintptr_t) &rs->sbuf[rs->sbuf_size]) -
+			   rs->ssge.addr);
+}
+
 /*
  * Update target SGE before sending data.  Otherwise the remote side may
  * update the entry before we do.
@@ -789,12 +795,6 @@ static int rs_write_data(struct rsocket *rs, struct ibv_sge *sge, int flags)
 	else
 		rs->ssge.addr = (uintptr_t) rs->sbuf;
 	return ret;
-}
-
-static uint32_t rs_sbuf_left(struct rsocket *rs)
-{
-	return (uint32_t) (((uint64_t) (uintptr_t) &rs->sbuf[rs->sbuf_size]) -
-			   rs->ssge.addr);
 }
 
 static void rs_send_credits(struct rsocket *rs)
