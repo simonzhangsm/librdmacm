@@ -44,11 +44,11 @@ O_NONBLOCK
 In addition to standard socket options, rsockets supports options
 specific to RDMA devices and protocols.  These options are accessible
 through rsetsockopt using SOL_RDMA option level.
-.P
+.TP
 RDMA_SQSIZE - Integer size of the underlying send queue.
-.P
+.TP
 RDMA_RQSIZE - Integer size of the underlying receive queue.
-.P
+.TP
 RDMA_INLINE - Integer size of inline data.
 .P
 Note that rsockets fd's cannot be passed into non-rsocket calls.  For
