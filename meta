@@ -1,7 +1,8 @@
 Version: 1
-Previous: 5782199f057afdaf663ad3c4b6d798afa679d2c2
-Head: 4c771a2a498204699ef8e91498214a9814422ee3
+Previous: b4a50ca4bcf48c966be02f4f2b32d5834f6b3420
+Head: 78550e5efc692e231a11bc32be7ab362258ea69f
 Applied:
+  rs-man: 78550e5efc692e231a11bc32be7ab362258ea69f
 Unapplied:
   rs-1sge: 10e5dd48bf6f4ccab00d5fafebec06b13110d5da
   ip6-opt: 7e43a759255e9890d1e41f1edf71792836f53941
