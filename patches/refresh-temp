@@ -1,0 +1,111 @@
+Bottom: 19653040b4f6827e46b2b5079ab41e32a223fc76
+Top:    0926a4bf52b8e126ca0aa65bb38b16ed340e1515
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-06-11 14:03:23 -0700
+
+Refresh of rs-man
+
+---
+
+diff --git a/Makefile.am b/Makefile.am
+index 1dc61e1..51b2f89 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -113,7 +113,8 @@ man_MANS = \
+ 	man/rdma_xclient.1 \
+ 	man/rstream.1 \
+ 	man/rcopy.1 \
+-	man/rdma_cm.7
++	man/rdma_cm.7 \
++	man/rsocket.7
+ 
+ EXTRA_DIST = src/cma.h src/indexer.h src/librdmacm.map \
+ 	librdmacm.spec.in $(man_MANS)
+diff --git a/man/rsocket.7 b/man/rsocket.7
+new file mode 100644
+index 0000000..b26bab7
+--- /dev/null
++++ b/man/rsocket.7
+@@ -0,0 +1,82 @@
++.TH "RSOCKET" 7 "2010-07-19" "librdmacm" "Librdmacm Programmer's Manual" librdmacm
++.SH NAME
++rsocket \- RDMA socket API
++.SH SYNOPSIS
++.B "#include <rdma/rsocket.h>"
++.SH "DESCRIPTION"
++RDMA socket API and protocol
++.SH "NOTES"
++rsockets is a protocol over RDMA that supports a socket-level API
++for applications.  rsocket APIs are intended to match the behavior
++of corresponding socket calls, except where noted.  rsocket
++functions match the name and function signature of socket calls,
++with the exception that all function calls are prefixed with an 'r'.
++.P
++The following functions are defined:
++.P
++rsocket
++.P
++rbind, rlisten, raccept, rconnect
++.P
++rshutdown, rclose
++.P
++rrecv, rrecvfrom, rrecvmsg, rread, rreadv
++.P
++rsend, rsendto, rsendmsg, rwrite, rwritev
++.P
++rpoll, rselect
++.P
++rgetpeername, rgetsockname
++.P
++rsetsockopt, rgetsockopt, rfcntl
++.P
++Functions take the same parameters as that use for sockets.  The
++follow capabilities and flags are supported at this time:
++.P
++PF_INET, PF_INET6, SOCK_STREAM, IPPROTO_TCP, TCP_MAXSEG
++.P
++MSG_DONTWAIT, MSG_PEEK
++.P
++SO_REUSEADDR, TCP_NODELAY, SO_ERROR, SO_SNDBUF, SO_RCVBUF
++.P
++O_NONBLOCK
++.P
++In addition to standard socket options, rsockets supports options
++specific to RDMA devices and protocols.  These options are accessible
++through rsetsockopt using SOL_RDMA option level.
++.P
++RDMA_SQSIZE - Integer size of the underlying send queue.
++.P
++RDMA_RQSIZE - Integer size of the underlying receive queue.
++.P
++RDMA_INLINE - Integer size of inline data.
++.P
++Note that rsockets fd's cannot be passed into non-rsocket calls.  For
++applications which must mix rsocket fd's with standard socket fd's or
++opened files, rpoll and rselect support polling both rsockets and
++normal fd's.
++.P
++Existing applications can make use of rsockets through the use of a
++preload library.  Because rsockets implements an end-to-end protocol,
++both sides of a connection must use rsockets.  The rdma_cm library
++provides such a preload library.  See the librdmacm documentation for
++more details.
++.P
++rsockets uses configuration files that give an administrator control
++over the default settings used by rsockets.  Use files under
++%sysconfig%/rdma/rsocket as shown:
++.P
++.P
++mem_default - default size of receive buffer(s)
++.P
++wmem_default - default size of send buffer(s)
++.P
++sqsize_default - default size of send queue
++.P
++rqsize_default - default size of receive queue
++.P
++inline_default - default size of inline data
++.P
++If configuration files are not available, rsockets uses internal defaults.
++.SH "SEE ALSO"
++rdma_cm(7)
