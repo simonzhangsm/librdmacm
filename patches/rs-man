@@ -1,5 +1,5 @@
 Bottom: 19653040b4f6827e46b2b5079ab41e32a223fc76
-Top:    0926a4bf52b8e126ca0aa65bb38b16ed340e1515
+Top:    b2be28c058bcea1f57039dd4966c64ac692e6bfa
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-06-11 13:20:18 -0700
 
@@ -26,7 +26,7 @@ index 1dc61e1..51b2f89 100644
  	librdmacm.spec.in $(man_MANS)
 diff --git a/man/rsocket.7 b/man/rsocket.7
 new file mode 100644
-index 0000000..b26bab7
+index 0000000..c6a2ad1
 --- /dev/null
 +++ b/man/rsocket.7
 @@ -0,0 +1,82 @@
@@ -76,11 +76,11 @@ index 0000000..b26bab7
 +In addition to standard socket options, rsockets supports options
 +specific to RDMA devices and protocols.  These options are accessible
 +through rsetsockopt using SOL_RDMA option level.
-+.P
++.TP
 +RDMA_SQSIZE - Integer size of the underlying send queue.
-+.P
++.TP
 +RDMA_RQSIZE - Integer size of the underlying receive queue.
-+.P
++.TP
 +RDMA_INLINE - Integer size of inline data.
 +.P
 +Note that rsockets fd's cannot be passed into non-rsocket calls.  For
