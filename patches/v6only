@@ -1,0 +1,13 @@
+Bottom: b2be28c058bcea1f57039dd4966c64ac692e6bfa
+Top:    b2be28c058bcea1f57039dd4966c64ac692e6bfa
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-06-12 12:02:04 -0700
+
+rsocket: Support IPV6_V6ONLY socket option
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
