@@ -161,6 +161,7 @@ struct rsocket {
 	long		  fd_flags;
 	uint64_t	  so_opts;
 	uint64_t	  tcp_opts;
+	uint64_t	  ipv6_opts;
 	enum rs_state	  state;
 	int		  cq_armed;
 	int		  retries;
@@ -1817,6 +1818,18 @@ int rsetsockopt(int socket, int level, int optname,
 			break;
 		}
 		break;
+	case IPPROTO_IPV6:
+		opts = &rs->ipv6_opts;
+		switch (optname) {
+		case IPV6_V6ONLY:
+			ret = rdma_set_option(rs->cm_id, RDMA_OPTION_ID,
+					      RDMA_OPTION_ID_AFONLY,
+					      (void *) optval, optlen);
+			opt_on = *(int *) optval;
+			break;
+		default:
+			break;
+		}
 	case SOL_RDMA:
 		if (rs->state > rs_listening) {
 			ret = ERR(EINVAL);
@@ -1910,6 +1923,16 @@ int rgetsockopt(int socket, int level, int optname,
 			break;
 		}
 		break;
+	case IPPROTO_IPV6:
+		switch (optname) {
+		case IPV6_V6ONLY:
+			*((int *) optval) = !!(rs->ipv6_opts & (1 << optname));
+			*optlen = sizeof(int);
+			break;
+		default:
+			ret = ENOTSUP;
+			break;
+		}
 	case SOL_RDMA:
 		switch (optname) {
 		case RDMA_SQSIZE:
