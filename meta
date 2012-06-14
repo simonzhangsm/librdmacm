@@ -1,8 +1,7 @@
 Version: 1
-Previous: 877c467dd4f9e617d2de124052c4b380c6e9aa5f
+Previous: 84410c3dfc13dec6c939765fec6c260ccfbe2a8d
 Head: 36dbcc6dd62fc62a0bb8bc3cc82869eb4242fd4f
 Applied:
-  rs-man: dba7b4833fd1208813028483451d389cbeecf02a
   v6only: 36dbcc6dd62fc62a0bb8bc3cc82869eb4242fd4f
 Unapplied:
   rs-1sge: 8ec392829399dec7ed5c608b8697a482e5faa2de
