@@ -1,0 +1,22 @@
+Bottom: 44f8f1d4ce3fc0356402ae05bbe8b63c973a4865
+Top:    938168c7141b54196d5a134aca1fe7c88dcfb3b5
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-06-25 15:14:04 -0700
+
+Refresh of rselect
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 860c63e..ed994fe 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -1631,7 +1631,7 @@ rs_poll_to_select(int nfds, struct pollfd *fds, fd_set *readfds,
+ 	int i, cnt = 0;
+ 
+ 	for (i = 0; i < nfds; i++) {
+-		if (readfds && (fds[i].revents & POLLIN)) {
++		if (readfds && (fds[i].revents & (POLLIN | POLLHUP))) {
+ 			FD_SET(fds[i].fd, readfds);
+ 			cnt++;
+ 		}
