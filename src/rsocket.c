@@ -131,21 +131,21 @@ union rs_wr_id {
 	};
 };
 
-/*
- * rsocket states are ordered as passive, connecting, connected, disconnected.
- */
 enum rs_state {
 	rs_init,
-	rs_bound,
-	rs_listening,
-	rs_resolving_addr,
-	rs_resolving_route,
-	rs_connecting,
-	rs_accepting,
-	rs_connect_error,
-	rs_connected,
-	rs_disconnected,
-	rs_error
+	rs_bound	   =		    0x0001,
+	rs_listening	   =		    0x0002,
+	rs_opening	   =		    0x0004,
+	rs_resolving_addr  = rs_opening |   0x0010,
+	rs_resolving_route = rs_opening |   0x0020,
+	rs_connecting      = rs_opening |   0x0040,
+	rs_accepting       = rs_opening |   0x0080,
+	rs_connected	   =		    0x0100,
+	rs_connect_wr 	   = rs_connected | 0x0200,
+	rs_connect_rd	   = rs_connected | 0x0400,
+	rs_disconnected	   =		    0x0800,
+	rs_error	   =		    0x1000,
+	rs_connect_error   = rs_error |     0x2000
 };
 
 #define RS_OPT_SWAP_SGL 1
@@ -321,7 +321,7 @@ static int rs_set_nonblocking(struct rsocket *rs, long arg)
 	if (rs->cm_id->recv_cq_channel)
 		ret = fcntl(rs->cm_id->recv_cq_channel->fd, F_SETFL, arg);
 
-	if (!ret && rs->state != rs_connected)
+	if (!ret && rs->state < rs_connected)
 		ret = fcntl(rs->cm_id->channel->fd, F_SETFL, arg);
 
 	return ret;
@@ -701,9 +701,9 @@ do_connect:
 		if (!ret)
 			goto connected;
 		if (errno == EAGAIN || errno == EWOULDBLOCK)
-			rs->state = rs_connecting;
+			rs->state = rs_active_connect;
 		break;
-	case rs_connecting:
+	case rs_active_connect:
 		ret = ucma_complete(rs->cm_id);
 		if (ret)
 			break;
@@ -907,7 +907,7 @@ static int rs_poll_cq(struct rsocket *rs)
 		}
 	}
 
-	if (rs->state == rs_connected) {
+	if (rs->state != rs_error) {
 		while (!ret && rcnt--)
 			ret = rdma_post_recvv(rs->cm_id, NULL, NULL, 0);
 
@@ -932,7 +932,7 @@ static int rs_get_cq_event(struct rsocket *rs)
 	if (!ret) {
 		ibv_ack_cq_events(rs->cm_id->recv_cq, 1);
 		rs->cq_armed = 0;
-	} else if (errno != EAGAIN && rs->state == rs_connected) {
+	} else if (errno != EAGAIN) {
 		rs->state = rs_error;
 	}
 
@@ -1444,7 +1444,7 @@ static int rs_poll_rs(struct rsocket *rs, int events,
 		return fds.revents;
 	case rs_resolving_addr:
 	case rs_resolving_route:
-	case rs_connecting:
+	case rs_active_connect:
 	case rs_accepting:
 		ret = rs_do_connect(rs);
 		if (ret) {
@@ -1466,10 +1466,12 @@ static int rs_poll_rs(struct rsocket *rs, int events,
 			revents |= POLLIN;
 		if ((events & POLLOUT) && rs_can_send(rs))
 			revents |= POLLOUT;
-		if (rs->state == rs_disconnected)
-			revents |= POLLHUP;
-		else if (rs->state == rs_error)
-			revents |= POLLERR;
+		if (rs->state > rs_connected) {
+			if (rs->state == rs_error)
+				revents |= POLLERR;
+			else
+				revents |= POLLHUP;
+		}
 
 		return revents;
 	case rs_connect_error:
@@ -1690,12 +1692,16 @@ int rshutdown(int socket, int how)
 	struct rsocket *rs;
 	int ret = 0;
 
+	if (how == SHUT_RD)
+		return 0;
+
 	rs = idm_at(&idm, socket);
 	if (rs->fd_flags & O_NONBLOCK)
 		rs_set_nonblocking(rs, 0);
 
 	if (rs->state == rs_connected) {
-		rs->state = rs_disconnected;
+		if (how == SHUT_RDWR)
+			rs->state = rs_disconnected;
 		if (!rs_can_send_ctrl(rs)) {
 			ret = rs_process_cq(rs, 0, rs_can_send_ctrl);
 			if (ret)
@@ -1710,6 +1716,9 @@ int rshutdown(int socket, int how)
 
 	if (!rs_all_sends_done(rs) && rs->state != rs_error)
 		rs_process_cq(rs, 0, rs_all_sends_done);
+
+	if ((rs->fd_flags & O_NONBLOCK) && (how == SHUT_WR))
+		rs_set_nonblocking(rs, 1);
 
 	return 0;
 }
