@@ -1,0 +1,22 @@
+Bottom: 0e6b8c5a5f999b6695127164e8c2493cb15abf49
+Top:    fe4d692e928f917ad1c29688c0faf1fbc4bcfd01
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-06-25 17:23:59 -0700
+
+Refresh of shut_wr
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 0bba7e5..8263def 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -1457,8 +1457,6 @@ static int rs_poll_rs(struct rsocket *rs, int events,
+ 		}
+ 		/* fall through */
+ 	case rs_connected:
+-	case rs_shutdown_rd:
+-	case rs_shutdown_wr:
+ 	case rs_disconnected:
+ 	case rs_error:
+ 		rs_process_cq(rs, nonblock, test);
