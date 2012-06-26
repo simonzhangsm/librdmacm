@@ -1,5 +1,5 @@
 Bottom: 938168c7141b54196d5a134aca1fe7c88dcfb3b5
-Top:    1ae738a42c25e6d2f1c92e4e79e5653b620de2c4
+Top:    0e6b8c5a5f999b6695127164e8c2493cb15abf49
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-06-25 14:19:54 -0700
 
@@ -11,20 +11,10 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index ed994fe..63bf03e 100644
+index ed994fe..0bba7e5 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
-@@ -96,7 +96,8 @@ enum {
- #define rs_msg_data(imm_data) (imm_data & 0x1FFFFFFF)
- 
- enum {
--	RS_CTRL_DISCONNECT
-+	RS_CTRL_DISCONNECT,
-+	RS_CTRL_SHUTDOWN
- };
- 
- struct rs_msg {
-@@ -321,7 +322,7 @@ static int rs_set_nonblocking(struct rsocket *rs, long arg)
+@@ -321,7 +321,7 @@ static int rs_set_nonblocking(struct rsocket *rs, long arg)
  	if (rs->cm_id->recv_cq_channel)
  		ret = fcntl(rs->cm_id->recv_cq_channel->fd, F_SETFL, arg);
  
@@ -33,16 +23,7 @@ index ed994fe..63bf03e 100644
  		ret = fcntl(rs->cm_id->channel->fd, F_SETFL, arg);
  
  	return ret;
-@@ -883,6 +884,8 @@ static int rs_poll_cq(struct rsocket *rs)
- 				if (rs_msg_data(imm_data) == RS_CTRL_DISCONNECT) {
- 					rs->state = rs_disconnected;
- 					return ERR(ECONNRESET);
-+				} else if (rs_msg_data(imm_data) == RS_CTRL_SHUTDOWN) {
-+					rs->state = rs_shutdown_rd;
- 				}
- 				break;
- 			default:
-@@ -907,7 +910,7 @@ static int rs_poll_cq(struct rsocket *rs)
+@@ -907,7 +907,7 @@ static int rs_poll_cq(struct rsocket *rs)
  		}
  	}
  
@@ -51,7 +32,7 @@ index ed994fe..63bf03e 100644
  		while (!ret && rcnt--)
  			ret = rdma_post_recvv(rs->cm_id, NULL, NULL, 0);
  
-@@ -932,7 +935,7 @@ static int rs_get_cq_event(struct rsocket *rs)
+@@ -932,7 +932,7 @@ static int rs_get_cq_event(struct rsocket *rs)
  	if (!ret) {
  		ibv_ack_cq_events(rs->cm_id->recv_cq, 1);
  		rs->cq_armed = 0;
@@ -60,7 +41,7 @@ index ed994fe..63bf03e 100644
  		rs->state = rs_error;
  	}
  
-@@ -1457,6 +1460,8 @@ static int rs_poll_rs(struct rsocket *rs, int events,
+@@ -1457,6 +1457,8 @@ static int rs_poll_rs(struct rsocket *rs, int events,
  		}
  		/* fall through */
  	case rs_connected:
@@ -69,7 +50,7 @@ index ed994fe..63bf03e 100644
  	case rs_disconnected:
  	case rs_error:
  		rs_process_cq(rs, nonblock, test);
-@@ -1466,10 +1471,12 @@ static int rs_poll_rs(struct rsocket *rs, int events,
+@@ -1466,10 +1468,12 @@ static int rs_poll_rs(struct rsocket *rs, int events,
  			revents |= POLLIN;
  		if ((events & POLLOUT) && rs_can_send(rs))
  			revents |= POLLOUT;
@@ -86,7 +67,7 @@ index ed994fe..63bf03e 100644
  
  		return revents;
  	case rs_connect_error:
-@@ -1690,12 +1697,16 @@ int rshutdown(int socket, int how)
+@@ -1690,12 +1694,16 @@ int rshutdown(int socket, int how)
  	struct rsocket *rs;
  	int ret = 0;
  
@@ -104,7 +85,7 @@ index ed994fe..63bf03e 100644
  		if (!rs_can_send_ctrl(rs)) {
  			ret = rs_process_cq(rs, 0, rs_can_send_ctrl);
  			if (ret)
-@@ -1711,6 +1722,9 @@ int rshutdown(int socket, int how)
+@@ -1711,6 +1719,9 @@ int rshutdown(int socket, int how)
  	if (!rs_all_sends_done(rs) && rs->state != rs_error)
  		rs_process_cq(rs, 0, rs_all_sends_done);
  
