@@ -1,5 +1,5 @@
 Bottom: b2be28c058bcea1f57039dd4966c64ac692e6bfa
-Top:    44f8f1d4ce3fc0356402ae05bbe8b63c973a4865
+Top:    27bfde2fb2ab4ee3033c6b465d55530a614e6bed
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-06-12 12:02:04 -0700
 
@@ -23,7 +23,7 @@ index c0f83b1..1487f8f 100755
  };
  
 diff --git a/src/rsocket.c b/src/rsocket.c
-index a3c2c6a..860c63e 100644
+index a3c2c6a..394fed4 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -161,6 +161,7 @@ struct rsocket {
@@ -53,7 +53,7 @@ index a3c2c6a..860c63e 100644
  	case SOL_RDMA:
  		if (rs->state > rs_listening) {
  			ret = ERR(EINVAL);
-@@ -1910,6 +1923,16 @@ int rgetsockopt(int socket, int level, int optname,
+@@ -1910,6 +1923,17 @@ int rgetsockopt(int socket, int level, int optname,
  			break;
  		}
  		break;
@@ -67,6 +67,7 @@ index a3c2c6a..860c63e 100644
 +			ret = ENOTSUP;
 +			break;
 +		}
++		break;
  	case SOL_RDMA:
  		switch (optname) {
  		case RDMA_SQSIZE:
