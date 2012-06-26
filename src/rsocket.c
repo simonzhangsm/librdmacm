@@ -96,8 +96,7 @@ enum {
 #define rs_msg_data(imm_data) (imm_data & 0x1FFFFFFF)
 
 enum {
-	RS_CTRL_DISCONNECT,
-	RS_CTRL_SHUTDOWN
+	RS_CTRL_DISCONNECT
 };
 
 struct rs_msg {
@@ -884,8 +883,6 @@ static int rs_poll_cq(struct rsocket *rs)
 				if (rs_msg_data(imm_data) == RS_CTRL_DISCONNECT) {
 					rs->state = rs_disconnected;
 					return ERR(ECONNRESET);
-				} else if (rs_msg_data(imm_data) == RS_CTRL_SHUTDOWN) {
-					rs->state = rs_shutdown_rd;
 				}
 				break;
 			default:
