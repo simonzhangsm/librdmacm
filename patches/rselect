@@ -1,5 +1,5 @@
-Bottom: 44f8f1d4ce3fc0356402ae05bbe8b63c973a4865
-Top:    938168c7141b54196d5a134aca1fe7c88dcfb3b5
+Bottom: 27bfde2fb2ab4ee3033c6b465d55530a614e6bed
+Top:    47c055283ab722851373ec3c7f8affac14e1f08b
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-06-25 15:04:52 -0700
 
@@ -11,7 +11,7 @@ SIgned-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index 860c63e..ed994fe 100644
+index 394fed4..c833d46 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -1631,7 +1631,7 @@ rs_poll_to_select(int nfds, struct pollfd *fds, fd_set *readfds,
