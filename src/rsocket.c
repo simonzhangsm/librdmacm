@@ -1933,6 +1933,7 @@ int rgetsockopt(int socket, int level, int optname,
 			ret = ENOTSUP;
 			break;
 		}
+		break;
 	case SOL_RDMA:
 		switch (optname) {
 		case RDMA_SQSIZE:
