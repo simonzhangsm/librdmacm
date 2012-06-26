@@ -147,6 +147,7 @@ enum rs_state {
 	rs_connected	   =		    0x0100,
 	rs_connect_wr 	   = rs_connected | 0x0200,
 	rs_connect_rd	   = rs_connected | 0x0400,
+	rs_connect_rdwr    = rs_connect_rd | rs_connect_wr,
 	rs_connect_error   =		    0x0800,
 	rs_disconnected	   =		    0x1000,
 	rs_error	   =		    0x2000,
@@ -632,7 +633,7 @@ int raccept(int socket, struct sockaddr *addr, socklen_t *addrlen)
 	rs_set_conn_data(new_rs, &param, &cresp);
 	ret = rdma_accept(new_rs->cm_id, &param);
 	if (!ret)
-		new_rs->state = rs_connected;
+		new_rs->state = rs_connect_rdwr;
 	else if (errno == EAGAIN || errno == EWOULDBLOCK)
 		new_rs->state = rs_accepting;
 	else
@@ -719,7 +720,7 @@ connected:
 		}
 
 		rs_save_conn_data(rs, cresp);
-		rs->state = rs_connected;
+		rs->state = rs_connect_rdwr;
 		break;
 	case rs_accepting:
 		if (!(rs->fd_flags & O_NONBLOCK))
@@ -729,7 +730,7 @@ connected:
 		if (ret)
 			break;
 
-		rs->state = rs_connected;
+		rs->state = rs_connect_rdwr;
 		break;
 	default:
 		ret = ERR(EINVAL);
@@ -1728,7 +1729,7 @@ int rshutdown(int socket, int how)
 				    0, 0, 0);
 	}
 
-	if (!rs_all_sends_done(rs) && rs->state != rs_error)
+	if (!rs_all_sends_done(rs) && !(rs->state & rs_error))
 		rs_process_cq(rs, 0, rs_all_sends_done);
 
 	if ((rs->fd_flags & O_NONBLOCK) && (how == SHUT_WR))
