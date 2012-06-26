@@ -1,10 +1,11 @@
 Version: 1
-Previous: d7a2b3a030db2e35e040656453c50b0895016dc5
-Head: 84bdc5da587b58be831799eac853c7db9886a22d
+Previous: f62cbfbb8bf5b95655cb3d33a36aab03362f5409
+Head: dd6737373d36a3d9feda9961b7bba0e16e548ec6
 Applied:
   v6only: 36dbcc6dd62fc62a0bb8bc3cc82869eb4242fd4f
   rselect: 1fdb8dc1bff60f2748e148a081aae55b7fa80034
   shut_wr: 84bdc5da587b58be831799eac853c7db9886a22d
+  refresh-temp: dd6737373d36a3d9feda9961b7bba0e16e548ec6
 Unapplied:
   rs-1sge: 8ec392829399dec7ed5c608b8697a482e5faa2de
   ip6-opt: 7e43a759255e9890d1e41f1edf71792836f53941
