@@ -888,6 +888,8 @@ static int rs_poll_cq(struct rsocket *rs)
 				if (rs_msg_data(imm_data) == RS_CTRL_DISCONNECT) {
 					rs->state = rs_disconnected;
 					return ERR(ECONNRESET);
+				} else if (rs_msg_data(imm_data) == RS_CTRL_SHUTDOWN) {
+					rs->state &= ~rs_connect_rd;
 				}
 				break;
 			default:
