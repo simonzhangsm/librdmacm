@@ -1457,8 +1457,6 @@ static int rs_poll_rs(struct rsocket *rs, int events,
 		}
 		/* fall through */
 	case rs_connected:
-	case rs_shutdown_rd:
-	case rs_shutdown_wr:
 	case rs_disconnected:
 	case rs_error:
 		rs_process_cq(rs, nonblock, test);
