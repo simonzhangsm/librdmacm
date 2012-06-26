@@ -131,21 +131,21 @@ union rs_wr_id {
 	};
 };
 
-/*
- * rsocket states are ordered as passive, connecting, connected, disconnected.
- */
 enum rs_state {
 	rs_init,
-	rs_bound,
-	rs_listening,
-	rs_resolving_addr,
-	rs_resolving_route,
-	rs_connecting,
-	rs_accepting,
-	rs_connect_error,
-	rs_connected,
-	rs_disconnected,
-	rs_error
+	rs_bound	   =		    0x0001,
+	rs_listening	   =		    0x0002,
+	rs_opening	   =		    0x0004,
+	rs_resolving_addr  = rs_opening |   0x0010,
+	rs_resolving_route = rs_opening |   0x0020,
+	rs_connecting      = rs_opening |   0x0040,
+	rs_accepting       = rs_opening |   0x0080,
+	rs_connected	   =		    0x0100,
+	rs_connect_wr 	   = rs_connected | 0x0200,
+	rs_connect_rd	   = rs_connected | 0x0400,
+	rs_disconnected	   =		    0x0800,
+	rs_error	   =		    0x1000,
+	rs_connect_error   = rs_error |     0x2000
 };
 
 #define RS_OPT_SWAP_SGL 1
@@ -701,9 +701,9 @@ do_connect:
 		if (!ret)
 			goto connected;
 		if (errno == EAGAIN || errno == EWOULDBLOCK)
-			rs->state = rs_connecting;
+			rs->state = rs_active_connect;
 		break;
-	case rs_connecting:
+	case rs_active_connect:
 		ret = ucma_complete(rs->cm_id);
 		if (ret)
 			break;
@@ -1444,7 +1444,7 @@ static int rs_poll_rs(struct rsocket *rs, int events,
 		return fds.revents;
 	case rs_resolving_addr:
 	case rs_resolving_route:
-	case rs_connecting:
+	case rs_active_connect:
 	case rs_accepting:
 		ret = rs_do_connect(rs);
 		if (ret) {
