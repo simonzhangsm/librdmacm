@@ -3,10 +3,21 @@ Top:    a67f701fbc904bcaea2ce884e38088db7feaff9d
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-06-25 14:19:54 -0700
 
-rsocket: Handle SHUT_WR shutdown option
+rsocket: Handle other shutdown option
+
+Handle SHUT_RD and SHUT_WR shutdown options.
 
 In order to handle shutting down the send and receive sides
-separately, we break the connection state into multiple substates.
+separately, we break the connection state into multiple sub-states.
+This allows us to be partially connected (i.e. for either just
+reads or just writes).
+
+Support for SHUT_WR is needed to handle netperf properly, which
+shuts down a socket by having the client use SHUT_WR, followed by
+the server completing the disconnect with SHUT_RDWR.  The following
+patch eliminates an error message from netperf:
+
+'shutdown_control: no response received  errno 95'
 
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
