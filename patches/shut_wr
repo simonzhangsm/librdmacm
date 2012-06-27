@@ -1,5 +1,5 @@
 Bottom: 47c055283ab722851373ec3c7f8affac14e1f08b
-Top:    a67f701fbc904bcaea2ce884e38088db7feaff9d
+Top:    fc740213810d83b3296beb8b580626fb77d698d1
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-06-25 14:19:54 -0700
 
@@ -25,7 +25,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index c833d46..419e9df 100644
+index c833d46..c77dd4a 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -96,7 +96,8 @@ enum {
@@ -114,22 +114,21 @@ index c833d46..419e9df 100644
  		break;
  	default:
  		ret = ERR(EINVAL);
-@@ -752,6 +757,14 @@ int rconnect(int socket, const struct sockaddr *addr, socklen_t addrlen)
+@@ -752,6 +757,13 @@ int rconnect(int socket, const struct sockaddr *addr, socklen_t addrlen)
  	return rs_do_connect(rs);
  }
  
-+static int rs_shutdown_state(struct rsocket *rs, int state)
++static void rs_shutdown_state(struct rsocket *rs, int state)
 +{
 +	rs->state &= ~state;
 +	if (rs->state == rs_connected)
 +		rs->state = rs_disconnected;
-+	return rs->state == rs_disconnected;
 +}
 +
  static int rs_post_write(struct rsocket *rs, uint64_t wr_id,
  			 struct ibv_sge *sgl, int nsge,
  			 uint32_t imm_data, int flags,
-@@ -852,7 +865,7 @@ static int rs_give_credits(struct rsocket *rs)
+@@ -852,7 +864,7 @@ static int rs_give_credits(struct rsocket *rs)
  {
  	return ((rs->rbuf_bytes_avail >= (rs->rbuf_size >> 1)) ||
  	        ((short) ((short) rs->rseq_no - (short) rs->rseq_comp) >= 0)) &&
@@ -138,7 +137,7 @@ index c833d46..419e9df 100644
  }
  
  static void rs_update_credits(struct rsocket *rs)
-@@ -882,7 +895,9 @@ static int rs_poll_cq(struct rsocket *rs)
+@@ -882,7 +894,9 @@ static int rs_poll_cq(struct rsocket *rs)
  			case RS_OP_CTRL:
  				if (rs_msg_data(imm_data) == RS_CTRL_DISCONNECT) {
  					rs->state = rs_disconnected;
@@ -149,7 +148,7 @@ index c833d46..419e9df 100644
  				}
  				break;
  			default:
-@@ -900,14 +915,14 @@ static int rs_poll_cq(struct rsocket *rs)
+@@ -900,14 +914,14 @@ static int rs_poll_cq(struct rsocket *rs)
  			} else {
  				rs->ctrl_avail++;
  			}
@@ -166,7 +165,7 @@ index c833d46..419e9df 100644
  		while (!ret && rcnt--)
  			ret = rdma_post_recvv(rs->cm_id, NULL, NULL, 0);
  
-@@ -932,7 +947,7 @@ static int rs_get_cq_event(struct rsocket *rs)
+@@ -932,7 +946,7 @@ static int rs_get_cq_event(struct rsocket *rs)
  	if (!ret) {
  		ibv_ack_cq_events(rs->cm_id->recv_cq, 1);
  		rs->cq_armed = 0;
@@ -175,7 +174,7 @@ index c833d46..419e9df 100644
  		rs->state = rs_error;
  	}
  
-@@ -1043,7 +1058,7 @@ static int rs_can_send(struct rsocket *rs)
+@@ -1043,7 +1057,7 @@ static int rs_can_send(struct rsocket *rs)
  
  static int rs_conn_can_send(struct rsocket *rs)
  {
@@ -184,7 +183,7 @@ index c833d46..419e9df 100644
  }
  
  static int rs_can_send_ctrl(struct rsocket *rs)
-@@ -1058,7 +1073,7 @@ static int rs_have_rdata(struct rsocket *rs)
+@@ -1058,7 +1072,7 @@ static int rs_have_rdata(struct rsocket *rs)
  
  static int rs_conn_have_rdata(struct rsocket *rs)
  {
@@ -193,7 +192,7 @@ index c833d46..419e9df 100644
  }
  
  static int rs_all_sends_done(struct rsocket *rs)
-@@ -1111,7 +1126,7 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
+@@ -1111,7 +1125,7 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
  	int ret;
  
  	rs = idm_at(&idm, socket);
@@ -202,7 +201,7 @@ index c833d46..419e9df 100644
  		ret = rs_do_connect(rs);
  		if (ret) {
  			if (errno == EINPROGRESS)
-@@ -1122,7 +1137,7 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
+@@ -1122,7 +1136,7 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
  	fastlock_acquire(&rs->rlock);
  	if (!rs_have_rdata(rs)) {
  		ret = rs_get_comp(rs, rs_nonblocking(rs, flags), rs_conn_have_rdata);
@@ -211,7 +210,7 @@ index c833d46..419e9df 100644
  			goto out;
  	}
  
-@@ -1213,7 +1228,7 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
+@@ -1213,7 +1227,7 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
  	int ret = 0;
  
  	rs = idm_at(&idm, socket);
@@ -220,7 +219,7 @@ index c833d46..419e9df 100644
  		ret = rs_do_connect(rs);
  		if (ret) {
  			if (errno == EINPROGRESS)
-@@ -1229,7 +1244,7 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
+@@ -1229,7 +1243,7 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
  					  rs_conn_can_send);
  			if (ret)
  				break;
@@ -229,7 +228,7 @@ index c833d46..419e9df 100644
  				ret = ERR(ECONNRESET);
  				break;
  			}
-@@ -1322,7 +1337,7 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
+@@ -1322,7 +1336,7 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
  	int i, ret = 0;
  
  	rs = idm_at(&idm, socket);
@@ -238,7 +237,7 @@ index c833d46..419e9df 100644
  		ret = rs_do_connect(rs);
  		if (ret) {
  			if (errno == EINPROGRESS)
-@@ -1343,7 +1358,7 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
+@@ -1343,7 +1357,7 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
  					  rs_conn_can_send);
  			if (ret)
  				break;
@@ -247,7 +246,7 @@ index c833d46..419e9df 100644
  				ret = ERR(ECONNRESET);
  				break;
  			}
-@@ -1435,17 +1450,35 @@ static int rs_poll_rs(struct rsocket *rs, int events,
+@@ -1435,17 +1449,35 @@ static int rs_poll_rs(struct rsocket *rs, int events,
  	short revents;
  	int ret;
  
@@ -289,7 +288,7 @@ index c833d46..419e9df 100644
  		ret = rs_do_connect(rs);
  		if (ret) {
  			if (errno == EINPROGRESS) {
-@@ -1455,28 +1488,13 @@ static int rs_poll_rs(struct rsocket *rs, int events,
+@@ -1455,28 +1487,13 @@ static int rs_poll_rs(struct rsocket *rs, int events,
  				return POLLOUT;
  			}
  		}
@@ -323,7 +322,7 @@ index c833d46..419e9df 100644
  }
  
  static int rs_poll_check(struct pollfd *fds, nfds_t nfds)
-@@ -1688,14 +1706,25 @@ int rselect(int nfds, fd_set *readfds, fd_set *writefds,
+@@ -1688,14 +1705,26 @@ int rselect(int nfds, fd_set *readfds, fd_set *writefds,
  int rshutdown(int socket, int how)
  {
  	struct rsocket *rs;
@@ -346,8 +345,9 @@ index c833d46..419e9df 100644
 +			ctrl = RS_CTRL_DISCONNECT;
 +			rs->state = rs_disconnected;
 +		} else {
-+			ctrl = rs_shutdown_state(rs, rs_connect_wr) ?
-+				RS_CTRL_DISCONNECT : RS_CTRL_SHUTDOWN;
++			rs_shutdown_state(rs, rs_connect_wr);
++			ctrl = (rs->state & rs_connected) ?
++				RS_CTRL_SHUTDOWN : RS_CTRL_DISCONNECT;
 +		}
  		if (!rs_can_send_ctrl(rs)) {
  			ret = rs_process_cq(rs, 0, rs_can_send_ctrl);
