@@ -895,7 +895,7 @@ static int rs_poll_cq(struct rsocket *rs)
 			case RS_OP_CTRL:
 				if (rs_msg_data(imm_data) == RS_CTRL_DISCONNECT) {
 					rs->state = rs_disconnected;
-					return ERR(ECONNRESET);
+					return 0;
 				} else if (rs_msg_data(imm_data) == RS_CTRL_SHUTDOWN) {
 					rs_shutdown_state(rs, rs_connect_rd);
 				}
@@ -1137,7 +1137,7 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
 	fastlock_acquire(&rs->rlock);
 	if (!rs_have_rdata(rs)) {
 		ret = rs_get_comp(rs, rs_nonblocking(rs, flags), rs_conn_have_rdata);
-		if (ret && errno != ECONNRESET)
+		if (ret) // && errno != ECONNRESET)
 			goto out;
 	}
 
@@ -1456,7 +1456,7 @@ check_cq:
 		rs_process_cq(rs, nonblock, test);
 
 		revents = 0;
-		if ((events & POLLIN) && rs_have_rdata(rs))
+		if ((events & POLLIN) && rs_conn_have_rdata(rs))
 			revents |= POLLIN;
 		if ((events & POLLOUT) && rs_can_send(rs))
 			revents |= POLLOUT;
