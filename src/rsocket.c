@@ -1741,7 +1741,7 @@ int rshutdown(int socket, int how)
 	if (!rs_all_sends_done(rs) && !(rs->state & rs_error))
 		rs_process_cq(rs, 0, rs_all_sends_done);
 
-	if ((rs->fd_flags & O_NONBLOCK) && (how == SHUT_WR))
+	if ((rs->fd_flags & O_NONBLOCK) && (rs->state & rs_connected))
 		rs_set_nonblocking(rs, 1);
 
 	return 0;
