@@ -1137,7 +1137,7 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
 	fastlock_acquire(&rs->rlock);
 	if (!rs_have_rdata(rs)) {
 		ret = rs_get_comp(rs, rs_nonblocking(rs, flags), rs_conn_have_rdata);
-		if (ret) // && errno != ECONNRESET)
+		if (ret)
 			goto out;
 	}
 
