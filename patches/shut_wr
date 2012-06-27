@@ -1,5 +1,5 @@
 Bottom: 47c055283ab722851373ec3c7f8affac14e1f08b
-Top:    393bbdc7ad0ca287d5a2e8f29cfd409aae89e3e6
+Top:    8366a50fa5ca152bee136892dff4bc184f12b4cd
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-06-25 14:19:54 -0700
 
@@ -14,7 +14,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index c833d46..8b310c4 100644
+index c833d46..e3da27f 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -96,7 +96,8 @@ enum {
@@ -127,10 +127,12 @@ index c833d46..8b310c4 100644
  }
  
  static void rs_update_credits(struct rsocket *rs)
-@@ -883,6 +896,8 @@ static int rs_poll_cq(struct rsocket *rs)
+@@ -882,7 +895,9 @@ static int rs_poll_cq(struct rsocket *rs)
+ 			case RS_OP_CTRL:
  				if (rs_msg_data(imm_data) == RS_CTRL_DISCONNECT) {
  					rs->state = rs_disconnected;
- 					return ERR(ECONNRESET);
+-					return ERR(ECONNRESET);
++					return 0;
 +				} else if (rs_msg_data(imm_data) == RS_CTRL_SHUTDOWN) {
 +					rs_shutdown_state(rs, rs_connect_rd);
  				}
@@ -189,6 +191,15 @@ index c833d46..8b310c4 100644
  		ret = rs_do_connect(rs);
  		if (ret) {
  			if (errno == EINPROGRESS)
+@@ -1122,7 +1137,7 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
+ 	fastlock_acquire(&rs->rlock);
+ 	if (!rs_have_rdata(rs)) {
+ 		ret = rs_get_comp(rs, rs_nonblocking(rs, flags), rs_conn_have_rdata);
+-		if (ret && errno != ECONNRESET)
++		if (ret) // && errno != ECONNRESET)
+ 			goto out;
+ 	}
+ 
 @@ -1213,7 +1228,7 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
  	int ret = 0;
  
@@ -237,7 +248,7 @@ index c833d46..8b310c4 100644
 +		rs_process_cq(rs, nonblock, test);
 +
 +		revents = 0;
-+		if ((events & POLLIN) && rs_have_rdata(rs))
++		if ((events & POLLIN) && rs_conn_have_rdata(rs))
 +			revents |= POLLIN;
 +		if ((events & POLLOUT) && rs_can_send(rs))
 +			revents |= POLLOUT;
