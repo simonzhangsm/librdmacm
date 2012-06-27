@@ -1,5 +1,5 @@
 Bottom: 47c055283ab722851373ec3c7f8affac14e1f08b
-Top:    8366a50fa5ca152bee136892dff4bc184f12b4cd
+Top:    a67f701fbc904bcaea2ce884e38088db7feaff9d
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-06-25 14:19:54 -0700
 
@@ -14,7 +14,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index c833d46..e3da27f 100644
+index c833d46..419e9df 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -96,7 +96,8 @@ enum {
@@ -196,7 +196,7 @@ index c833d46..e3da27f 100644
  	if (!rs_have_rdata(rs)) {
  		ret = rs_get_comp(rs, rs_nonblocking(rs, flags), rs_conn_have_rdata);
 -		if (ret && errno != ECONNRESET)
-+		if (ret) // && errno != ECONNRESET)
++		if (ret)
  			goto out;
  	}
  
