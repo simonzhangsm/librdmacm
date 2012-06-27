@@ -1,0 +1,23 @@
+Bottom: 682d725f0f3e78b58304d69dab7b65bb75b6be16
+Top:    393bbdc7ad0ca287d5a2e8f29cfd409aae89e3e6
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-06-27 10:20:10 -0700
+
+Refresh of shut_wr
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 4ecb425..8b310c4 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -897,8 +897,7 @@ static int rs_poll_cq(struct rsocket *rs)
+ 					rs->state = rs_disconnected;
+ 					return ERR(ECONNRESET);
+ 				} else if (rs_msg_data(imm_data) == RS_CTRL_SHUTDOWN) {
+-					if (rs_shutdown_state(rs, rs_connect_rd))
+-						return ERR(ECONNRESET);
++					rs_shutdown_state(rs, rs_connect_rd);
+ 				}
+ 				break;
+ 			default:
