@@ -5,7 +5,7 @@ Date:   2012-06-25 15:04:52 -0700
 
 rsocket: Set readfds event if rsocket has been disconnected
 
-SIgned-off-by: Sean Hefty <sean.hefty@intel.com>
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
 ---

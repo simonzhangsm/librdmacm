@@ -1,10 +1,9 @@
 Version: 1
-Previous: 70d106a0cd1a73e78539f5beff518940d10ab9ad
-Head: 9ae2a0c5dcdc07c43141717bc56eb4b1a1bec6ec
+Previous: cc0fd8ce6aed8001fbe33ff0f3a0529b18571f8f
+Head: 52ee17ec6697c63e048d2c875371e6ab452c0541
 Applied:
   v6only: 3afce107e2baec86c5541ed0acd992e37bcb992a
-  rselect: 7d25968d337e976e0e22fdba69c8a2a2f5d35008
-  refresh-temp: 9ae2a0c5dcdc07c43141717bc56eb4b1a1bec6ec
+  rselect: 52ee17ec6697c63e048d2c875371e6ab452c0541
 Unapplied:
   shut_wr: 9eb853b70f4f3a13a876971d9e01cda955d95072
   rs-1sge: 8ec392829399dec7ed5c608b8697a482e5faa2de
