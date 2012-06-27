@@ -1,0 +1,26 @@
+Bottom: 971825c3c112e14db9db5ba78fbe42a1f9fde63d
+Top:    1264339bc4c5c10bfdee4de6e8d685732a67024a
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-06-26 17:14:23 -0700
+
+Refresh of shut_wr
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 4eb1ce1..4ed646b 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -145,9 +145,9 @@ enum rs_state {
+ 	rs_connecting      = rs_opening |   0x0040,
+ 	rs_accepting       = rs_opening |   0x0080,
+ 	rs_connected	   =		    0x0100,
+-	rs_connect_wr 	   = rs_connected | 0x0200,
+-	rs_connect_rd	   = rs_connected | 0x0400,
+-	rs_connect_rdwr    = rs_connect_rd | rs_connect_wr,
++	rs_connect_wr 	   =		    0x0200,
++	rs_connect_rd	   =		    0x0400,
++	rs_connect_rdwr    = rs_connected | rs_connect_rd | rs_connect_wr,
+ 	rs_connect_error   =		    0x0800,
+ 	rs_disconnected	   =		    0x1000,
+ 	rs_error	   =		    0x2000,
