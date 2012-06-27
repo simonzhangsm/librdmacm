@@ -1,5 +1,5 @@
 Bottom: 47c055283ab722851373ec3c7f8affac14e1f08b
-Top:    1c160ef5df5740a60dc56e2b865de959ae19f00c
+Top:    682d725f0f3e78b58304d69dab7b65bb75b6be16
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-06-25 14:19:54 -0700
 
@@ -11,7 +11,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index c833d46..581ecd8 100644
+index c833d46..4ecb425 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -96,7 +96,8 @@ enum {
@@ -341,7 +341,7 @@ index c833d46..581ecd8 100644
 +	if (!rs_all_sends_done(rs) && !(rs->state & rs_error))
  		rs_process_cq(rs, 0, rs_all_sends_done);
  
-+	if ((rs->fd_flags & O_NONBLOCK) && (how == SHUT_WR))
++	if ((rs->fd_flags & O_NONBLOCK) && (rs->state & rs_connected))
 +		rs_set_nonblocking(rs, 1);
 +
  	return 0;
