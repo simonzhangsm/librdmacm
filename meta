@@ -1,8 +1,7 @@
 Version: 1
-Previous: 62df40bf07afceea718c57998a5abd38a4e225e4
+Previous: a9621178284e01a60c415bda99b1d4bd2ee1cf4e
 Head: 2e5b0fc95964f74ea59dd725e849027faa0cd526
 Applied:
-  shut_wr: 2e5b0fc95964f74ea59dd725e849027faa0cd526
 Unapplied:
   v6only-kernel: 56e2b4566930fa7b05debec8b247e8dfe9df7ffe
   rs-1sge: 8ec392829399dec7ed5c608b8697a482e5faa2de
