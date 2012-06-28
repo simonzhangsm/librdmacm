@@ -1,5 +1,5 @@
 Bottom: 1242d5df80aef5749c32bdb6490d768bfdd28ffe
-Top:    1242d5df80aef5749c32bdb6490d768bfdd28ffe
+Top:    b7dfa8c66e1dc86225c445ccf919d88ab1bb492c
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-06-28 11:34:38 -0700
 
@@ -10,4 +10,117 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 ---
 
-
+diff --git a/src/rsocket.c b/src/rsocket.c
+index bdb756f..30727fa 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -1079,7 +1079,7 @@ static int rs_all_sends_done(struct rsocket *rs)
+ 	return (rs->sqe_avail + rs->ctrl_avail) == rs->sq_size;
+ }
+ 
+-static ssize_t rs_peek(struct rsocket *rs, void *buf, size_t len)
++static ssize_t rs_peek(struct rsocket *rs, void **buf, size_t len)
+ {
+ 	size_t left = len;
+ 	uint32_t end_size, rsize;
+@@ -1099,15 +1099,15 @@ static ssize_t rs_peek(struct rsocket *rs, void *buf, size_t len)
+ 
+ 		end_size = rs->rbuf_size - rbuf_offset;
+ 		if (rsize > end_size) {
+-			memcpy(buf, &rs->rbuf[rbuf_offset], end_size);
++			memcpy(*buf, &rs->rbuf[rbuf_offset], end_size);
+ 			rbuf_offset = 0;
+-			buf += end_size;
++			*buf += end_size;
+ 			rsize -= end_size;
+ 			left -= end_size;
+ 		}
+-		memcpy(buf, &rs->rbuf[rbuf_offset], rsize);
++		memcpy(*buf, &rs->rbuf[rbuf_offset], rsize);
+ 		rbuf_offset += rsize;
+-		buf += rsize;
++		*buf += rsize;
+ 	}
+ 
+ 	return len - left;
+@@ -1133,43 +1133,47 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
+ 		}
+ 	}
+ 	fastlock_acquire(&rs->rlock);
+-	if (!rs_have_rdata(rs)) {
+-		ret = rs_get_comp(rs, rs_nonblocking(rs, flags), rs_conn_have_rdata);
+-		if (ret)
+-			goto out;
+-	}
+-
+-	ret = 0;
+-	if (flags & MSG_PEEK) {
+-		left = len - rs_peek(rs, buf, len);
+-		goto out;
+-	}
++	do {
++		if (!rs_have_rdata(rs)) {
++			ret = rs_get_comp(rs, rs_nonblocking(rs, flags),
++					  rs_conn_have_rdata);
++			if (ret)
++				break;
++		}
+ 
+-	for (; left && rs_have_rdata(rs); left -= rsize) {
+-		if (left < rs->rmsg[rs->rmsg_head].data) {
+-			rsize = left;
+-			rs->rmsg[rs->rmsg_head].data -= left;
+-		} else {
+-			rs->rseq_no++;
+-			rsize = rs->rmsg[rs->rmsg_head].data;
+-			if (++rs->rmsg_head == rs->rq_size + 1)
+-				rs->rmsg_head = 0;
++		ret = 0;
++		if (flags & MSG_PEEK) {
++			left -= rs_peek(rs, &buf, left);
++			continue;
+ 		}
+ 
+-		end_size = rs->rbuf_size - rs->rbuf_offset;
+-		if (rsize > end_size) {
+-			memcpy(buf, &rs->rbuf[rs->rbuf_offset], end_size);
+-			rs->rbuf_offset = 0;
+-			buf += end_size;
+-			rsize -= end_size;
+-			left -= end_size;
++		for (; left && rs_have_rdata(rs); left -= rsize) {
++			if (left < rs->rmsg[rs->rmsg_head].data) {
++				rsize = left;
++				rs->rmsg[rs->rmsg_head].data -= left;
++			} else {
++				rs->rseq_no++;
++				rsize = rs->rmsg[rs->rmsg_head].data;
++				if (++rs->rmsg_head == rs->rq_size + 1)
++					rs->rmsg_head = 0;
++			}
++
++			end_size = rs->rbuf_size - rs->rbuf_offset;
++			if (rsize > end_size) {
++				memcpy(buf, &rs->rbuf[rs->rbuf_offset], end_size);
++				rs->rbuf_offset = 0;
++				buf += end_size;
++				rsize -= end_size;
++				left -= end_size;
++			}
++			memcpy(buf, &rs->rbuf[rs->rbuf_offset], rsize);
++			rs->rbuf_offset += rsize;
++			buf += rsize;
+ 		}
+-		memcpy(buf, &rs->rbuf[rs->rbuf_offset], rsize);
+-		rs->rbuf_offset += rsize;
+-		buf += rsize;
+-	}
+-	rs->rbuf_bytes_avail += len - left;
+-out:
++		rs->rbuf_bytes_avail += len - left;
++
++	} while ((flags & MSG_WAITALL) && (rs->state & rs_connect_rd) && left);
++
+ 	fastlock_release(&rs->rlock);
+ 	return ret ? ret : len - left;
+ }
