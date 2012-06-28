@@ -1,11 +1,11 @@
 Version: 1
-Previous: a4309e4007752ea5acc48f00de3324d122add66b
+Previous: ead3bbda367bf5121379806598c2420007e42e8e
 Head: e676e681549b31596680a5cadb74bc4d9f56af67
 Applied:
   rselect: 0680bea236f65373732b82d405787cf979ee5c67
+  shut_wr: e676e681549b31596680a5cadb74bc4d9f56af67
 Unapplied:
   v6only: 3afce107e2baec86c5541ed0acd992e37bcb992a
-  shut_wr: cbdea5d2bc984ec26fcc85ee04cb77f76147e9de
   rs-1sge: 8ec392829399dec7ed5c608b8697a482e5faa2de
   ip6-opt: 7e43a759255e9890d1e41f1edf71792836f53941
 Hidden:
