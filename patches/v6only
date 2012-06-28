@@ -1,5 +1,5 @@
 Bottom: 1242d5df80aef5749c32bdb6490d768bfdd28ffe
-Top:    1242d5df80aef5749c32bdb6490d768bfdd28ffe
+Top:    91153ae24e0243a1f3cf380e415d9bc5e8094789
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-06-12 12:02:04 -0700
 
@@ -10,4 +10,64 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 ---
 
-
+diff --git a/include/rdma/rdma_cma.h b/include/rdma/rdma_cma.h
+index c0f83b1..1487f8f 100755
+--- a/include/rdma/rdma_cma.h
++++ b/include/rdma/rdma_cma.h
+@@ -650,6 +650,7 @@ enum {
+ enum {
+ 	RDMA_OPTION_ID_TOS	 = 0,	/* uint8_t: RFC 2474 */
+ 	RDMA_OPTION_ID_REUSEADDR = 1,   /* int: ~SO_REUSEADDR */
++	RDMA_OPTION_ID_AFONLY	 = 2,   /* int: ~IPV6_V6ONLY */
+ 	RDMA_OPTION_IB_PATH	 = 1	/* struct ibv_path_data[] */
+ };
+ 
+diff --git a/src/rsocket.c b/src/rsocket.c
+index bdb756f..ed125b3 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -166,6 +166,7 @@ struct rsocket {
+ 	long		  fd_flags;
+ 	uint64_t	  so_opts;
+ 	uint64_t	  tcp_opts;
++	uint64_t	  ipv6_opts;
+ 	int		  state;
+ 	int		  cq_armed;
+ 	int		  retries;
+@@ -1849,6 +1850,18 @@ int rsetsockopt(int socket, int level, int optname,
+ 			break;
+ 		}
+ 		break;
++	case IPPROTO_IPV6:
++		opts = &rs->ipv6_opts;
++		switch (optname) {
++		case IPV6_V6ONLY:
++			ret = rdma_set_option(rs->cm_id, RDMA_OPTION_ID,
++					      RDMA_OPTION_ID_AFONLY,
++					      (void *) optval, optlen);
++			opt_on = *(int *) optval;
++			break;
++		default:
++			break;
++		}
+ 	case SOL_RDMA:
+ 		if (rs->state >= rs_opening) {
+ 			ret = ERR(EINVAL);
+@@ -1942,6 +1955,17 @@ int rgetsockopt(int socket, int level, int optname,
+ 			break;
+ 		}
+ 		break;
++	case IPPROTO_IPV6:
++		switch (optname) {
++		case IPV6_V6ONLY:
++			*((int *) optval) = !!(rs->ipv6_opts & (1 << optname));
++			*optlen = sizeof(int);
++			break;
++		default:
++			ret = ENOTSUP;
++			break;
++		}
++		break;
+ 	case SOL_RDMA:
+ 		switch (optname) {
+ 		case RDMA_SQSIZE:
