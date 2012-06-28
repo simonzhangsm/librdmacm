@@ -1,0 +1,13 @@
+Bottom: 1242d5df80aef5749c32bdb6490d768bfdd28ffe
+Top:    1242d5df80aef5749c32bdb6490d768bfdd28ffe
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-06-28 11:34:38 -0700
+
+rsockets: Add support for MSG_WAITALL rrecv() flag
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
