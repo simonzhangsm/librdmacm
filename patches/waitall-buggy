@@ -1,5 +1,5 @@
 Bottom: 1242d5df80aef5749c32bdb6490d768bfdd28ffe
-Top:    b7dfa8c66e1dc86225c445ccf919d88ab1bb492c
+Top:    cc155d40ac28117d20959cbd97dbc2bbb3c4ffe6
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-06-28 11:34:38 -0700
 
@@ -11,7 +11,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index bdb756f..30727fa 100644
+index bdb756f..6605df9 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -1079,7 +1079,7 @@ static int rs_all_sends_done(struct rsocket *rs)
@@ -43,7 +43,7 @@ index bdb756f..30727fa 100644
  	}
  
  	return len - left;
-@@ -1133,43 +1133,47 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
+@@ -1133,43 +1133,48 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
  		}
  	}
  	fastlock_acquire(&rs->rlock);
@@ -77,6 +77,7 @@ index bdb756f..30727fa 100644
 -				rs->rmsg_head = 0;
 +		ret = 0;
 +		if (flags & MSG_PEEK) {
++			// fixme or will peek same data in waitall loop
 +			left -= rs_peek(rs, &buf, left);
 +			continue;
  		}
@@ -117,7 +118,7 @@ index bdb756f..30727fa 100644
 -	}
 -	rs->rbuf_bytes_avail += len - left;
 -out:
-+		rs->rbuf_bytes_avail += len - left;
++		rs->rbuf_bytes_avail += len - left; // <- fixme in waitall loop
 +
 +	} while ((flags & MSG_WAITALL) && (rs->state & rs_connect_rd) && left);
 +
