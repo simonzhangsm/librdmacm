@@ -1,0 +1,18 @@
+Bottom: 91153ae24e0243a1f3cf380e415d9bc5e8094789
+Top:    91153ae24e0243a1f3cf380e415d9bc5e8094789
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-07-09 14:58:14 -0700
+
+rsocket: Build rspreload library as part of build
+
+Build rspreload.so, but do not install it.  This avoids the
+need for the user to build it manually, without risking that
+the preload library intercepts socket calls without the user's
+explicit knowledge.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
