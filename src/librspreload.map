@@ -1,0 +1,30 @@
+RSPRELOAD_1.0 {
+	global:
+		socket;
+		bind;
+		listen;
+		accept;
+		connect;
+		shutdown;
+		close;
+		recv;
+		recvfrom;
+		recvmsg;
+		send;
+		sendto;
+		sendmsg;
+		read;
+		readv;
+		write;
+		writev;
+		poll;
+		select;
+		getpeername;
+		getsockname;
+		setsockopt;
+		getsockopt;
+		fcntl;
+		poll;
+		select;
+	local: *;
+};
