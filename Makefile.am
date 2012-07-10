@@ -1,6 +1,7 @@
 INCLUDES = -I$(srcdir)/include
 
-lib_LTLIBRARIES = src/librdmacm.la src/librspreload.la
+lib_LTLIBRARIES = src/librdmacm.la
+noinst_LTLIBRARIES  = src/librspreload.la
 
 ACLOCAL_AMFLAGS = -I config
 AM_CFLAGS = -g -Wall -D_GNU_SOURCE -DSYSCONFDIR=\"$(sysconfdir)\" -DRDMADIR=\"@rdmadir@\"
