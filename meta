@@ -1,9 +1,8 @@
 Version: 1
-Previous: 7ec2c36d645a44bdadb39d523bd0a98c4981bc74
-Head: 3fca9cdeb3c5e2740c4db699b4dd88655cf958cc
+Previous: 97ced530b5000a51794386696c5476d9f06e071d
+Head: edf7a87dbaa7ccfc4fd384cbaf40671283deb734
 Applied:
-  build-preload: 7d5fcaa40a63b04164c2910a37c807df306797b1
-  refresh-temp: 3fca9cdeb3c5e2740c4db699b4dd88655cf958cc
+  build-preload: edf7a87dbaa7ccfc4fd384cbaf40671283deb734
 Unapplied:
   waitall-buggy: c49c6b56c55385774065f5aa2704078e6ae0ceb8
   rs-1sge: 8ec392829399dec7ed5c608b8697a482e5faa2de

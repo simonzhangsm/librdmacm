@@ -1,5 +1,5 @@
 Bottom: 91153ae24e0243a1f3cf380e415d9bc5e8094789
-Top:    1156af15371b9307f7a9cf12d291ba35e3e631c6
+Top:    33d02e70ba10ea30f1cdc845e1e0200a9eaea214
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-09 14:58:14 -0700
 
@@ -16,10 +16,10 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/Makefile.am b/Makefile.am
-index 51b2f89..9bf6070 100644
+index 51b2f89..3f1280f 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -1,11 +1,13 @@
+@@ -1,16 +1,20 @@
  INCLUDES = -I$(srcdir)/include
  
  lib_LTLIBRARIES = src/librdmacm.la
@@ -33,13 +33,58 @@ index 51b2f89..9bf6070 100644
  
  if HAVE_LD_VERSION_SCRIPT
      librdmacm_version_script = -Wl,--version-script=$(srcdir)/src/librdmacm.map
-@@ -19,6 +21,9 @@ src_librdmacm_la_LDFLAGS = -version-info 1 -export-dynamic \
++    librspreload_version_script = -Wl,--version-script=$(srcdir)/src/librspreload.map
+ else
+     librdmacm_version_script =
++    librspreload_version_script =
+ endif
+ 
+ src_librdmacm_la_SOURCES = src/cma.c src/addrinfo.c src/acm.c \
+@@ -19,6 +23,11 @@ src_librdmacm_la_LDFLAGS = -version-info 1 -export-dynamic \
  			   $(librdmacm_version_script)
  src_librdmacm_la_DEPENDENCIES =  $(srcdir)/src/librdmacm.map
  
 +src_librspreload_la_SOURCES = src/preload.c src/indexer.c
++src_librspreload_la_LDFLAGS = -version-info 1 -export-dynamic \
++			   $(librspreload_version_script)
 +src_librspreload_la_LIBADD = $(top_builddir)/src/librdmacm.la
 +
  bin_PROGRAMS = examples/ucmatose examples/rping examples/udaddy examples/mckey \
  	       examples/rdma_client examples/rdma_server examples/rdma_xclient \
  	       examples/rdma_xserver examples/rstream examples/rcopy
+diff --git a/src/librspreload.map b/src/librspreload.map
+new file mode 100644
+index 0000000..554050d
+--- /dev/null
++++ b/src/librspreload.map
+@@ -0,0 +1,30 @@
++RSPRELOAD_1.0 {
++	global:
++		socket;
++		bind;
++		listen;
++		accept;
++		connect;
++		shutdown;
++		close;
++		recv;
++		recvfrom;
++		recvmsg;
++		send;
++		sendto;
++		sendmsg;
++		read;
++		readv;
++		write;
++		writev;
++		poll;
++		select;
++		getpeername;
++		getsockname;
++		setsockopt;
++		getsockopt;
++		fcntl;
++		poll;
++		select;
++	local: *;
++};
