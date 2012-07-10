@@ -1,5 +1,5 @@
 Bottom: 91153ae24e0243a1f3cf380e415d9bc5e8094789
-Top:    33d02e70ba10ea30f1cdc845e1e0200a9eaea214
+Top:    05ed8795786ee984cd507b9a4687494434370278
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-09 14:58:14 -0700
 
@@ -16,14 +16,15 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/Makefile.am b/Makefile.am
-index 51b2f89..3f1280f 100644
+index 51b2f89..23d97f4 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -1,16 +1,20 @@
+@@ -1,16 +1,21 @@
  INCLUDES = -I$(srcdir)/include
  
++rslibdir = $(libdir)/rsocket
  lib_LTLIBRARIES = src/librdmacm.la
-+noinst_LTLIBRARIES  = src/librspreload.la
++rslibdir_LTLIBRARIES = src/librspreload.la
  
  ACLOCAL_AMFLAGS = -I config
  AM_CFLAGS = -g -Wall -D_GNU_SOURCE -DSYSCONFDIR=\"$(sysconfdir)\" -DRDMADIR=\"@rdmadir@\"
@@ -40,18 +41,58 @@ index 51b2f89..3f1280f 100644
  endif
  
  src_librdmacm_la_SOURCES = src/cma.c src/addrinfo.c src/acm.c \
-@@ -19,6 +23,11 @@ src_librdmacm_la_LDFLAGS = -version-info 1 -export-dynamic \
+@@ -19,6 +24,12 @@ src_librdmacm_la_LDFLAGS = -version-info 1 -export-dynamic \
  			   $(librdmacm_version_script)
  src_librdmacm_la_DEPENDENCIES =  $(srcdir)/src/librdmacm.map
  
 +src_librspreload_la_SOURCES = src/preload.c src/indexer.c
 +src_librspreload_la_LDFLAGS = -version-info 1 -export-dynamic \
 +			   $(librspreload_version_script)
++src_librspreload_la_DEPENDENCIES =  $(srcdir)/src/librspreload.map
 +src_librspreload_la_LIBADD = $(top_builddir)/src/librdmacm.la
 +
  bin_PROGRAMS = examples/ucmatose examples/rping examples/udaddy examples/mckey \
  	       examples/rdma_client examples/rdma_server examples/rdma_xclient \
  	       examples/rdma_xserver examples/rstream examples/rcopy
+@@ -116,7 +127,7 @@ man_MANS = \
+ 	man/rdma_cm.7 \
+ 	man/rsocket.7
+ 
+-EXTRA_DIST = src/cma.h src/indexer.h src/librdmacm.map \
++EXTRA_DIST = src/cma.h src/indexer.h src/librdmacm.map src/librspreload.map \
+ 	librdmacm.spec.in $(man_MANS)
+ 
+ dist-hook: librdmacm.spec
+diff --git a/librdmacm.spec.in b/librdmacm.spec.in
+index 7248137..fe4ae97 100644
+--- a/librdmacm.spec.in
++++ b/librdmacm.spec.in
+@@ -44,6 +44,7 @@ rm -rf $RPM_BUILD_ROOT
+ %makeinstall
+ # remove unpackaged files from the buildroot
+ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
++rm -f $RPM_BUILD_ROOT%{_libdir}/rsocket/*.la
+ 
+ %clean
+ rm -rf $RPM_BUILD_ROOT
+@@ -53,13 +54,16 @@ rm -rf $RPM_BUILD_ROOT
+ 
+ %files
+ %defattr(-,root,root,-)
+-%{_libdir}/librdmacm*.so.*
++%{_libdir}/lib*.so.*
++%{_libdir}/rsocket/lib*.so.*
+ %doc AUTHORS COPYING README
+ 
+ %files devel
+ %defattr(-,root,root)
+ %{_libdir}/lib*.so
++%{_libdir}/rsocket/lib*.so
+ %{_libdir}/*.a
++%{_libdir}/rsocket/*.a
+ %{_includedir}/*
+ %{_mandir}/man3/*
+ %{_mandir}/man7/*
 diff --git a/src/librspreload.map b/src/librspreload.map
 new file mode 100644
 index 0000000..554050d
