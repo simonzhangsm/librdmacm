@@ -1,0 +1,22 @@
+Bottom: 50465fe288254c5dcda8e29f166d42b7cdbb4d2d
+Top:    e8a593c3ff191ffcaccc9621780345523eb869d8
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-07-10 12:19:42 -0700
+
+Refresh of build-preload
+
+---
+
+diff --git a/Makefile.am b/Makefile.am
+index 23d97f4..064bd1f 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -2,7 +2,7 @@ INCLUDES = -I$(srcdir)/include
+ 
+ rslibdir = $(libdir)/rsocket
+ lib_LTLIBRARIES = src/librdmacm.la
+-rslibdir_LTLIBRARIES = src/librspreload.la
++rslib_LTLIBRARIES = src/librspreload.la
+ 
+ ACLOCAL_AMFLAGS = -I config
+ AM_CFLAGS = -g -Wall -D_GNU_SOURCE -DSYSCONFDIR=\"$(sysconfdir)\" -DRDMADIR=\"@rdmadir@\"
