@@ -1,0 +1,24 @@
+Bottom: 05ed8795786ee984cd507b9a4687494434370278
+Top:    50465fe288254c5dcda8e29f166d42b7cdbb4d2d
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-07-10 12:03:11 -0700
+
+Refresh of build-preload
+
+---
+
+diff --git a/librdmacm.spec.in b/librdmacm.spec.in
+index fe4ae97..4652bbc 100644
+--- a/librdmacm.spec.in
++++ b/librdmacm.spec.in
+@@ -60,8 +60,8 @@ rm -rf $RPM_BUILD_ROOT
+ 
+ %files devel
+ %defattr(-,root,root)
+-%{_libdir}/lib*.so
+-%{_libdir}/rsocket/lib*.so
++%{_libdir}/librdmacm*.so
++%{_libdir}/rsocket/librspreload*.so
+ %{_libdir}/*.a
+ %{_libdir}/rsocket/*.a
+ %{_includedir}/*
