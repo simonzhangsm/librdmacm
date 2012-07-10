@@ -1,5 +1,5 @@
 Bottom: 91153ae24e0243a1f3cf380e415d9bc5e8094789
-Top:    00e1df4bcbc33b38df0e85b87fbbabd2da64d772
+Top:    1156af15371b9307f7a9cf12d291ba35e3e631c6
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-09 14:58:14 -0700
 
@@ -16,14 +16,14 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/Makefile.am b/Makefile.am
-index 51b2f89..901e8ee 100644
+index 51b2f89..9bf6070 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -1,11 +1,12 @@
+@@ -1,11 +1,13 @@
  INCLUDES = -I$(srcdir)/include
  
--lib_LTLIBRARIES = src/librdmacm.la
-+lib_LTLIBRARIES = src/librdmacm.la src/librspreload.la
+ lib_LTLIBRARIES = src/librdmacm.la
++noinst_LTLIBRARIES  = src/librspreload.la
  
  ACLOCAL_AMFLAGS = -I config
  AM_CFLAGS = -g -Wall -D_GNU_SOURCE -DSYSCONFDIR=\"$(sysconfdir)\" -DRDMADIR=\"@rdmadir@\"
@@ -33,7 +33,7 @@ index 51b2f89..901e8ee 100644
  
  if HAVE_LD_VERSION_SCRIPT
      librdmacm_version_script = -Wl,--version-script=$(srcdir)/src/librdmacm.map
-@@ -19,6 +20,9 @@ src_librdmacm_la_LDFLAGS = -version-info 1 -export-dynamic \
+@@ -19,6 +21,9 @@ src_librdmacm_la_LDFLAGS = -version-info 1 -export-dynamic \
  			   $(librdmacm_version_script)
  src_librdmacm_la_DEPENDENCIES =  $(srcdir)/src/librdmacm.map
  
