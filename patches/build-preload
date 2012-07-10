@@ -1,5 +1,5 @@
 Bottom: 91153ae24e0243a1f3cf380e415d9bc5e8094789
-Top:    50465fe288254c5dcda8e29f166d42b7cdbb4d2d
+Top:    e8a593c3ff191ffcaccc9621780345523eb869d8
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-09 14:58:14 -0700
 
@@ -16,7 +16,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/Makefile.am b/Makefile.am
-index 51b2f89..23d97f4 100644
+index 51b2f89..064bd1f 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -1,16 +1,21 @@
@@ -24,7 +24,7 @@ index 51b2f89..23d97f4 100644
  
 +rslibdir = $(libdir)/rsocket
  lib_LTLIBRARIES = src/librdmacm.la
-+rslibdir_LTLIBRARIES = src/librspreload.la
++rslib_LTLIBRARIES = src/librspreload.la
  
  ACLOCAL_AMFLAGS = -I config
  AM_CFLAGS = -g -Wall -D_GNU_SOURCE -DSYSCONFDIR=\"$(sysconfdir)\" -DRDMADIR=\"@rdmadir@\"
