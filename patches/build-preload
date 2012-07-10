@@ -1,5 +1,5 @@
 Bottom: 91153ae24e0243a1f3cf380e415d9bc5e8094789
-Top:    05ed8795786ee984cd507b9a4687494434370278
+Top:    50465fe288254c5dcda8e29f166d42b7cdbb4d2d
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-09 14:58:14 -0700
 
@@ -64,7 +64,7 @@ index 51b2f89..23d97f4 100644
  
  dist-hook: librdmacm.spec
 diff --git a/librdmacm.spec.in b/librdmacm.spec.in
-index 7248137..fe4ae97 100644
+index 7248137..4652bbc 100644
 --- a/librdmacm.spec.in
 +++ b/librdmacm.spec.in
 @@ -44,6 +44,7 @@ rm -rf $RPM_BUILD_ROOT
@@ -86,8 +86,9 @@ index 7248137..fe4ae97 100644
  
  %files devel
  %defattr(-,root,root)
- %{_libdir}/lib*.so
-+%{_libdir}/rsocket/lib*.so
+-%{_libdir}/lib*.so
++%{_libdir}/librdmacm*.so
++%{_libdir}/rsocket/librspreload*.so
  %{_libdir}/*.a
 +%{_libdir}/rsocket/*.a
  %{_includedir}/*
