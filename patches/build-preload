@@ -3,12 +3,11 @@ Top:    e8a593c3ff191ffcaccc9621780345523eb869d8
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-09 14:58:14 -0700
 
-rsocket: Build rspreload library as part of build
+rsocket: Build librspreload library as part of build
 
-Build rspreload.so, but do not install it.  This avoids the
-need for the user to build it manually, without risking that
-the preload library intercepts socket calls without the user's
-explicit knowledge.
+Build the rsocket preload library as part of the build.  To reduce the
+risk of the preload library intercepting calls without the user's
+knowledge, the preload library is installed into {_libdir}/rsocket.
 
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
