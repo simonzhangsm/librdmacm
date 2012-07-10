@@ -2,7 +2,7 @@ INCLUDES = -I$(srcdir)/include
 
 rslibdir = $(libdir)/rsocket
 lib_LTLIBRARIES = src/librdmacm.la
-rslibdir_LTLIBRARIES = src/librspreload.la
+rslib_LTLIBRARIES = src/librspreload.la
 
 ACLOCAL_AMFLAGS = -I config
 AM_CFLAGS = -g -Wall -D_GNU_SOURCE -DSYSCONFDIR=\"$(sysconfdir)\" -DRDMADIR=\"@rdmadir@\"
