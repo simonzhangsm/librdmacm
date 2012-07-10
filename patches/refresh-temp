@@ -1,0 +1,58 @@
+Bottom: a28f53d18ae8ac8f9c8e4b58b003388a6498d969
+Top:    a4b09c3cdc7c25dd763ce76138432c0aba19fc68
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-07-10 15:09:56 -0700
+
+Refresh of build-preload
+
+---
+
+diff --git a/Makefile.am b/Makefile.am
+index 62f0a63..d74bbac 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -8,15 +8,14 @@ ACLOCAL_AMFLAGS = -I config
+ AM_CFLAGS = -g -Wall -D_GNU_SOURCE -DSYSCONFDIR=\"$(sysconfdir)\" -DRDMADIR=\"@rdmadir@\"
+ 
+ src_librdmacm_la_CFLAGS = $(AM_CFLAGS)
+-src_librspreload_la_CFLAGS = -Wall -shared -fPIC -D_GNU_SOURCE
++src_librspreload_la_CFLAGS = -Wall -ldl -shared -fPIC -D_GNU_SOURCE
+ 
+ if HAVE_LD_VERSION_SCRIPT
+     librdmacm_version_script = -Wl,--version-script=$(srcdir)/src/librdmacm.map
+-    librspreload_version_script = -Wl,--version-script=$(srcdir)/src/librspreload.map
+ else
+     librdmacm_version_script =
+-    librspreload_version_script =
+ endif
++librspreload_version_script =
+ 
+ src_librdmacm_la_SOURCES = src/cma.c src/addrinfo.c src/acm.c \
+ 		src/rsocket.c src/indexer.c
+diff --git a/src/preload.c b/src/preload.c
+index d21389f..5ed77d7 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -54,6 +54,7 @@
+ #include <string.h>
+ #include <netinet/in.h>
+ #include <netinet/tcp.h>
++#include <stdio.h>
+ 
+ #include <rdma/rdma_cma.h>
+ #include <rdma/rdma_verbs.h>
+@@ -224,6 +225,7 @@ static void init_preload(void)
+ 	/* Quick check without lock */
+ 	if (init)
+ 		return;
++printf("%s\n", __func__);
+ 
+ 	pthread_mutex_lock(&mut);
+ 	if (init)
+@@ -328,6 +330,7 @@ int socket(int domain, int type, int protocol)
+ 	static __thread int recursive;
+ 	int index, ret;
+ 
++printf("%s\n", __func__);
+ 	if (recursive)
+ 		goto real;
