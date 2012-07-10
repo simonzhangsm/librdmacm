@@ -54,6 +54,7 @@
 #include <string.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
+#include <stdio.h>
 
 #include <rdma/rdma_cma.h>
 #include <rdma/rdma_verbs.h>
@@ -224,6 +225,7 @@ static void init_preload(void)
 	/* Quick check without lock */
 	if (init)
 		return;
+printf("%s\n", __func__);
 
 	pthread_mutex_lock(&mut);
 	if (init)
@@ -328,6 +330,7 @@ int socket(int domain, int type, int protocol)
 	static __thread int recursive;
 	int index, ret;
 
+printf("%s\n", __func__);
 	if (recursive)
 		goto real;
 
