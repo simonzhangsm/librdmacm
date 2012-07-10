@@ -1,7 +1,8 @@
 INCLUDES = -I$(srcdir)/include
 
+rslibdir = $(libdir)/rsocket
 lib_LTLIBRARIES = src/librdmacm.la
-noinst_LTLIBRARIES  = src/librspreload.la
+rslibdir_LTLIBRARIES = src/librspreload.la
 
 ACLOCAL_AMFLAGS = -I config
 AM_CFLAGS = -g -Wall -D_GNU_SOURCE -DSYSCONFDIR=\"$(sysconfdir)\" -DRDMADIR=\"@rdmadir@\"
@@ -26,6 +27,7 @@ src_librdmacm_la_DEPENDENCIES =  $(srcdir)/src/librdmacm.map
 src_librspreload_la_SOURCES = src/preload.c src/indexer.c
 src_librspreload_la_LDFLAGS = -version-info 1 -export-dynamic \
 			   $(librspreload_version_script)
+src_librspreload_la_DEPENDENCIES =  $(srcdir)/src/librspreload.map
 src_librspreload_la_LIBADD = $(top_builddir)/src/librdmacm.la
 
 bin_PROGRAMS = examples/ucmatose examples/rping examples/udaddy examples/mckey \
@@ -125,7 +127,7 @@ man_MANS = \
 	man/rdma_cm.7 \
 	man/rsocket.7
 
-EXTRA_DIST = src/cma.h src/indexer.h src/librdmacm.map \
+EXTRA_DIST = src/cma.h src/indexer.h src/librdmacm.map src/librspreload.map \
 	librdmacm.spec.in $(man_MANS)
 
 dist-hook: librdmacm.spec
