@@ -11,8 +11,10 @@ src_librspreload_la_CFLAGS = $(AM_CFLAGS)
 
 if HAVE_LD_VERSION_SCRIPT
     librdmacm_version_script = -Wl,--version-script=$(srcdir)/src/librdmacm.map
+    librspreload_version_script = -Wl,--version-script=$(srcdir)/src/librspreload.map
 else
     librdmacm_version_script =
+    librspreload_version_script =
 endif
 
 src_librdmacm_la_SOURCES = src/cma.c src/addrinfo.c src/acm.c \
@@ -22,6 +24,8 @@ src_librdmacm_la_LDFLAGS = -version-info 1 -export-dynamic \
 src_librdmacm_la_DEPENDENCIES =  $(srcdir)/src/librdmacm.map
 
 src_librspreload_la_SOURCES = src/preload.c src/indexer.c
+src_librspreload_la_LDFLAGS = -version-info 1 -export-dynamic \
+			   $(librspreload_version_script)
 src_librspreload_la_LIBADD = $(top_builddir)/src/librdmacm.la
 
 bin_PROGRAMS = examples/ucmatose examples/rping examples/udaddy examples/mckey \
