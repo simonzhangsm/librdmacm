@@ -60,8 +60,8 @@ rm -rf $RPM_BUILD_ROOT
 
 %files devel
 %defattr(-,root,root)
-%{_libdir}/lib*.so
-%{_libdir}/rsocket/lib*.so
+%{_libdir}/librdmacm*.so
+%{_libdir}/rsocket/librspreload*.so
 %{_libdir}/*.a
 %{_libdir}/rsocket/*.a
 %{_includedir}/*
