@@ -1,0 +1,22 @@
+Bottom: e8a593c3ff191ffcaccc9621780345523eb869d8
+Top:    a28f53d18ae8ac8f9c8e4b58b003388a6498d969
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-07-10 13:23:42 -0700
+
+Refresh of build-preload
+
+---
+
+diff --git a/Makefile.am b/Makefile.am
+index 064bd1f..62f0a63 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -8,7 +8,7 @@ ACLOCAL_AMFLAGS = -I config
+ AM_CFLAGS = -g -Wall -D_GNU_SOURCE -DSYSCONFDIR=\"$(sysconfdir)\" -DRDMADIR=\"@rdmadir@\"
+ 
+ src_librdmacm_la_CFLAGS = $(AM_CFLAGS)
+-src_librspreload_la_CFLAGS = $(AM_CFLAGS)
++src_librspreload_la_CFLAGS = -Wall -shared -fPIC -D_GNU_SOURCE
+ 
+ if HAVE_LD_VERSION_SCRIPT
+     librdmacm_version_script = -Wl,--version-script=$(srcdir)/src/librdmacm.map
