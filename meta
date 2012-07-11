@@ -1,8 +1,7 @@
 Version: 1
-Previous: 98aa2826223d5dde949f8f9bea6f832f5fcc7e1f
+Previous: 4b24ad46b83729c91175d37b9a244baddb057beb
 Head: 18a001ac3215de7a860231007aa2d57058ed1735
 Applied:
-  doc-rspre: 5e8b63a53951f7fbec61acfb1b5a494b39d56487
   v1-0-16: 18a001ac3215de7a860231007aa2d57058ed1735
 Unapplied:
   waitall-buggy: c49c6b56c55385774065f5aa2704078e6ae0ceb8
