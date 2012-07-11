@@ -12,10 +12,8 @@ src_librspreload_la_CFLAGS = $(AM_CFLAGS)
 
 if HAVE_LD_VERSION_SCRIPT
     librdmacm_version_script = -Wl,--version-script=$(srcdir)/src/librdmacm.map
-    librspreload_version_script =
 else
     librdmacm_version_script =
-    librspreload_version_script =
 endif
 
 src_librdmacm_la_SOURCES = src/cma.c src/addrinfo.c src/acm.c \
@@ -25,8 +23,7 @@ src_librdmacm_la_LDFLAGS = -version-info 1 -export-dynamic \
 src_librdmacm_la_DEPENDENCIES =  $(srcdir)/src/librdmacm.map
 
 src_librspreload_la_SOURCES = src/preload.c src/indexer.c
-src_librspreload_la_LDFLAGS = -version-info 1 -export-dynamic \
-			   $(librspreload_version_script)
+src_librspreload_la_LDFLAGS = -version-info 1 -export-dynamic
 src_librspreload_la_DEPENDENCIES =  $(srcdir)/src/librspreload.map
 src_librspreload_la_LIBADD = $(top_builddir)/src/librdmacm.la
 
@@ -127,7 +124,7 @@ man_MANS = \
 	man/rdma_cm.7 \
 	man/rsocket.7
 
-EXTRA_DIST = src/cma.h src/indexer.h src/librdmacm.map src/librspreload.map \
+EXTRA_DIST = src/cma.h src/indexer.h src/librdmacm.map \
 	librdmacm.spec.in $(man_MANS)
 
 dist-hook: librdmacm.spec
