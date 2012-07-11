@@ -123,7 +123,7 @@ man_MANS = \
 	man/rdma_cm.7 \
 	man/rsocket.7
 
-EXTRA_DIST = src/cma.h src/indexer.h src/librdmacm.map \
+EXTRA_DIST = src/cma.h src/indexer.h src/librdmacm.map examples/common.h \
 	librdmacm.spec.in $(man_MANS)
 
 dist-hook: librdmacm.spec
