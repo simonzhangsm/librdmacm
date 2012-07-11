@@ -1,5 +1,5 @@
 Bottom: 91153ae24e0243a1f3cf380e415d9bc5e8094789
-Top:    fa0afbb920504a794165a458b584e32efebb3ce6
+Top:    220121d634269cc5dec0c0d7bc1545acc1e3b8a9
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-09 14:58:14 -0700
 
@@ -15,7 +15,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/Makefile.am b/Makefile.am
-index 51b2f89..581cded 100644
+index 51b2f89..b271b45 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -1,11 +1,14 @@
@@ -33,13 +33,12 @@ index 51b2f89..581cded 100644
  
  if HAVE_LD_VERSION_SCRIPT
      librdmacm_version_script = -Wl,--version-script=$(srcdir)/src/librdmacm.map
-@@ -19,6 +22,11 @@ src_librdmacm_la_LDFLAGS = -version-info 1 -export-dynamic \
+@@ -19,6 +22,10 @@ src_librdmacm_la_LDFLAGS = -version-info 1 -export-dynamic \
  			   $(librdmacm_version_script)
  src_librdmacm_la_DEPENDENCIES =  $(srcdir)/src/librdmacm.map
  
 +src_librspreload_la_SOURCES = src/preload.c src/indexer.c
 +src_librspreload_la_LDFLAGS = -version-info 1 -export-dynamic
-+src_librspreload_la_DEPENDENCIES =  $(srcdir)/src/librspreload.map
 +src_librspreload_la_LIBADD = $(top_builddir)/src/librdmacm.la
 +
  bin_PROGRAMS = examples/ucmatose examples/rping examples/udaddy examples/mckey \
