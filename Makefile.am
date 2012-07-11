@@ -8,14 +8,15 @@ ACLOCAL_AMFLAGS = -I config
 AM_CFLAGS = -g -Wall -D_GNU_SOURCE -DSYSCONFDIR=\"$(sysconfdir)\" -DRDMADIR=\"@rdmadir@\"
 
 src_librdmacm_la_CFLAGS = $(AM_CFLAGS)
-src_librspreload_la_CFLAGS = -Wall -ldl -shared -fPIC -D_GNU_SOURCE
+src_librspreload_la_CFLAGS = $(AM_CFLAGS)
 
 if HAVE_LD_VERSION_SCRIPT
     librdmacm_version_script = -Wl,--version-script=$(srcdir)/src/librdmacm.map
+    librspreload_version_script =
 else
     librdmacm_version_script =
+    librspreload_version_script =
 endif
-librspreload_version_script =
 
 src_librdmacm_la_SOURCES = src/cma.c src/addrinfo.c src/acm.c \
 		src/rsocket.c src/indexer.c

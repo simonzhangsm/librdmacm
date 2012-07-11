@@ -31,14 +31,6 @@
  *
  */
 
-/*
- * Build:
- * gcc -lrdmacm -Wall -shared -fPIC -o preload.so -D_GNU_SOURCE preload.c indexer.c
- *
- * Use:
- * LD_PRELOAD=preload.so binary --plus_args
- */
-
 #if HAVE_CONFIG_H
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
@@ -54,7 +46,6 @@
 #include <string.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
-#include <stdio.h>
 
 #include <rdma/rdma_cma.h>
 #include <rdma/rdma_verbs.h>
@@ -225,7 +216,6 @@ static void init_preload(void)
 	/* Quick check without lock */
 	if (init)
 		return;
-printf("%s\n", __func__);
 
 	pthread_mutex_lock(&mut);
 	if (init)
@@ -330,7 +320,6 @@ int socket(int domain, int type, int protocol)
 	static __thread int recursive;
 	int index, ret;
 
-printf("%s\n", __func__);
 	if (recursive)
 		goto real;
 
