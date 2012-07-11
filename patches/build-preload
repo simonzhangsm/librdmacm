@@ -1,5 +1,5 @@
 Bottom: 91153ae24e0243a1f3cf380e415d9bc5e8094789
-Top:    a4b09c3cdc7c25dd763ce76138432c0aba19fc68
+Top:    c64a76f16b2f730e7c7514ef9ef676f4e60f07e0
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-09 14:58:14 -0700
 
@@ -15,10 +15,10 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/Makefile.am b/Makefile.am
-index 51b2f89..d74bbac 100644
+index 51b2f89..e01b4cc 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -1,17 +1,21 @@
+@@ -1,16 +1,21 @@
  INCLUDES = -I$(srcdir)/include
  
 +rslibdir = $(libdir)/rsocket
@@ -29,18 +29,18 @@ index 51b2f89..d74bbac 100644
  AM_CFLAGS = -g -Wall -D_GNU_SOURCE -DSYSCONFDIR=\"$(sysconfdir)\" -DRDMADIR=\"@rdmadir@\"
  
  src_librdmacm_la_CFLAGS = $(AM_CFLAGS)
-+src_librspreload_la_CFLAGS = -Wall -ldl -shared -fPIC -D_GNU_SOURCE
++src_librspreload_la_CFLAGS = $(AM_CFLAGS)
  
  if HAVE_LD_VERSION_SCRIPT
      librdmacm_version_script = -Wl,--version-script=$(srcdir)/src/librdmacm.map
++    librspreload_version_script =
  else
      librdmacm_version_script =
++    librspreload_version_script =
  endif
-+librspreload_version_script =
  
  src_librdmacm_la_SOURCES = src/cma.c src/addrinfo.c src/acm.c \
- 		src/rsocket.c src/indexer.c
-@@ -19,6 +23,12 @@ src_librdmacm_la_LDFLAGS = -version-info 1 -export-dynamic \
+@@ -19,6 +24,12 @@ src_librdmacm_la_LDFLAGS = -version-info 1 -export-dynamic \
  			   $(librdmacm_version_script)
  src_librdmacm_la_DEPENDENCIES =  $(srcdir)/src/librdmacm.map
  
@@ -53,7 +53,7 @@ index 51b2f89..d74bbac 100644
  bin_PROGRAMS = examples/ucmatose examples/rping examples/udaddy examples/mckey \
  	       examples/rdma_client examples/rdma_server examples/rdma_xclient \
  	       examples/rdma_xserver examples/rstream examples/rcopy
-@@ -116,7 +126,7 @@ man_MANS = \
+@@ -116,7 +127,7 @@ man_MANS = \
  	man/rdma_cm.7 \
  	man/rsocket.7
  
@@ -130,29 +130,21 @@ index 0000000..554050d
 +	local: *;
 +};
 diff --git a/src/preload.c b/src/preload.c
-index d21389f..5ed77d7 100644
+index d21389f..8758d5c 100644
 --- a/src/preload.c
 +++ b/src/preload.c
-@@ -54,6 +54,7 @@
- #include <string.h>
- #include <netinet/in.h>
- #include <netinet/tcp.h>
-+#include <stdio.h>
+@@ -31,14 +31,6 @@
+  *
+  */
  
- #include <rdma/rdma_cma.h>
- #include <rdma/rdma_verbs.h>
-@@ -224,6 +225,7 @@ static void init_preload(void)
- 	/* Quick check without lock */
- 	if (init)
- 		return;
-+printf("%s\n", __func__);
- 
- 	pthread_mutex_lock(&mut);
- 	if (init)
-@@ -328,6 +330,7 @@ int socket(int domain, int type, int protocol)
- 	static __thread int recursive;
- 	int index, ret;
- 
-+printf("%s\n", __func__);
- 	if (recursive)
- 		goto real;
+-/*
+- * Build:
+- * gcc -lrdmacm -Wall -shared -fPIC -o preload.so -D_GNU_SOURCE preload.c indexer.c
+- *
+- * Use:
+- * LD_PRELOAD=preload.so binary --plus_args
+- */
+-
+ #if HAVE_CONFIG_H
+ #  include <config.h>
+ #endif /* HAVE_CONFIG_H */
