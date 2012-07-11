@@ -1,5 +1,5 @@
 Bottom: 91153ae24e0243a1f3cf380e415d9bc5e8094789
-Top:    c64a76f16b2f730e7c7514ef9ef676f4e60f07e0
+Top:    fa0afbb920504a794165a458b584e32efebb3ce6
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-09 14:58:14 -0700
 
@@ -15,10 +15,10 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/Makefile.am b/Makefile.am
-index 51b2f89..e01b4cc 100644
+index 51b2f89..581cded 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -1,16 +1,21 @@
+@@ -1,11 +1,14 @@
  INCLUDES = -I$(srcdir)/include
  
 +rslibdir = $(libdir)/rsocket
@@ -33,35 +33,18 @@ index 51b2f89..e01b4cc 100644
  
  if HAVE_LD_VERSION_SCRIPT
      librdmacm_version_script = -Wl,--version-script=$(srcdir)/src/librdmacm.map
-+    librspreload_version_script =
- else
-     librdmacm_version_script =
-+    librspreload_version_script =
- endif
- 
- src_librdmacm_la_SOURCES = src/cma.c src/addrinfo.c src/acm.c \
-@@ -19,6 +24,12 @@ src_librdmacm_la_LDFLAGS = -version-info 1 -export-dynamic \
+@@ -19,6 +22,11 @@ src_librdmacm_la_LDFLAGS = -version-info 1 -export-dynamic \
  			   $(librdmacm_version_script)
  src_librdmacm_la_DEPENDENCIES =  $(srcdir)/src/librdmacm.map
  
 +src_librspreload_la_SOURCES = src/preload.c src/indexer.c
-+src_librspreload_la_LDFLAGS = -version-info 1 -export-dynamic \
-+			   $(librspreload_version_script)
++src_librspreload_la_LDFLAGS = -version-info 1 -export-dynamic
 +src_librspreload_la_DEPENDENCIES =  $(srcdir)/src/librspreload.map
 +src_librspreload_la_LIBADD = $(top_builddir)/src/librdmacm.la
 +
  bin_PROGRAMS = examples/ucmatose examples/rping examples/udaddy examples/mckey \
  	       examples/rdma_client examples/rdma_server examples/rdma_xclient \
  	       examples/rdma_xserver examples/rstream examples/rcopy
-@@ -116,7 +127,7 @@ man_MANS = \
- 	man/rdma_cm.7 \
- 	man/rsocket.7
- 
--EXTRA_DIST = src/cma.h src/indexer.h src/librdmacm.map \
-+EXTRA_DIST = src/cma.h src/indexer.h src/librdmacm.map src/librspreload.map \
- 	librdmacm.spec.in $(man_MANS)
- 
- dist-hook: librdmacm.spec
 diff --git a/librdmacm.spec.in b/librdmacm.spec.in
 index 7248137..4652bbc 100644
 --- a/librdmacm.spec.in
@@ -93,42 +76,6 @@ index 7248137..4652bbc 100644
  %{_includedir}/*
  %{_mandir}/man3/*
  %{_mandir}/man7/*
-diff --git a/src/librspreload.map b/src/librspreload.map
-new file mode 100644
-index 0000000..554050d
---- /dev/null
-+++ b/src/librspreload.map
-@@ -0,0 +1,30 @@
-+RSPRELOAD_1.0 {
-+	global:
-+		socket;
-+		bind;
-+		listen;
-+		accept;
-+		connect;
-+		shutdown;
-+		close;
-+		recv;
-+		recvfrom;
-+		recvmsg;
-+		send;
-+		sendto;
-+		sendmsg;
-+		read;
-+		readv;
-+		write;
-+		writev;
-+		poll;
-+		select;
-+		getpeername;
-+		getsockname;
-+		setsockopt;
-+		getsockopt;
-+		fcntl;
-+		poll;
-+		select;
-+	local: *;
-+};
 diff --git a/src/preload.c b/src/preload.c
 index d21389f..8758d5c 100644
 --- a/src/preload.c
