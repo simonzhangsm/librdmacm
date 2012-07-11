@@ -24,7 +24,6 @@ src_librdmacm_la_DEPENDENCIES =  $(srcdir)/src/librdmacm.map
 
 src_librspreload_la_SOURCES = src/preload.c src/indexer.c
 src_librspreload_la_LDFLAGS = -version-info 1 -export-dynamic
-src_librspreload_la_DEPENDENCIES =  $(srcdir)/src/librspreload.map
 src_librspreload_la_LIBADD = $(top_builddir)/src/librdmacm.la
 
 bin_PROGRAMS = examples/ucmatose examples/rping examples/udaddy examples/mckey \
