@@ -1,6 +1,6 @@
 Bottom: 220121d634269cc5dec0c0d7bc1545acc1e3b8a9
 Top:    dfec70d648229122a223c74fd6c162bb7057df14
-Author: Sean Hefty <sean.hefty@intel.com>
+Author: Yann Droneaud <ydroneaud@opteya.com>
 Date:   2012-07-11 11:54:39 -0700
 
 librdmacm: Validate source address protocol family in rdma_resolve_addr
