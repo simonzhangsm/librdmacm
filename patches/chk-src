@@ -1,0 +1,17 @@
+Bottom: 220121d634269cc5dec0c0d7bc1545acc1e3b8a9
+Top:    220121d634269cc5dec0c0d7bc1545acc1e3b8a9
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-07-11 11:54:39 -0700
+
+librdmacm: Validate source address protocol family in rdma_resolve_addr
+
+If a source address is provided but its protocol family is not recognized,
+returns an error.
+
+Signed-off-by: Yann Droneaud <ydroneaud@opteya.com>
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
