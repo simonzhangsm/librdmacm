@@ -1,0 +1,13 @@
+Bottom: 31af2c38b30cc7004b87c3d8c3adf4afc84f8df4
+Top:    31af2c38b30cc7004b87c3d8c3adf4afc84f8df4
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-07-11 15:13:29 -0700
+
+rspreload: Document use of librspreload library
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
