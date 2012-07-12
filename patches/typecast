@@ -1,0 +1,19 @@
+Bottom: b0d26700067fa09254ee8df365690f91fd2ac5fb
+Top:    b0d26700067fa09254ee8df365690f91fd2ac5fb
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-07-12 09:24:10 -0700
+
+librspreload: Fix typecast to eliminate compile warnings
+
+src/preload.c: In function ?bind?:
+src/preload.c:350: warning: assignment from incompatible pointer type
+src/preload.c: In function ?connect?:
+src/preload.c:397: warning: assignment from incompatible pointer type
+
+Signed-off-by: Hal Rosenstock <hal@mellanox.com>
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
