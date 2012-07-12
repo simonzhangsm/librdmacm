@@ -1,6 +1,6 @@
 Bottom: b0d26700067fa09254ee8df365690f91fd2ac5fb
 Top:    b0d26700067fa09254ee8df365690f91fd2ac5fb
-Author: Sean Hefty <sean.hefty@intel.com>
+Author: Hal Rosenstock <hal@mellanox.com>
 Date:   2012-07-12 09:24:10 -0700
 
 librspreload: Fix typecast to eliminate compile warnings
