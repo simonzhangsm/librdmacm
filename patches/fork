@@ -1,0 +1,16 @@
+Bottom: 7ec243f3149e9a1ff1d5183f18e30d2458e354d6
+Top:    7ec243f3149e9a1ff1d5183f18e30d2458e354d6
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-07-13 15:25:53 -0700
+
+librspreload: Support server apps that call fork()
+
+Provide limited support for applications that call fork() after
+accepting a connection.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
