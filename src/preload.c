@@ -92,10 +92,12 @@ static pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
 static int sq_size;
 static int rq_size;
 static int sq_inline;
+static int fork_support;
 
 enum fd_type {
 	fd_normal,
-	fd_rsocket
+	fd_rsocket,
+	fd_fork
 };
 
 struct fd_info {
@@ -207,6 +209,10 @@ void getenv_options(void)
 	var = getenv("RS_INLINE");
 	if (var)
 		sq_inline = atoi(var);
+
+	var = getenv("RDMAV_FORK_SAFE");
+	if (var)
+		fork_support = atoi(var);
 }
 
 static void init_preload(void)
@@ -365,8 +371,16 @@ int socket(int domain, int type, int protocol)
 	ret = rsocket(domain, type, protocol);
 	recursive = 0;
 	if (ret >= 0) {
-		fd_store(index, ret, fd_rsocket);
-		set_rsocket_options(ret);
+		if (fork_support) {
+			rclose(ret);
+			ret = real_socket(domain, type, protocol);
+			if (ret < 0)
+				return ret;
+			fd_store(index, ret, fd_fork);
+		} else {
+			fd_store(index, ret, fd_rsocket);
+			set_rsocket_options(ret);
+		}
 		return index;
 	}
 	fd_close(index, &ret);
@@ -421,12 +435,37 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
 	}
 }
 
+static int connect_fork(int socket, const struct sockaddr *addr, socklen_t addrlen)
+{
+	struct sockaddr_in *sin;
+	int fd, ret;
+	uint32_t msg;
+
+	fd_get(socket, &fd);
+	ret = real.connect(fd, addr, addrlen);
+	if (ret)
+		return ret;
+
+	ret = real.read(fd, &msg, sizeof msg);
+	if (ret != sizeof msg)
+		return ret;
+
+	ret = transpose_socket(socket, &fd, fd_rsocket);
+	if (ret)
+		return ret;
+
+	return rconnect(fd, addr, addrlen);
+}
+
 int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
 {
 	struct sockaddr_in *sin;
 	int fd, ret;
 
-	if (fd_get(socket, &fd) == fd_rsocket) {
+	switch (fd_get(socket, &fd)) {
+	case fd_fork:
+		return connect_fork(socket, addr, addrlen);
+	case fd_rsocket:
 		sin = (struct sockaddr_in *) addr;
 		if (ntohs(sin->sin_port) > 1024) {
 			ret = rconnect(fd, addr, addrlen);
