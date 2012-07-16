@@ -1,5 +1,5 @@
-Bottom: 454cf9a1db769bb4bf7d2c1d4b95f0a992a0aafa
-Top:    6824bd04c82761ee7e8d74496b6527b2166fd460
+Bottom: a8d2f5e9e4909e604d5a7b614f02d08080507dcb
+Top:    e90a53de4491d0aa00f51dec53f5a436f320da53
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-13 15:25:53 -0700
 
@@ -14,7 +14,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index 0d457bf..9c4c423 100644
+index 498e813..ca81292 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -92,10 +92,12 @@ static pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
@@ -42,7 +42,7 @@ index 0d457bf..9c4c423 100644
  }
  
  static void init_preload(void)
-@@ -344,8 +350,16 @@ int socket(int domain, int type, int protocol)
+@@ -365,8 +371,16 @@ int socket(int domain, int type, int protocol)
  	ret = rsocket(domain, type, protocol);
  	recursive = 0;
  	if (ret >= 0) {
@@ -61,7 +61,7 @@ index 0d457bf..9c4c423 100644
  		return index;
  	}
  	fd_close(index, &ret);
-@@ -403,6 +417,27 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
+@@ -421,6 +435,27 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
  	}
  }
  
