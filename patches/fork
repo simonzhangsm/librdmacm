@@ -1,5 +1,5 @@
 Bottom: 454cf9a1db769bb4bf7d2c1d4b95f0a992a0aafa
-Top:    1c8fbc5fdc8ac86358d7095d9ac4561f47eec4ea
+Top:    6824bd04c82761ee7e8d74496b6527b2166fd460
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-13 15:25:53 -0700
 
@@ -14,7 +14,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index 0d457bf..177c621 100644
+index 0d457bf..9c4c423 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -92,10 +92,12 @@ static pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
@@ -61,7 +61,7 @@ index 0d457bf..177c621 100644
  		return index;
  	}
  	fd_close(index, &ret);
-@@ -403,6 +417,29 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
+@@ -403,6 +417,27 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
  	}
  }
  
@@ -79,12 +79,10 @@ index 0d457bf..177c621 100644
 +	if (ret != sizeof msg)
 +		return ret;
 +
-+	rs = rsocket(domain, type, protocol);
-+
-+	real_shutdown(fd, SHUT_RDWR);
-+	real_close(fd);
-+
-+	fd_store(socket, fd, fd_rsocket);
++	ret = transpose_socket(socket, &fd, fd_rsocket, rsocket,
++			       real_close, rclose, real_getsockname,
++			       real_getsockopt, rsetsockopt,
++			       real_fcntl, rfcntl);
 +	return connect(socket, addr, addrlen);
 +}
 +
