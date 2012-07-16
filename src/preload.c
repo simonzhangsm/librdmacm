@@ -252,51 +252,63 @@ out:
 }
 
 /*
- * Convert from an rsocket to a normal socket.  The new socket should have the
- * same settings and bindings as the rsocket.  We currently only handle setting
- * a few of the more common values.
+ * Convert between an rsocket and a normal socket.  The new socket should have
+ * the same settings and bindings as the current socket.  We currently only
+ * handle setting a few of the more common values.
  */
-static int socket_fallback(int socket, int *fd)
+static int
+transpose_socket(int index, int *fd, enum fd_type new_type,
+	int (*socket_new)(int domain, int type, int protocol),
+	int (*close_old)(int socket),
+	int (*close_new)(int socket),
+	int (*getsockname_old)(int socket, struct sockaddr *addr,
+			       socklen_t *addrlen),
+	int (*getsockopt_old)(int socket, int level, int optname,
+			      void *optval, socklen_t *optlen),
+	int (*setsockopt_new)(int socket, int level, int optname,
+			      const void *optval, socklen_t optlen),
+	int (*fcntl_old)(int socket, int cmd, ... /* arg */),
+	int (*fcntl_new)(int socket, int cmd, ... /* arg */))
 {
 	socklen_t len = 0;
 	int new_fd, param, ret;
 
-	ret = rgetsockname(*fd, NULL, &len);
+	ret = getsockname_old(*fd, NULL, &len);
 	if (ret)
 		return ret;
 
 	param = (len == sizeof(struct sockaddr_in6)) ? PF_INET6 : PF_INET;
-	new_fd = real_socket(param, SOCK_STREAM, IPPROTO_TCP);
+	new_fd = socket_new(param, SOCK_STREAM, 0);
 	if (new_fd < 0)
 		return new_fd;
 
-	ret = rfcntl(*fd, F_GETFL);
+	ret = fcntl_old(*fd, F_GETFL);
 	if (ret > 0)
-		ret = real_fcntl(new_fd, F_SETFL, ret);
+		ret = fcntl_new(new_fd, F_SETFL, ret);
 	if (ret)
 		goto err;
 
 	len = sizeof param;
-	ret = rgetsockopt(*fd, SOL_SOCKET, SO_REUSEADDR, &param, &len);
+	ret = getsockopt_old(*fd, SOL_SOCKET, SO_REUSEADDR, &param, &len);
 	if (param && !ret)
-		ret = real_setsockopt(new_fd, SOL_SOCKET, SO_REUSEADDR, &param, len);
+		ret = setsockopt_new(new_fd, SOL_SOCKET, SO_REUSEADDR, &param, len);
 	if (ret)
 		goto err;
 
 	len = sizeof param;
-	ret = rgetsockopt(*fd, IPPROTO_TCP, TCP_NODELAY, &param, &len);
+	ret = getsockopt_old(*fd, IPPROTO_TCP, TCP_NODELAY, &param, &len);
 	if (param && !ret)
-		ret = real_setsockopt(new_fd, IPPROTO_TCP, TCP_NODELAY, &param, len);
+		ret = setsockopt_new(new_fd, IPPROTO_TCP, TCP_NODELAY, &param, len);
 	if (ret)
 		goto err;
 
-	rclose(*fd);
-	fd_store(socket, new_fd, fd_normal);
+	close_old(*fd);
+	fd_store(socket, new_fd, new_type);
 	*fd = new_fd;
 	return 0;
 
 err:
-	real_close(new_fd);
+	close_new(new_fd);
 	return ret;
 }
 
@@ -351,7 +363,10 @@ int bind(int socket, const struct sockaddr *addr, socklen_t addrlen)
 		if (!sin->sin_port || ntohs(sin->sin_port) > 1024)
 			return rbind(fd, addr, addrlen);
 
-		ret = socket_fallback(socket, &fd);
+		ret = transpose_socket(socket, &fd, fd_normal, real_socket,
+				       rclose, real_close, rgetsockname,
+				       rgetsockopt, real_setsockopt,
+				       rfcntl, real_fcntl);
 		if (ret)
 			return ret;
 	}
@@ -401,7 +416,10 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
 				return ret;
 		}
 
-		ret = socket_fallback(socket, &fd);
+		ret = transpose_socket(socket, &fd, fd_normal, real_socket,
+				       rclose, real_close, rgetsockname,
+				       rgetsockopt, real_setsockopt,
+				       rfcntl, real_fcntl);
 		if (ret)
 			return ret;
 	}
