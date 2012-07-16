@@ -1,0 +1,23 @@
+Bottom: e61a43e1e4e084e2b3c0a5b0070b81f378686b89
+Top:    a8d2f5e9e4909e604d5a7b614f02d08080507dcb
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-07-16 16:00:30 -0700
+
+Refresh of transpose
+
+---
+
+diff --git a/src/preload.c b/src/preload.c
+index 3417223..498e813 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -280,8 +280,7 @@ out:
+  * the same settings and bindings as the current socket.  We currently only
+  * handle setting a few of the more common values.
+  */
+-static int
+-transpose_socket(int index, int *fd, enum fd_type new_type)
++static int transpose_socket(int index, int *fd, enum fd_type new_type)
+ {
+ 	socklen_t len = 0;
+ 	int new_fd, param, ret;
