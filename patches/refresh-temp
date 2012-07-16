@@ -1,0 +1,82 @@
+Bottom: aaae6221e67fef87997f863c01c8702f0dfc8d21
+Top:    1c8fbc5fdc8ac86358d7095d9ac4561f47eec4ea
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-07-16 14:31:04 -0700
+
+Refresh of fork
+
+---
+
+diff --git a/src/preload.c b/src/preload.c
+index 599e5fb..177c621 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -319,68 +319,6 @@ err:
+ }
+ 
+ /*
+- * Convert between an rsocket and a normal socket.  The new socket should have the
+- * same settings and bindings as the current socket.  We currently only handle
+- * setting a few of the more common values.
+- */
+-static int
+-transpose_socket(int index, int *fd, enum fd_type new_type,
+-	int (*socket_new)(int domain, int type, int protocol),
+-	int (*shutdown_old)(int socket, int how),
+-	int (*close_old)(int socket),
+-	int (*getsockname_old)(int socket, struct sockaddr *addr,
+-			       socklen_t *addrlen),
+-	int (*getsockopt_old)(int socket, int level, int optname,
+-			      void *optval, socklen_t *optlen),
+-	int (*setsockopt_new)(int socket, int level, int optname,
+-			      const void *optval, socklen_t optlen),
+-	int (*fcntl_old)(int socket, int cmd, ... /* arg */),
+-	int (*fcntl_new)(int socket, int cmd, ... /* arg */))
+-{
+-	socklen_t len = 0;
+-	int new_fd, param, ret;
+-
+-	ret = getsockname_old(*fd, NULL, &len);
+-	if (ret)
+-		return ret;
+-
+-	param = (len == sizeof(struct sockaddr_in6)) ? PF_INET6 : PF_INET;
+-	new_fd = socket_new(param, SOCK_STREAM, 0);
+-	if (new_fd < 0)
+-		return new_fd;
+-
+-	ret = fcntl_old(*fd, F_GETFL);
+-	if (ret > 0)
+-		ret = fcntl_new(new_fd, F_SETFL, ret);
+-	if (ret)
+-		goto err;
+-
+-	len = sizeof param;
+-	ret = getsockopt_old(*fd, SOL_SOCKET, SO_REUSEADDR, &param, &len);
+-	if (param && !ret)
+-		ret = setsockopt_new(new_fd, SOL_SOCKET, SO_REUSEADDR, &param, len);
+-	if (ret)
+-		goto err;
+-
+-	len = sizeof param;
+-	ret = getsockopt_old(*fd, IPPROTO_TCP, TCP_NODELAY, &param, &len);
+-	if (param && !ret)
+-		ret = setsockopt_new(new_fd, IPPROTO_TCP, TCP_NODELAY, &param, len);
+-	if (ret)
+-		goto err;
+-
+-	shutdown_old(*fd, SHUT_RDWR);
+-	close_old(*fd);
+-	fd_store(socket, new_fd, new_type);
+-	*fd = new_fd;
+-	return 0;
+-
+-err:
+-	real_close(new_fd);
+-	return ret;
+-}
+-
+-/*
+  * Use defaults on failure.
+  */
+ void set_rsocket_options(int rsocket)
