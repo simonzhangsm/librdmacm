@@ -1,5 +1,5 @@
 Bottom: 7ec243f3149e9a1ff1d5183f18e30d2458e354d6
-Top:    e61a43e1e4e084e2b3c0a5b0070b81f378686b89
+Top:    a8d2f5e9e4909e604d5a7b614f02d08080507dcb
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-16 14:17:58 -0700
 
@@ -17,7 +17,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index 2750b30..3417223 100644
+index 2750b30..498e813 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -53,38 +53,38 @@
@@ -168,7 +168,7 @@ index 2750b30..3417223 100644
  
  	getenv_options();
  	init = 1;
-@@ -252,51 +276,61 @@ out:
+@@ -252,51 +276,60 @@ out:
  }
  
  /*
@@ -180,8 +180,7 @@ index 2750b30..3417223 100644
 + * handle setting a few of the more common values.
   */
 -static int socket_fallback(int socket, int *fd)
-+static int
-+transpose_socket(int index, int *fd, enum fd_type new_type)
++static int transpose_socket(int index, int *fd, enum fd_type new_type)
  {
  	socklen_t len = 0;
  	int new_fd, param, ret;
@@ -245,7 +244,7 @@ index 2750b30..3417223 100644
  	return ret;
  }
  
-@@ -338,7 +372,7 @@ int socket(int domain, int type, int protocol)
+@@ -338,7 +371,7 @@ int socket(int domain, int type, int protocol)
  	}
  	fd_close(index, &ret);
  real:
@@ -254,7 +253,7 @@ index 2750b30..3417223 100644
  }
  
  int bind(int socket, const struct sockaddr *addr, socklen_t addrlen)
-@@ -351,19 +385,19 @@ int bind(int socket, const struct sockaddr *addr, socklen_t addrlen)
+@@ -351,19 +384,19 @@ int bind(int socket, const struct sockaddr *addr, socklen_t addrlen)
  		if (!sin->sin_port || ntohs(sin->sin_port) > 1024)
  			return rbind(fd, addr, addrlen);
  
@@ -277,7 +276,7 @@ index 2750b30..3417223 100644
  }
  
  int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
-@@ -384,7 +418,7 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
+@@ -384,7 +417,7 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
  		fd_store(index, ret, fd_rsocket);
  		return index;
  	} else {
@@ -286,7 +285,7 @@ index 2750b30..3417223 100644
  	}
  }
  
-@@ -401,19 +435,19 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
+@@ -401,19 +434,19 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
  				return ret;
  		}
  
@@ -309,7 +308,7 @@ index 2750b30..3417223 100644
  }
  
  ssize_t recvfrom(int socket, void *buf, size_t len, int flags,
-@@ -422,14 +456,14 @@ ssize_t recvfrom(int socket, void *buf, size_t len, int flags,
+@@ -422,14 +455,14 @@ ssize_t recvfrom(int socket, void *buf, size_t len, int flags,
  	int fd;
  	return (fd_get(socket, &fd) == fd_rsocket) ?
  		rrecvfrom(fd, buf, len, flags, src_addr, addrlen) :
@@ -326,7 +325,7 @@ index 2750b30..3417223 100644
  }
  
  ssize_t read(int socket, void *buf, size_t count)
-@@ -437,7 +471,7 @@ ssize_t read(int socket, void *buf, size_t count)
+@@ -437,7 +470,7 @@ ssize_t read(int socket, void *buf, size_t count)
  	int fd;
  	init_preload();
  	return (fd_get(socket, &fd) == fd_rsocket) ?
@@ -335,7 +334,7 @@ index 2750b30..3417223 100644
  }
  
  ssize_t readv(int socket, const struct iovec *iov, int iovcnt)
-@@ -445,14 +479,14 @@ ssize_t readv(int socket, const struct iovec *iov, int iovcnt)
+@@ -445,14 +478,14 @@ ssize_t readv(int socket, const struct iovec *iov, int iovcnt)
  	int fd;
  	init_preload();
  	return (fd_get(socket, &fd) == fd_rsocket) ?
@@ -352,7 +351,7 @@ index 2750b30..3417223 100644
  }
  
  ssize_t sendto(int socket, const void *buf, size_t len, int flags,
-@@ -461,14 +495,14 @@ ssize_t sendto(int socket, const void *buf, size_t len, int flags,
+@@ -461,14 +494,14 @@ ssize_t sendto(int socket, const void *buf, size_t len, int flags,
  	int fd;
  	return (fd_get(socket, &fd) == fd_rsocket) ?
  		rsendto(fd, buf, len, flags, dest_addr, addrlen) :
@@ -369,7 +368,7 @@ index 2750b30..3417223 100644
  }
  
  ssize_t write(int socket, const void *buf, size_t count)
-@@ -476,7 +510,7 @@ ssize_t write(int socket, const void *buf, size_t count)
+@@ -476,7 +509,7 @@ ssize_t write(int socket, const void *buf, size_t count)
  	int fd;
  	init_preload();
  	return (fd_get(socket, &fd) == fd_rsocket) ?
@@ -378,7 +377,7 @@ index 2750b30..3417223 100644
  }
  
  ssize_t writev(int socket, const struct iovec *iov, int iovcnt)
-@@ -484,7 +518,7 @@ ssize_t writev(int socket, const struct iovec *iov, int iovcnt)
+@@ -484,7 +517,7 @@ ssize_t writev(int socket, const struct iovec *iov, int iovcnt)
  	int fd;
  	init_preload();
  	return (fd_get(socket, &fd) == fd_rsocket) ?
@@ -387,7 +386,7 @@ index 2750b30..3417223 100644
  }
  
  static struct pollfd *fds_alloc(nfds_t nfds)
-@@ -514,7 +548,7 @@ int poll(struct pollfd *fds, nfds_t nfds, int timeout)
+@@ -514,7 +547,7 @@ int poll(struct pollfd *fds, nfds_t nfds, int timeout)
  			goto use_rpoll;
  	}
  
@@ -396,7 +395,7 @@ index 2750b30..3417223 100644
  
  use_rpoll:
  	rfds = fds_alloc(nfds);
-@@ -619,14 +653,14 @@ int shutdown(int socket, int how)
+@@ -619,14 +652,14 @@ int shutdown(int socket, int how)
  {
  	int fd;
  	return (fd_get(socket, &fd) == fd_rsocket) ?
@@ -413,7 +412,7 @@ index 2750b30..3417223 100644
  }
  
  int getpeername(int socket, struct sockaddr *addr, socklen_t *addrlen)
-@@ -634,7 +668,7 @@ int getpeername(int socket, struct sockaddr *addr, socklen_t *addrlen)
+@@ -634,7 +667,7 @@ int getpeername(int socket, struct sockaddr *addr, socklen_t *addrlen)
  	int fd;
  	return (fd_get(socket, &fd) == fd_rsocket) ?
  		rgetpeername(fd, addr, addrlen) :
@@ -422,7 +421,7 @@ index 2750b30..3417223 100644
  }
  
  int getsockname(int socket, struct sockaddr *addr, socklen_t *addrlen)
-@@ -642,7 +676,7 @@ int getsockname(int socket, struct sockaddr *addr, socklen_t *addrlen)
+@@ -642,7 +675,7 @@ int getsockname(int socket, struct sockaddr *addr, socklen_t *addrlen)
  	int fd;
  	return (fd_get(socket, &fd) == fd_rsocket) ?
  		rgetsockname(fd, addr, addrlen) :
@@ -431,7 +430,7 @@ index 2750b30..3417223 100644
  }
  
  int setsockopt(int socket, int level, int optname,
-@@ -651,7 +685,7 @@ int setsockopt(int socket, int level, int optname,
+@@ -651,7 +684,7 @@ int setsockopt(int socket, int level, int optname,
  	int fd;
  	return (fd_get(socket, &fd) == fd_rsocket) ?
  		rsetsockopt(fd, level, optname, optval, optlen) :
@@ -440,7 +439,7 @@ index 2750b30..3417223 100644
  }
  
  int getsockopt(int socket, int level, int optname,
-@@ -660,7 +694,7 @@ int getsockopt(int socket, int level, int optname,
+@@ -660,7 +693,7 @@ int getsockopt(int socket, int level, int optname,
  	int fd;
  	return (fd_get(socket, &fd) == fd_rsocket) ?
  		rgetsockopt(fd, level, optname, optval, optlen) :
@@ -449,7 +448,7 @@ index 2750b30..3417223 100644
  }
  
  int fcntl(int socket, int cmd, ... /* arg */)
-@@ -679,7 +713,7 @@ int fcntl(int socket, int cmd, ... /* arg */)
+@@ -679,7 +712,7 @@ int fcntl(int socket, int cmd, ... /* arg */)
  	case F_GETSIG:
  	case F_GETLEASE:
  		ret = (fd_get(socket, &fd) == fd_rsocket) ?
@@ -458,7 +457,7 @@ index 2750b30..3417223 100644
  		break;
  	case F_DUPFD:
  	/*case F_DUPFD_CLOEXEC:*/
-@@ -691,12 +725,12 @@ int fcntl(int socket, int cmd, ... /* arg */)
+@@ -691,12 +724,12 @@ int fcntl(int socket, int cmd, ... /* arg */)
  	case F_NOTIFY:
  		lparam = va_arg(args, long);
  		ret = (fd_get(socket, &fd) == fd_rsocket) ?
