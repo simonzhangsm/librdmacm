@@ -280,8 +280,7 @@ out:
  * the same settings and bindings as the current socket.  We currently only
  * handle setting a few of the more common values.
  */
-static int
-transpose_socket(int index, int *fd, enum fd_type new_type)
+static int transpose_socket(int index, int *fd, enum fd_type new_type)
 {
 	socklen_t len = 0;
 	int new_fd, param, ret;
