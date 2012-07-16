@@ -252,9 +252,9 @@ out:
 }
 
 /*
- * Convert between an rsocket and a normal socket.  The new socket should have the
- * same settings and bindings as the current socket.  We currently only handle
- * setting a few of the more common values.
+ * Convert between an rsocket and a normal socket.  The new socket should have
+ * the same settings and bindings as the current socket.  We currently only
+ * handle setting a few of the more common values.
  */
 static int
 transpose_socket(int index, int *fd, enum fd_type new_type,
