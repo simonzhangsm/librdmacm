@@ -285,58 +285,52 @@ transpose_socket(int index, int *fd, enum fd_type new_type)
 {
 	socklen_t len = 0;
 	int new_fd, param, ret;
+	struct socket_calls *new, *old;
 
-	ret = new_type == fd_rsocket ?
-	      real.getsockname(*fd, NULL, &len) : rgetsockname(*fd, NULL, &len);
+	if (new_type == fd_rsocket) {
+		new = &rs;
+		old = &real;
+	} else {
+		new = &real;
+		old = &rs;
+	}
+
+	ret = old->getsockname(*fd, NULL, &len);
 	if (ret)
 		return ret;
 
 	param = (len == sizeof(struct sockaddr_in6)) ? PF_INET6 : PF_INET;
-	new_fd = new_type == fd_rsocket ?
-		 rsocket(param, SOCK_STREAM, 0) : socket(param, SOCK_STREAM, 0);
+	new_fd = new->socket(param, SOCK_STREAM, 0);
 	if (new_fd < 0)
 		return new_fd;
 
-	ret = new_type == fd_rsocket ?
-	      real.fcntl(*fd, F_GETFL) : rcntl(*fd, F_GETFL);
-	if (ret > 0) {
-		ret = new_type == fd_rsocket ?
-		      rfcntl(new_fd, F_SETFL, ret) : real.fcntl(new_fd, F_SETFL, ret);
-	}
+	ret = old->fcntl(*fd, F_GETFL);
+	if (ret > 0)
+		ret = new->fcntl(new_fd, F_SETFL, ret);
 	if (ret)
 		goto err;
 
 	len = sizeof param;
-	ret = new_type == fd_rsocket ?
-	      real.getsockopt(*fd, SOL_SOCKET, SO_REUSEADDR, &param, &len) :
-	      rgetsockopt(*fd, SOL_SOCKET, SO_REUSEADDR, &param, &len);
-	if (param && !ret) {
-		ret = new_type == fd_rsocket ?
-		      rsetsockopt(new_fd, SOL_SOCKET, SO_REUSEADDR, &param, len) :
-		      real.setsockopt(new_fd, SOL_SOCKET, SO_REUSEADDR, &param, len);
-	}
+	ret = old->getsockopt(*fd, SOL_SOCKET, SO_REUSEADDR, &param, &len);
+	if (param && !ret)
+		ret = new->setsockopt(new_fd, SOL_SOCKET, SO_REUSEADDR, &param, len);
 	if (ret)
 		goto err;
 
 	len = sizeof param;
-	ret = new_type == fd_rsocket ?
-	      real.getsockopt(*fd, IPPROTO_TCP, TCP_NODELAY, &param, &len) :
-	      rgetsockopt(*fd, IPPROTO_TCP, TCP_NODELAY, &param, &len);
-	if (param && !ret) {
-		ret = new_type == fd_rsocket ?
-		      rsetsockopt(new_fd, IPPROTO_TCP, TCP_NODELAY, &param, len) :
-		      real.setsockopt(new_fd, IPPROTO_TCP, TCP_NODELAY, &param, len);
-	}
+	ret = old->getsockopt(*fd, IPPROTO_TCP, TCP_NODELAY, &param, &len);
+	if (param && !ret)
+		ret = new->setsockopt(new_fd, IPPROTO_TCP, TCP_NODELAY, &param, len);
 	if (ret)
 		goto err;
 
-	new_type == fd_rsocket ? rclose(*fd) : real.close(*fd);
+	old->close(*fd);
 	fd_store(socket, new_fd, new_type);
 	*fd = new_fd;
 	return 0;
 
 err:
-	new_type == fd_rsocket ? real.close(new_fd) : rclose(new_fd);
+	new->close(new_fd);
 	return ret;
 }
 
