@@ -1,5 +1,5 @@
 Bottom: 7ec243f3149e9a1ff1d5183f18e30d2458e354d6
-Top:    11bc8abd7626b80e35f4275314327e7ddf07c950
+Top:    454cf9a1db769bb4bf7d2c1d4b95f0a992a0aafa
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-16 14:17:58 -0700
 
@@ -17,7 +17,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index 2750b30..cc0d7eb 100644
+index 2750b30..0d457bf 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -252,51 +252,63 @@ out:
@@ -27,9 +27,9 @@ index 2750b30..cc0d7eb 100644
 - * Convert from an rsocket to a normal socket.  The new socket should have the
 - * same settings and bindings as the rsocket.  We currently only handle setting
 - * a few of the more common values.
-+ * Convert between an rsocket and a normal socket.  The new socket should have the
-+ * same settings and bindings as the current socket.  We currently only handle
-+ * setting a few of the more common values.
++ * Convert between an rsocket and a normal socket.  The new socket should have
++ * the same settings and bindings as the current socket.  We currently only
++ * handle setting a few of the more common values.
   */
 -static int socket_fallback(int socket, int *fd)
 +static int
