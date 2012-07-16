@@ -431,12 +431,10 @@ static int connect_fork(int socket, const struct sockaddr *addr, socklen_t addrl
 	if (ret != sizeof msg)
 		return ret;
 
-	rs = rsocket(domain, type, protocol);
-
-	real_shutdown(fd, SHUT_RDWR);
-	real_close(fd);
-
-	fd_store(socket, fd, fd_rsocket);
+	ret = transpose_socket(socket, &fd, fd_rsocket, rsocket,
+			       real_close, rclose, real_getsockname,
+			       real_getsockopt, rsetsockopt,
+			       real_fcntl, rfcntl);
 	return connect(socket, addr, addrlen);
 }
 
