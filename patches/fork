@@ -1,5 +1,5 @@
 Bottom: a8d2f5e9e4909e604d5a7b614f02d08080507dcb
-Top:    e90a53de4491d0aa00f51dec53f5a436f320da53
+Top:    2c3d4d1bd4b9fe1a653896a8d234d46ca6620399
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-13 15:25:53 -0700
 
@@ -14,7 +14,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index 498e813..ca81292 100644
+index 498e813..22c4b65 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -92,10 +92,12 @@ static pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
@@ -61,31 +61,42 @@ index 498e813..ca81292 100644
  		return index;
  	}
  	fd_close(index, &ret);
-@@ -421,6 +435,27 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
+@@ -421,12 +435,37 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
  	}
  }
  
 +static int connect_fork(int socket, const struct sockaddr *addr, socklen_t addrlen)
 +{
++	struct sockaddr_in *sin;
++	int fd, ret;
 +	uint32_t msg;
-+	int rs, fd, ret;
 +
-+	fd = fd_getd(socket);
-+	ret = real_connect(fd, addr, addrlen);
-+	if (!ret)
++	fd_get(socket, &fd);
++	ret = real.connect(fd, addr, addrlen);
++	if (ret)
 +		return ret;
 +
-+	ret = real_read(fd, &msg, sizeof msg);
++	ret = real.read(fd, &msg, sizeof msg);
 +	if (ret != sizeof msg)
 +		return ret;
 +
-+	ret = transpose_socket(socket, &fd, fd_rsocket, rsocket,
-+			       real_close, rclose, real_getsockname,
-+			       real_getsockopt, rsetsockopt,
-+			       real_fcntl, rfcntl);
-+	return connect(socket, addr, addrlen);
++	ret = transpose_socket(socket, &fd, fd_rsocket);
++	if (ret)
++		return ret;
++
++	return rconnect(fd, addr, addrlen);
 +}
 +
  int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
  {
  	struct sockaddr_in *sin;
+ 	int fd, ret;
+ 
+-	if (fd_get(socket, &fd) == fd_rsocket) {
++	switch (fd_get(socket, &fd)) {
++	case fd_fork:
++		return connect_fork(socket, addr, addrlen);
++	case fd_rsocket:
+ 		sin = (struct sockaddr_in *) addr;
+ 		if (ntohs(sin->sin_port) > 1024) {
+ 			ret = rconnect(fd, addr, addrlen);
