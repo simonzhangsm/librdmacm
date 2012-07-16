@@ -1,0 +1,26 @@
+Bottom: 11bc8abd7626b80e35f4275314327e7ddf07c950
+Top:    454cf9a1db769bb4bf7d2c1d4b95f0a992a0aafa
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-07-16 14:30:19 -0700
+
+Refresh of transpose
+
+---
+
+diff --git a/src/preload.c b/src/preload.c
+index cc0d7eb..0d457bf 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -252,9 +252,9 @@ out:
+ }
+ 
+ /*
+- * Convert between an rsocket and a normal socket.  The new socket should have the
+- * same settings and bindings as the current socket.  We currently only handle
+- * setting a few of the more common values.
++ * Convert between an rsocket and a normal socket.  The new socket should have
++ * the same settings and bindings as the current socket.  We currently only
++ * handle setting a few of the more common values.
+  */
+ static int
+ transpose_socket(int index, int *fd, enum fd_type new_type,
