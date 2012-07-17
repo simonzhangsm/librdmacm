@@ -1,5 +1,5 @@
 Bottom: c0306f4628b14e75db3da212b4a99875f49be65f
-Top:    89b109b9172f2fd26f7feaca314718e1127b4e64
+Top:    6fb26f02c06c27cb2b94fd21d21273260c3c4563
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-13 15:25:53 -0700
 
@@ -14,7 +14,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index d2058e2..1d76df9 100644
+index d2058e2..cdf1ea6 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -46,6 +46,8 @@
@@ -76,7 +76,7 @@ index d2058e2..1d76df9 100644
 -		set_rsocket_options(ret);
 +		if (fork_support) {
 +			rclose(ret);
-+			ret = real_socket(domain, type, protocol);
++			ret = real.socket(domain, type, protocol);
 +			if (ret < 0)
 +				return ret;
 +			fd_store(index, ret, fd_fork);
@@ -137,7 +137,7 @@ index d2058e2..1d76df9 100644
  		sin = (struct sockaddr_in *) addr;
  		if (ntohs(sin->sin_port) > 1024) {
  			ret = rconnect(fd, addr, addrlen);
-@@ -754,3 +803,85 @@ int fcntl(int socket, int cmd, ... /* arg */)
+@@ -754,3 +803,86 @@ int fcntl(int socket, int cmd, ... /* arg */)
  	va_end(args);
  	return ret;
  }
@@ -201,6 +201,7 @@ index d2058e2..1d76df9 100644
 +
 +	param = 1;
 +	rsetsockopt(dfd, IPPROTO_TCP, TCP_NODELAY, &param, sizeof param);
++	set_rsocket_options(dfd);
 +
 +	msg = 0;
 +	ret = real.write(sfd, &msg, sizeof msg);
