@@ -819,7 +819,6 @@ int fcntl(int socket, int cmd, ... /* arg */)
  */
 pid_t fork(void)
 {
-	struct sockaddr_storage sa;
 	struct sockaddr_in6 sin6;
 	pid_t pid;
 	sem_t *sem;
@@ -833,12 +832,12 @@ pid_t fork(void)
 	    (fd_get(last_accept, &sfd) != fd_fork))
 		goto out;
 
-	len = sizeof sa;
-	ret = real.getsockname(sfd, (struct sockaddr *) &sa, &len);
+	len = sizeof sin6;
+	ret = real.getsockname(sfd, (struct sockaddr *) &sin6, &len);
 	if (ret)
 		goto out;
-	sin6.sin6_family = sa.ss_family;
-	sin6.sin6_port = ((struct sockaddr_in6 *) &sa)->sin6_port;
+	sin6.sin6_flowinfor = sin6.sin6_scope_id = 0;
+	memset(&sin6.sin6_addr, 0, sizeof sin6.sin6_addr);
 
 	sem = sem_open("/rsocket_fork", O_CREAT, 0644, 1);
 	if (sem == SEM_FAILED)
@@ -852,7 +851,7 @@ pid_t fork(void)
 	rsetsockopt(lfd, SOL_SOCKET, SO_REUSEADDR, &param, sizeof param);
 
 	sem_wait(sem);
-	ret = rbind(lfd, &sin6, sizeof sin6);
+	ret = rbind(lfd, (struct sockaddr *) &sin6, sizeof sin6);
 	if (ret)
 		goto lclose;
 
