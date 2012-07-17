@@ -836,14 +836,14 @@ pid_t fork(void)
 	ret = real.getsockname(sfd, (struct sockaddr *) &sin6, &len);
 	if (ret)
 		goto out;
-	sin6.sin6_flowinfor = sin6.sin6_scope_id = 0;
+	sin6.sin6_flowinfo = sin6.sin6_scope_id = 0;
 	memset(&sin6.sin6_addr, 0, sizeof sin6.sin6_addr);
 
 	sem = sem_open("/rsocket_fork", O_CREAT, 0644, 1);
 	if (sem == SEM_FAILED)
 		goto out;
 
-	lfd = rsocket(sa.ss_family, SOCK_STREAM, 0);
+	lfd = rsocket(sin6.sin6_family, SOCK_STREAM, 0);
 	if (lfd < 0)
 		goto sclose;
 
