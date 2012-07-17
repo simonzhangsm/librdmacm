@@ -1,5 +1,5 @@
 Bottom: 7ec243f3149e9a1ff1d5183f18e30d2458e354d6
-Top:    5fd229f7e20bde0c0ed3050847f79e5d4c8af2b1
+Top:    c0306f4628b14e75db3da212b4a99875f49be65f
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-16 14:17:58 -0700
 
@@ -17,7 +17,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index 2750b30..8f281d3 100644
+index 2750b30..d2058e2 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -53,38 +53,38 @@
@@ -320,8 +320,9 @@ index 2750b30..8f281d3 100644
  		}
  
 -		ret = socket_fallback(socket, &fd);
+-		if (ret)
 +		ret = transpose_socket(socket, fd_normal);
- 		if (ret)
++		if (ret < 0)
  			return ret;
 +
 +		rclose(fd);
