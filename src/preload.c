@@ -391,7 +391,7 @@ int socket(int domain, int type, int protocol)
 	if (ret >= 0) {
 		if (fork_support) {
 			rclose(ret);
-			ret = real_socket(domain, type, protocol);
+			ret = real.socket(domain, type, protocol);
 			if (ret < 0)
 				return ret;
 			fd_store(index, ret, fd_fork);
@@ -863,6 +863,7 @@ pid_t fork(void)
 
 	param = 1;
 	rsetsockopt(dfd, IPPROTO_TCP, TCP_NODELAY, &param, sizeof param);
+	set_rsocket_options(dfd);
 
 	msg = 0;
 	ret = real.write(sfd, &msg, sizeof msg);
