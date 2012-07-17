@@ -818,40 +818,68 @@ int fcntl(int socket, int cmd, ... /* arg */)
 pid_t fork(void)
 {
 	struct sockaddr_storage sa;
+	struct sockaddr_in6 sin6;
 	pid_t pid;
 	sem_t *sem;
-	int fd, lfd, newfd, ret, len, param;
+	int lfd, sfd, dfd, ret, len, param;
 	uint32_t msg;
 
 	init_preload();
 	pid = real.fork();
 	if (pid || !fork_support || (last_accept < 0) ||
-	    (fd_get(last_accept, &fd) != fd_fork))
+	    (fd_get(last_accept, &sfd) != fd_fork))
 		goto out;
+
+	len = sizeof sa;
+	ret = real.getsockname(sfd, &sa, &len);
+	if (ret)
+		goto out;
+	sin6.sin6_family = sa.ss_family;
+	sin6.sin6_port = ((struct sockaddr_in6 *) &sa)->sin6_port;
 
 	sem = sem_open("/rsocket_fork", O_CREAT, 0644, 1);
 	if (sem == SEM_FAILED)
 		goto out;
 
-	lfd = transpose_socket(last_accept, fd_rsocket);
+	lfd = rsocket(sa.ss_family, SOCK_STREAM, 0);
 	if (lfd < 0)
-		goto out;
+		goto sclose;
 
 	param = 1;
-	len = sizeof param;
-	rsetsockopt(lfd, SOL_SOCKET, SO_REUSEADDR, &param, len);
-
-	len = sizeof sa;
-	ret = real.getsockname(fd, &sa, &len);
-	if (ret)
-		goto out;
+	rsetsockopt(lfd, SOL_SOCKET, SO_REUSEADDR, &param, sizeof param);
 
 	sem_wait(sem);
-	ret = rbind()
+	ret = rbind(lfd, &sin6, sizeof sin6);
+	if (ret)
+		goto lclose;
 
-	real.close(fd);
+	ret = rlisten(lfd, 1);
+	if (ret)
+		goto lclose;
 
+	dfd = raccept(lfd, NULL, NULL);
+	if (dfd < 0)
+		goto lclose;
+
+	param = 1;
+	rsetsockopt(dfd, IPPROTO_TCP, TCP_NODELAY, &param, sizeof param);
+
+	msg = 0;
+	ret = real.write(sfd, &msg, sizeof msg);
+	if (ret != sizeof msg) {
+		rclose(dfd);
+		goto lclose;
+	}
+
+	copysockopts(dfd, sfd, &rs, &real);
+	real.shutdown(sfd, SHUT_RDWR);
+	real.close(sfd);
+	fd_store(last_accept, dfd, fd_rsocket);
+
+lclose:
+	rclose(lfd);
 	sem_post(sem);
+sclose:
 	sem_close(sem);
 out:
 	last_accept = -1;
