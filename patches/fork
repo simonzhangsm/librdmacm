@@ -1,5 +1,5 @@
 Bottom: c0306f4628b14e75db3da212b4a99875f49be65f
-Top:    14944660e78363c6bab4cdc351003fe0f8f71bf4
+Top:    079d7bbe6129342c62546a42ccf45af677b9160f
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-13 15:25:53 -0700
 
@@ -14,7 +14,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index d2058e2..ed952d7 100644
+index d2058e2..6cc0d72 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -46,6 +46,8 @@
@@ -181,14 +181,14 @@ index d2058e2..ed952d7 100644
 +	ret = real.getsockname(sfd, (struct sockaddr *) &sin6, &len);
 +	if (ret)
 +		goto out;
-+	sin6.sin6_flowinfor = sin6.sin6_scope_id = 0;
++	sin6.sin6_flowinfo = sin6.sin6_scope_id = 0;
 +	memset(&sin6.sin6_addr, 0, sizeof sin6.sin6_addr);
 +
 +	sem = sem_open("/rsocket_fork", O_CREAT, 0644, 1);
 +	if (sem == SEM_FAILED)
 +		goto out;
 +
-+	lfd = rsocket(sa.ss_family, SOCK_STREAM, 0);
++	lfd = rsocket(sin6.sin6_family, SOCK_STREAM, 0);
 +	if (lfd < 0)
 +		goto sclose;
 +
