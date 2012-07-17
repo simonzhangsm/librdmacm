@@ -451,7 +451,7 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
 		}
 
 		ret = transpose_socket(socket, fd_normal);
-		if (ret)
+		if (ret < 0)
 			return ret;
 
 		rclose(fd);
