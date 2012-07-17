@@ -460,7 +460,6 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
 
 static int connect_fork(int socket, const struct sockaddr *addr, socklen_t addrlen)
 {
-	struct sockaddr_in *sin;
 	int fd, ret;
 	uint32_t msg;
 
@@ -505,6 +504,9 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
 
 		rclose(fd);
 		fd = ret;
+		break;
+	default:
+		break;
 	}
 
 	return real.connect(fd, addr, addrlen);
@@ -821,7 +823,8 @@ pid_t fork(void)
 	struct sockaddr_in6 sin6;
 	pid_t pid;
 	sem_t *sem;
-	int lfd, sfd, dfd, ret, len, param;
+	int lfd, sfd, dfd, ret, param;
+	socklen_t len;
 	uint32_t msg;
 
 	init_preload();
@@ -831,7 +834,7 @@ pid_t fork(void)
 		goto out;
 
 	len = sizeof sa;
-	ret = real.getsockname(sfd, &sa, &len);
+	ret = real.getsockname(sfd, (struct sockaddr *) &sa, &len);
 	if (ret)
 		goto out;
 	sin6.sin6_family = sa.ss_family;
