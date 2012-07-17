@@ -1,5 +1,5 @@
-Bottom: 5fd229f7e20bde0c0ed3050847f79e5d4c8af2b1
-Top:    704e50345b9783ecab92b6e8a634edd31c1342f6
+Bottom: c0306f4628b14e75db3da212b4a99875f49be65f
+Top:    3ef5d9a598c00e66ce2beafac99c914e0942c3c3
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-13 15:25:53 -0700
 
@@ -14,7 +14,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index 8f281d3..fee191b 100644
+index d2058e2..5860a4c 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -46,6 +46,8 @@
