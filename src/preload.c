@@ -276,60 +276,73 @@ out:
 }
 
 /*
- * Convert between an rsocket and a normal socket.  The new socket should have
- * the same settings and bindings as the current socket.  We currently only
- * handle setting a few of the more common values.
+ * We currently only handle copying a few common values.
  */
-static int transpose_socket(int index, int *fd, enum fd_type new_type)
+static int copysockopts(int dfd, int sfd, struct socket_calls *dapi,
+			struct socket_calls *sapi)
+{
+	socklen_t len;
+	int param, ret;
+
+	ret = sapi->fcntl(sfd, F_GETFL);
+	if (ret > 0)
+		ret = dapi->fcntl(dfd, F_SETFL, ret);
+	if (ret)
+		return ret;
+
+	len = sizeof param;
+	ret = sapi->getsockopt(sfd, SOL_SOCKET, SO_REUSEADDR, &param, &len);
+	if (param && !ret)
+		ret = dapi->setsockopt(dfd, SOL_SOCKET, SO_REUSEADDR, &param, len);
+	if (ret)
+		return ret;
+
+	len = sizeof param;
+	ret = sapi->getsockopt(sfd, IPPROTO_TCP, TCP_NODELAY, &param, &len);
+	if (param && !ret)
+		ret = dapi->setsockopt(dfd, IPPROTO_TCP, TCP_NODELAY, &param, len);
+	if (ret)
+		return ret;
+
+	return 0;
+}
+
+/*
+ * Convert between an rsocket and a normal socket.
+ */
+static int transpose_socket(int socket, enum fd_type new_type)
 {
 	socklen_t len = 0;
-	int new_fd, param, ret;
-	struct socket_calls *new, *old;
+	int sfd, dfd, param, ret;
+	struct socket_calls *sapi, *dapi;
 
+	sfd = fd_getd(socket);
 	if (new_type == fd_rsocket) {
-		new = &rs;
-		old = &real;
+		dapi = &rs;
+		sapi = &real;
 	} else {
-		new = &real;
-		old = &rs;
+		dapi = &real;
+		sapi = &rs;
 	}
 
-	ret = old->getsockname(*fd, NULL, &len);
+	ret = sapi->getsockname(sfd, NULL, &len);
 	if (ret)
 		return ret;
 
 	param = (len == sizeof(struct sockaddr_in6)) ? PF_INET6 : PF_INET;
-	new_fd = new->socket(param, SOCK_STREAM, 0);
-	if (new_fd < 0)
-		return new_fd;
+	dfd = dapi->socket(param, SOCK_STREAM, 0);
+	if (dfd < 0)
+		return dfd;
 
-	ret = old->fcntl(*fd, F_GETFL);
-	if (ret > 0)
-		ret = new->fcntl(new_fd, F_SETFL, ret);
+	ret = copysockopts(dfd, sfd, dapi, sapi);
 	if (ret)
 		goto err;
 
-	len = sizeof param;
-	ret = old->getsockopt(*fd, SOL_SOCKET, SO_REUSEADDR, &param, &len);
-	if (param && !ret)
-		ret = new->setsockopt(new_fd, SOL_SOCKET, SO_REUSEADDR, &param, len);
-	if (ret)
-		goto err;
-
-	len = sizeof param;
-	ret = old->getsockopt(*fd, IPPROTO_TCP, TCP_NODELAY, &param, &len);
-	if (param && !ret)
-		ret = new->setsockopt(new_fd, IPPROTO_TCP, TCP_NODELAY, &param, len);
-	if (ret)
-		goto err;
-
-	old->close(*fd);
-	fd_store(socket, new_fd, new_type);
-	*fd = new_fd;
-	return 0;
+	fd_store(socket, dfd, new_type);
+	return dfd;
 
 err:
-	new->close(new_fd);
+	dapi->close(dfd);
 	return ret;
 }
 
@@ -384,9 +397,12 @@ int bind(int socket, const struct sockaddr *addr, socklen_t addrlen)
 		if (!sin->sin_port || ntohs(sin->sin_port) > 1024)
 			return rbind(fd, addr, addrlen);
 
-		ret = transpose_socket(socket, &fd, fd_normal);
-		if (ret)
+		ret = transpose_socket(socket, fd_normal);
+		if (ret < 0)
 			return ret;
+
+		rclose(fd);
+		fd = ret;
 	}
 
 	return real.bind(fd, addr, addrlen);
@@ -434,9 +450,12 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
 				return ret;
 		}
 
-		ret = transpose_socket(socket, &fd, fd_normal);
+		ret = transpose_socket(socket, fd_normal);
 		if (ret)
 			return ret;
+
+		rclose(fd);
+		fd = ret;
 	}
 
 	return real.connect(fd, addr, addrlen);
