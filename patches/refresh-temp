@@ -1,0 +1,22 @@
+Bottom: 5fd229f7e20bde0c0ed3050847f79e5d4c8af2b1
+Top:    c0306f4628b14e75db3da212b4a99875f49be65f
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-07-17 11:45:35 -0700
+
+Refresh of transpose
+
+---
+
+diff --git a/src/preload.c b/src/preload.c
+index 8f281d3..d2058e2 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -451,7 +451,7 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
+ 		}
+ 
+ 		ret = transpose_socket(socket, fd_normal);
+-		if (ret)
++		if (ret < 0)
+ 			return ret;
+ 
+ 		rclose(fd);
