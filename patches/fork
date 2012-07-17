@@ -1,5 +1,5 @@
 Bottom: c0306f4628b14e75db3da212b4a99875f49be65f
-Top:    3e3c89beff00570aab96ab4c0bd6a397aaae83a4
+Top:    14944660e78363c6bab4cdc351003fe0f8f71bf4
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-13 15:25:53 -0700
 
@@ -14,7 +14,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index d2058e2..00ca24e 100644
+index d2058e2..ed952d7 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -46,6 +46,8 @@
@@ -146,7 +146,7 @@ index d2058e2..00ca24e 100644
  	}
  
  	return real.connect(fd, addr, addrlen);
-@@ -754,3 +805,87 @@ int fcntl(int socket, int cmd, ... /* arg */)
+@@ -754,3 +805,86 @@ int fcntl(int socket, int cmd, ... /* arg */)
  	va_end(args);
  	return ret;
  }
@@ -164,7 +164,6 @@ index d2058e2..00ca24e 100644
 + */
 +pid_t fork(void)
 +{
-+	struct sockaddr_storage sa;
 +	struct sockaddr_in6 sin6;
 +	pid_t pid;
 +	sem_t *sem;
@@ -178,12 +177,12 @@ index d2058e2..00ca24e 100644
 +	    (fd_get(last_accept, &sfd) != fd_fork))
 +		goto out;
 +
-+	len = sizeof sa;
-+	ret = real.getsockname(sfd, (struct sockaddr *) &sa, &len);
++	len = sizeof sin6;
++	ret = real.getsockname(sfd, (struct sockaddr *) &sin6, &len);
 +	if (ret)
 +		goto out;
-+	sin6.sin6_family = sa.ss_family;
-+	sin6.sin6_port = ((struct sockaddr_in6 *) &sa)->sin6_port;
++	sin6.sin6_flowinfor = sin6.sin6_scope_id = 0;
++	memset(&sin6.sin6_addr, 0, sizeof sin6.sin6_addr);
 +
 +	sem = sem_open("/rsocket_fork", O_CREAT, 0644, 1);
 +	if (sem == SEM_FAILED)
@@ -197,7 +196,7 @@ index d2058e2..00ca24e 100644
 +	rsetsockopt(lfd, SOL_SOCKET, SO_REUSEADDR, &param, sizeof param);
 +
 +	sem_wait(sem);
-+	ret = rbind(lfd, &sin6, sizeof sin6);
++	ret = rbind(lfd, (struct sockaddr *) &sin6, sizeof sin6);
 +	if (ret)
 +		goto lclose;
 +
