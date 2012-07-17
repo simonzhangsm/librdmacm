@@ -8,6 +8,9 @@ librspreload: Support server apps that call fork()
 Provide limited support for applications that call fork() after
 accepting a connection.
 
+Fork support is indicated by setting the environment variable
+RDMAV_FORK_SAFE.
+
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
