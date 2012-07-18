@@ -468,7 +468,7 @@ static int connect_fork(int socket, const struct sockaddr *addr, socklen_t addrl
 	if (ret)
 		return ret;
 
-	ret = real.read(fd, &msg, sizeof msg);
+	ret = real.recv(fd, &msg, sizeof msg, MSG_PEEK);
 	if ((ret != sizeof msg) || msg) {
 		fd_store(socket, fd, fd_normal);
 		return 0;
