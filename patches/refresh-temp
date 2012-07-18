@@ -1,0 +1,22 @@
+Bottom: c3cf2f5759614f2ebce8277cf3fac4f7c1643d05
+Top:    94fad5ac7a70819178822801a6a0dc686831107d
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-07-18 11:56:02 -0700
+
+Refresh of fork
+
+---
+
+diff --git a/src/preload.c b/src/preload.c
+index 5b6b50a..2c07cc2 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -846,7 +846,8 @@ pid_t fork(void)
+ 	sin6.sin6_flowinfo = sin6.sin6_scope_id = 0;
+ 	memset(&sin6.sin6_addr, 0, sizeof sin6.sin6_addr);
+ 
+-	sem = sem_open("/rsocket_fork", O_CREAT | O_RDWR, S_IRWXU, 1);
++	sem = sem_open("/rsocket_fork", O_CREAT | O_RDWR,
++		       S_IRWXU | S_IRWXG, 1);
+ 	if (sem == SEM_FAILED)
+ 		goto out;
