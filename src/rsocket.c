@@ -425,10 +425,12 @@ static int rs_create_ep(struct rsocket *rs)
 
 	rs_set_qp_size(rs);
 	ret = rs_init_bufs(rs);
+	printf("rs create ep init bufs %d\n", ret);
 	if (ret)
 		return ret;
 
 	ret = rs_create_cq(rs);
+	printf("rs create ep - create cq %d\n", ret);
 	if (ret)
 		return ret;
 
@@ -445,6 +447,7 @@ static int rs_create_ep(struct rsocket *rs)
 	qp_attr.cap.max_inline_data = rs->sq_inline;
 
 	ret = rdma_create_qp(rs->cm_id, NULL, &qp_attr);
+	printf("rs create ep - create qp %d\n", ret);
 	if (ret)
 		return ret;
 
