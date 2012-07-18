@@ -848,12 +848,12 @@ pid_t fork(void)
 	memset(&sin6.sin6_addr, 0, sizeof sin6.sin6_addr);
 
 	sem = sem_open("/rsocket_fork", O_CREAT, 0644, 1);
-	printf("fork - sem_open %d\n", sem);
+	printf("fork - sem_open\n");
 	if (sem == SEM_FAILED)
 		goto out;
 
 	lfd = rsocket(sin6.sin6_family, SOCK_STREAM, 0);
-	printf("fork - rsocket %d\n", ldf);
+	printf("fork - rsocket %d\n", lfd);
 	if (lfd < 0)
 		goto sclose;
 
