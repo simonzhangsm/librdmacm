@@ -468,8 +468,8 @@ static int connect_fork(int socket, const struct sockaddr *addr, socklen_t addrl
 	long flags;
 
 	fd = fd_getd(socket);
-	flags = real.fcntl(fd, F_GETFD);
-	real.fcntl(fd, F_SETFD, 0);
+	flags = real.fcntl(fd, F_GETFL);
+	real.fcntl(fd, F_SETFL, 0);
 	ret = real.connect(fd, addr, addrlen);
 	if (ret)
 		return ret;
@@ -480,7 +480,7 @@ static int connect_fork(int socket, const struct sockaddr *addr, socklen_t addrl
 		return 0;
 	}
 
-	real.fcntl(fd, F_SETFD, flags);
+	real.fcntl(fd, F_SETFL, flags);
 	ret = transpose_socket(socket, fd_rsocket);
 	if (ret < 0)
 		return ret;
