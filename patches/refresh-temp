@@ -1,0 +1,21 @@
+Bottom: 4f509e4d5734c0779509a899a2a333341d675ac7
+Top:    d828c8304e1d729bdba3e1f75df1041761f4f158
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-07-18 09:13:18 -0700
+
+Refresh of dbg
+
+---
+
+diff --git a/src/preload.c b/src/preload.c
+index 9d217e9..b261c89 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -48,6 +48,7 @@
+ #include <netinet/tcp.h>
+ #include <unistd.h>
+ #include <semaphore.h>
++#include <stdio.h>
+ 
+ #include <rdma/rdma_cma.h>
+ #include <rdma/rdma_verbs.h>
