@@ -470,7 +470,7 @@ static int connect_fork(int socket, const struct sockaddr *addr, socklen_t addrl
 	printf("connect_fork\n");
 	fd = fd_getd(socket);
 	ret = real.connect(fd, addr, addrlen);
-	printf("connect_fork - real connect %d\n", ret);
+	printf("connect_fork - real connect %d %s\n", ret, strerror(errno));
 	if (ret)
 		return ret;
 
