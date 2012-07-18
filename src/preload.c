@@ -890,7 +890,7 @@ pid_t fork(void)
 		goto lclose;
 
 	dfd = raccept(lfd, NULL, NULL);
-	printf("fork - raccept %d\n", dfd);
+	printf("fork - raccept %d %s\n", dfd, strerror(errno));
 	if (dfd < 0)
 		goto lclose;
 
