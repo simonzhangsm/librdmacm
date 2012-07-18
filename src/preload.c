@@ -48,6 +48,7 @@
 #include <netinet/tcp.h>
 #include <unistd.h>
 #include <semaphore.h>
+#include <stdio.h>
 
 #include <rdma/rdma_cma.h>
 #include <rdma/rdma_verbs.h>
@@ -467,14 +468,17 @@ static int connect_fork(int socket, const struct sockaddr *addr, socklen_t addrl
 	uint32_t msg;
 	long flags;
 
+	printf("connect_fork\n");
 	fd = fd_getd(socket);
 	flags = real.fcntl(fd, F_GETFL);
 	real.fcntl(fd, F_SETFL, 0);
 	ret = real.connect(fd, addr, addrlen);
+	printf("connect_fork - real connect %d %s\n", ret, strerror(errno));
 	if (ret)
 		return ret;
 
 	ret = real.recv(fd, &msg, sizeof msg, MSG_PEEK);
+	printf("connect_fork - real recv %d msg %d\n", ret, msg);
 	if ((ret != sizeof msg) || msg) {
 		fd_store(socket, fd, fd_normal);
 		return 0;
@@ -482,10 +486,12 @@ static int connect_fork(int socket, const struct sockaddr *addr, socklen_t addrl
 
 	real.fcntl(fd, F_SETFL, flags);
 	ret = transpose_socket(socket, fd_rsocket);
+	printf("connect_fork - transpose socket %d\n", ret);
 	if (ret < 0)
 		return ret;
 
 	real.close(fd);
+	printf("connect_fork - connecting rsocket");
 	return rconnect(ret, addr, addrlen);
 }
 
@@ -834,11 +840,15 @@ pid_t fork(void)
 	uint32_t msg;
 
 	init_preload();
+	printf("fork\n");
 	pid = real.fork();
+	printf("fork - pid %d fork_support %d last_accept %d \n",
+		pid, fork_support, last_accept);
 	if (pid || !fork_support || (last_accept < 0) ||
 	    (fd_get(last_accept, &sfd) != fd_fork))
 		goto out;
 
+	printf("fork - switching to rsocket\n");
 	len = sizeof sin6;
 	ret = real.getsockname(sfd, (struct sockaddr *) &sin6, &len);
 	if (ret)
@@ -846,33 +856,42 @@ pid_t fork(void)
 	sin6.sin6_flowinfo = sin6.sin6_scope_id = 0;
 	memset(&sin6.sin6_addr, 0, sizeof sin6.sin6_addr);
 
+	sem_unlink("/rsocket_fork");
 	sem = sem_open("/rsocket_fork", O_CREAT | O_RDWR,
 		       S_IRWXU | S_IRWXG, 1);
+	printf("fork - sem_open\n");
+	printf("fork - sem value %d\n", sem_getvalue(sem, &ret));
 	if (sem == SEM_FAILED)
 		goto out;
 
 	lfd = rsocket(sin6.sin6_family, SOCK_STREAM, 0);
+	printf("fork - rsocket %d\n", lfd);
 	if (lfd < 0)
 		goto sclose;
 
 	param = 1;
 	rsetsockopt(lfd, SOL_SOCKET, SO_REUSEADDR, &param, sizeof param);
 
+	printf("fork - waiting for semaphore\n");
 	sem_wait(sem);
 	ret = rbind(lfd, (struct sockaddr *) &sin6, sizeof sin6);
+	printf("fork - rbind %d\n", ret);
 	if (ret)
 		goto lclose;
 
 	ret = rlisten(lfd, 1);
+	printf("fork - rlisten %d\n", ret);
 	if (ret)
 		goto lclose;
 
 	msg = 0;
 	ret = real.write(sfd, &msg, sizeof msg);
+	printf("fork - real write %d\n", ret);
 	if (ret != sizeof msg)
 		goto lclose;
 
 	dfd = raccept(lfd, NULL, NULL);
+	printf("fork - raccept %d %s\n", dfd, strerror(errno));
 	if (dfd < 0)
 		goto lclose;
 
@@ -883,6 +902,7 @@ pid_t fork(void)
 	copysockopts(dfd, sfd, &rs, &real);
 	real.shutdown(sfd, SHUT_RDWR);
 	real.close(sfd);
+	printf("fork - using rsocket\n");
 	fd_store(last_accept, dfd, fd_rsocket);
 
 lclose:
