@@ -48,6 +48,7 @@
 #include <byteswap.h>
 #include <stddef.h>
 #include <netdb.h>
+#include <stdio.h>
 
 #include "cma.h"
 #include <infiniband/driver.h>
@@ -139,6 +140,7 @@ static void ucma_cleanup(void)
 		free(cma_dev_array);
 		cma_dev_cnt = 0;
 	}
+	printf("ucma_cleanup\n");
 }
 
 static int check_abi_version(void)
@@ -212,6 +214,7 @@ int ucma_init(void)
 	if (cma_dev_cnt)
 		return 0;
 
+	printf("ucma_init\n");
 	pthread_mutex_lock(&mut);
 	if (cma_dev_cnt) {
 		pthread_mutex_unlock(&mut);
