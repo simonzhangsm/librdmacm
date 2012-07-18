@@ -361,7 +361,9 @@ static int rs_init_bufs(struct rsocket *rs)
 	if (!rs->sbuf)
 		return -1;
 
+	printf("rs init bufs cm_id %p pd %p\n", rs->cm_id, rs->cm_id->pd);
 	rs->smr = rdma_reg_msgs(rs->cm_id, rs->sbuf, rs->sbuf_size);
+	printf("rs init bufs - after reg %p\n", rs->smr);
 	if (!rs->smr)
 		return -1;
 
@@ -425,10 +427,12 @@ static int rs_create_ep(struct rsocket *rs)
 
 	rs_set_qp_size(rs);
 	ret = rs_init_bufs(rs);
+	printf("rs create ep init bufs %d\n", ret);
 	if (ret)
 		return ret;
 
 	ret = rs_create_cq(rs);
+	printf("rs create ep - create cq %d\n", ret);
 	if (ret)
 		return ret;
 
@@ -445,6 +449,7 @@ static int rs_create_ep(struct rsocket *rs)
 	qp_attr.cap.max_inline_data = rs->sq_inline;
 
 	ret = rdma_create_qp(rs->cm_id, NULL, &qp_attr);
+	printf("rs create ep - create qp %d\n", ret);
 	if (ret)
 		return ret;
 
@@ -602,16 +607,19 @@ int raccept(int socket, struct sockaddr *addr, socklen_t *addrlen)
 	struct rs_conn_data *creq, cresp;
 	int ret;
 
+	printf("raccept %d\n", socket);
 	rs = idm_at(&idm, socket);
 	new_rs = rs_alloc(rs);
 	if (!new_rs)
 		return ERR(ENOMEM);
 
 	ret = rdma_get_request(rs->cm_id, &new_rs->cm_id);
+	printf("raccept get request %d\n", ret);
 	if (ret)
 		goto err;
 
 	ret = rs_insert(new_rs);
+	printf("raccept insert %d\n", ret);
 	if (ret < 0)
 		goto err;
 
@@ -625,6 +633,7 @@ int raccept(int socket, struct sockaddr *addr, socklen_t *addrlen)
 		rs_set_nonblocking(new_rs, O_NONBLOCK);
 
 	ret = rs_create_ep(new_rs);
+	printf("raccept create ep %d\n", ret);
 	if (ret)
 		goto err;
 
@@ -632,6 +641,7 @@ int raccept(int socket, struct sockaddr *addr, socklen_t *addrlen)
 	param = new_rs->cm_id->event->param.conn;
 	rs_set_conn_data(new_rs, &param, &cresp);
 	ret = rdma_accept(new_rs->cm_id, &param);
+	printf("raccept rdma accept %d\n", ret);
 	if (!ret)
 		new_rs->state = rs_connect_rdwr;
 	else if (errno == EAGAIN || errno == EWOULDBLOCK)
