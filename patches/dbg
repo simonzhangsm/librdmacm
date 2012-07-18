@@ -1,5 +1,5 @@
 Bottom: db6f379646ca0fae747ef5cd04b50c3952350431
-Top:    03db0fc9f2cb988f6b56ccc07b7f9522e9f73c2f
+Top:    f01035aaf2318888602d8db4ba44878cf14d21ca
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-18 09:01:43 -0700
 
@@ -9,7 +9,7 @@ debug fork
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index 7be40f6..c83da39 100644
+index 7be40f6..576d7dd 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -48,6 +48,7 @@
@@ -27,7 +27,7 @@ index 7be40f6..c83da39 100644
 +	printf("connect_fork\n");
  	fd = fd_getd(socket);
  	ret = real.connect(fd, addr, addrlen);
-+	printf("connect_fork - real connect %d\n", ret);
++	printf("connect_fork - real connect %d %s\n", ret, strerror(errno));
  	if (ret)
  		return ret;
  
