@@ -856,7 +856,6 @@ pid_t fork(void)
 	memset(&sin6.sin6_addr, 0, sizeof sin6.sin6_addr);
 
 	sem = sem_open("/rsocket_fork", O_CREAT | O_RDWR, S_IRWXU, 1);
-	sem = sem_open("/rsocket_fork", O_CREAT, 0644, 1);
 	printf("fork - sem_open\n");
 	if (sem == SEM_FAILED)
 		goto out;
@@ -869,6 +868,7 @@ pid_t fork(void)
 	param = 1;
 	rsetsockopt(lfd, SOL_SOCKET, SO_REUSEADDR, &param, sizeof param);
 
+	printf("fork - waiting for semaphore\n");
 	sem_wait(sem);
 	ret = rbind(lfd, (struct sockaddr *) &sin6, sizeof sin6);
 	printf("fork - rbind %d\n", ret);
