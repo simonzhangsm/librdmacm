@@ -437,20 +437,23 @@ int listen(int socket, int backlog)
 int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
 {
 	int fd, index, ret;
+	enum fd_type type;
 
-	if (fd_get(socket, &fd) == fd_rsocket) {
+	type = fd_get(socket, &fd);
+	if (type == fd_rsocket || type == fd_fork) {
 		index = fd_open();
 		if (index < 0)
 			return index;
 
-		ret = raccept(fd, addr, addrlen);
+		ret = (type == fd_rsocket) ? raccept(fd, addr, addrlen) :
+					     real.accept(fd, addr, addrlen);
 		if (ret < 0) {
 			fd_close(index, &fd);
 			return ret;
 		}
 
-		fd_store(index, ret, fd_rsocket);
-		last_accept = index;
+		fd_store(index, ret, type);
+		last_accept = (type == fd_fork) ? index : -1;
 		return index;
 	} else {
 		last_accept = -1;
