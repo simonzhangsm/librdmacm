@@ -1,5 +1,5 @@
 Bottom: c0306f4628b14e75db3da212b4a99875f49be65f
-Top:    7877a1a5ec8b625a7127ef30ba236e4677df5df2
+Top:    c3cf2f5759614f2ebce8277cf3fac4f7c1643d05
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-13 15:25:53 -0700
 
@@ -17,7 +17,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index d2058e2..a1073d5 100644
+index d2058e2..5b6b50a 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -46,6 +46,8 @@
@@ -128,8 +128,8 @@ index d2058e2..a1073d5 100644
 +	long flags;
 +
 +	fd = fd_getd(socket);
-+	flags = real.fcntl(fd, F_GETFD);
-+	real.fcntl(fd, F_SETFD, 0);
++	flags = real.fcntl(fd, F_GETFL);
++	real.fcntl(fd, F_SETFL, 0);
 +	ret = real.connect(fd, addr, addrlen);
 +	if (ret)
 +		return ret;
@@ -140,7 +140,7 @@ index d2058e2..a1073d5 100644
 +		return 0;
 +	}
 +
-+	real.fcntl(fd, F_SETFD, flags);
++	real.fcntl(fd, F_SETFL, flags);
 +	ret = transpose_socket(socket, fd_rsocket);
 +	if (ret < 0)
 +		return ret;
