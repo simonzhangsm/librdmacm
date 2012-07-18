@@ -867,6 +867,11 @@ pid_t fork(void)
 	if (ret)
 		goto lclose;
 
+	msg = 0;
+	ret = real.write(sfd, &msg, sizeof msg);
+	if (ret != sizeof msg)
+		goto lclose;
+
 	dfd = raccept(lfd, NULL, NULL);
 	if (dfd < 0)
 		goto lclose;
@@ -874,13 +879,6 @@ pid_t fork(void)
 	param = 1;
 	rsetsockopt(dfd, IPPROTO_TCP, TCP_NODELAY, &param, sizeof param);
 	set_rsocket_options(dfd);
-
-	msg = 0;
-	ret = real.write(sfd, &msg, sizeof msg);
-	if (ret != sizeof msg) {
-		rclose(dfd);
-		goto lclose;
-	}
 
 	copysockopts(dfd, sfd, &rs, &real);
 	real.shutdown(sfd, SHUT_RDWR);
