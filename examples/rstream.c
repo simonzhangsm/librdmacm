@@ -182,6 +182,7 @@ static void show_perf(void)
 
 static int size_to_count(int size)
 {
+	return 100;
 	if (size >= 1000000)
 		return 100;
 	else if (size >= 100000)
