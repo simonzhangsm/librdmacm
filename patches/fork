@@ -1,5 +1,5 @@
 Bottom: c0306f4628b14e75db3da212b4a99875f49be65f
-Top:    d4edc2731701b6ca6a94f9087e44dbb9f76ec25c
+Top:    a60724bf5aa9081e8c88db5b5cfd3786af42b333
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-13 15:25:53 -0700
 
@@ -17,7 +17,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index d2058e2..56c6c7d 100644
+index d2058e2..731643d 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -46,6 +46,8 @@
@@ -90,7 +90,7 @@ index d2058e2..56c6c7d 100644
  		return index;
  	}
  	fd_close(index, &ret);
-@@ -418,31 +437,68 @@ int listen(int socket, int backlog)
+@@ -418,31 +437,67 @@ int listen(int socket, int backlog)
  int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
  {
  	int fd, index, ret;
@@ -131,9 +131,8 @@ index d2058e2..56c6c7d 100644
 +	flags = real.fcntl(fd, F_GETFD);
 +	real.fcntl(fd, F_SETFD, 0);
 +	ret = real.connect(fd, addr, addrlen);
-+	if (ret) {
++	if (ret)
 +		return ret;
-+	}
 +
 +	ret = real.recv(fd, &msg, sizeof msg, MSG_PEEK);
 +	if ((ret != sizeof msg) || msg) {
@@ -163,7 +162,7 @@ index d2058e2..56c6c7d 100644
  		sin = (struct sockaddr_in *) addr;
  		if (ntohs(sin->sin_port) > 1024) {
  			ret = rconnect(fd, addr, addrlen);
-@@ -456,6 +512,9 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
+@@ -456,6 +511,9 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
  
  		rclose(fd);
  		fd = ret;
@@ -173,7 +172,7 @@ index d2058e2..56c6c7d 100644
  	}
  
  	return real.connect(fd, addr, addrlen);
-@@ -754,3 +813,86 @@ int fcntl(int socket, int cmd, ... /* arg */)
+@@ -754,3 +812,86 @@ int fcntl(int socket, int cmd, ... /* arg */)
  	va_end(args);
  	return ret;
  }
