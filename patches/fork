@@ -1,5 +1,5 @@
 Bottom: c0306f4628b14e75db3da212b4a99875f49be65f
-Top:    079d7bbe6129342c62546a42ccf45af677b9160f
+Top:    8e858610108557f53e93dd7af44d25857fb890d0
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-13 15:25:53 -0700
 
@@ -17,7 +17,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index d2058e2..6cc0d72 100644
+index d2058e2..e901d13 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -46,6 +46,8 @@
@@ -112,7 +112,7 @@ index d2058e2..6cc0d72 100644
 +	if (ret)
 +		return ret;
 +
-+	ret = real.read(fd, &msg, sizeof msg);
++	ret = real.recv(fd, &msg, sizeof msg, MSG_PEEK);
 +	if ((ret != sizeof msg) || msg) {
 +		fd_store(socket, fd, fd_normal);
 +		return 0;
