@@ -1,5 +1,5 @@
 Bottom: 1f4485c0b98410aa12e6f2832d81210b64ac5c0f
-Top:    bf38d805cecbb29ad4eeaf8fed937dbf9eeaa591
+Top:    51cdc21140cba2d70c2ae10355c2ed5354963fe1
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-18 09:01:43 -0700
 
@@ -9,7 +9,7 @@ debug fork
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index f824af3..aa1939d 100644
+index f824af3..e429ad6 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -48,6 +48,7 @@
@@ -101,6 +101,6 @@ index f824af3..aa1939d 100644
  		goto lclose;
  
  	dfd = raccept(lfd, NULL, NULL);
-+	printf("fork - raccept %d\n", dfd);
++	printf("fork - raccept %d %s\n", dfd, strerror(errno));
  	if (dfd < 0)
  		goto lclose;
