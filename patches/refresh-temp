@@ -1,0 +1,27 @@
+Bottom: d828c8304e1d729bdba3e1f75df1041761f4f158
+Top:    901c8528514d5af879874c624b7902e80da7c626
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-07-18 09:13:54 -0700
+
+Refresh of dbg
+
+---
+
+diff --git a/src/preload.c b/src/preload.c
+index b261c89..cc33e2f 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -848,12 +848,12 @@ pid_t fork(void)
+ 	memset(&sin6.sin6_addr, 0, sizeof sin6.sin6_addr);
+ 
+ 	sem = sem_open("/rsocket_fork", O_CREAT, 0644, 1);
+-	printf("fork - sem_open %d\n", sem);
++	printf("fork - sem_open\n");
+ 	if (sem == SEM_FAILED)
+ 		goto out;
+ 
+ 	lfd = rsocket(sin6.sin6_family, SOCK_STREAM, 0);
+-	printf("fork - rsocket %d\n", ldf);
++	printf("fork - rsocket %d\n", lfd);
+ 	if (lfd < 0)
+ 		goto sclose;
