@@ -834,7 +834,8 @@ pid_t fork(void)
 	init_preload();
 	printf("fork\n");
 	pid = real.fork();
-	printf("fork - pid %d\n", pid);
+	printf("fork - pid %d fork_support %d last_accept %d \n",
+		pid, fork_support, last_accept);
 	if (pid || !fork_support || (last_accept < 0) ||
 	    (fd_get(last_accept, &sfd) != fd_fork))
 		goto out;
