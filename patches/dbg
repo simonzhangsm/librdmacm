@@ -1,5 +1,5 @@
-Bottom: 7a6199c6bbfabb859c48c87ff027b3e8d1e4d6f1
-Top:    9dd3afd153571ff1b3b3d2bcea15c8ab559d77dd
+Bottom: abbc38c21bbfe7d98d8a01bbaa634d07ca20751e
+Top:    2e0d31141fb1fe8d53014430b90995379341e284
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-18 09:01:43 -0700
 
@@ -9,7 +9,7 @@ debug fork
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index a1073d5..976e2e0 100644
+index 5b6b50a..942bcf1 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -48,6 +48,7 @@
@@ -26,8 +26,8 @@ index a1073d5..976e2e0 100644
  
 +	printf("connect_fork\n");
  	fd = fd_getd(socket);
- 	flags = real.fcntl(fd, F_GETFD);
- 	real.fcntl(fd, F_SETFD, 0);
+ 	flags = real.fcntl(fd, F_GETFL);
+ 	real.fcntl(fd, F_SETFL, 0);
  	ret = real.connect(fd, addr, addrlen);
 +	printf("connect_fork - real connect %d %s\n", ret, strerror(errno));
  	if (ret)
@@ -40,7 +40,7 @@ index a1073d5..976e2e0 100644
  		return 0;
 @@ -482,6 +486,7 @@ static int connect_fork(int socket, const struct sockaddr *addr, socklen_t addrl
  
- 	real.fcntl(fd, F_SETFD, flags);
+ 	real.fcntl(fd, F_SETFL, flags);
  	ret = transpose_socket(socket, fd_rsocket);
 +	printf("connect_fork - transpose socket %d\n", ret);
  	if (ret < 0)
