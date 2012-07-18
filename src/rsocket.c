@@ -361,7 +361,9 @@ static int rs_init_bufs(struct rsocket *rs)
 	if (!rs->sbuf)
 		return -1;
 
+	printf("rs init bufs cm_id %p pd %p\n", rs->cm_id, rs->cm_id->pd);
 	rs->smr = rdma_reg_msgs(rs->cm_id, rs->sbuf, rs->sbuf_size);
+	printf("rs init bufs - after reg %p\n", rs->smr);
 	if (!rs->smr)
 		return -1;
 
