@@ -1,0 +1,21 @@
+Bottom: 03db0fc9f2cb988f6b56ccc07b7f9522e9f73c2f
+Top:    f01035aaf2318888602d8db4ba44878cf14d21ca
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-07-18 10:34:02 -0700
+
+Refresh of dbg
+
+---
+
+diff --git a/src/preload.c b/src/preload.c
+index c83da39..576d7dd 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -470,7 +470,7 @@ static int connect_fork(int socket, const struct sockaddr *addr, socklen_t addrl
+ 	printf("connect_fork\n");
+ 	fd = fd_getd(socket);
+ 	ret = real.connect(fd, addr, addrlen);
+-	printf("connect_fork - real connect %d\n", ret);
++	printf("connect_fork - real connect %d %s\n", ret, strerror(errno));
+ 	if (ret)
+ 		return ret;
