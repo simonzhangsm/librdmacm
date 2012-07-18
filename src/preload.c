@@ -855,6 +855,7 @@ pid_t fork(void)
 	sin6.sin6_flowinfo = sin6.sin6_scope_id = 0;
 	memset(&sin6.sin6_addr, 0, sizeof sin6.sin6_addr);
 
+	sem_unlink("/rsocket_fork");
 	sem = sem_open("/rsocket_fork", O_CREAT | O_RDWR,
 		       S_IRWXU | S_IRWXG, 1);
 	printf("fork - sem_open\n");
