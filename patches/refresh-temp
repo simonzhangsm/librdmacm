@@ -1,0 +1,39 @@
+Bottom: 94fad5ac7a70819178822801a6a0dc686831107d
+Top:    b4a26d5e7818127e6cc14cfd2d7591232b5e775b
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-07-18 12:02:42 -0700
+
+Refresh of fork
+
+---
+
+diff --git a/src/preload.c b/src/preload.c
+index 2c07cc2..f824af3 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -867,6 +867,11 @@ pid_t fork(void)
+ 	if (ret)
+ 		goto lclose;
+ 
++	msg = 0;
++	ret = real.write(sfd, &msg, sizeof msg);
++	if (ret != sizeof msg)
++		goto lclose;
++
+ 	dfd = raccept(lfd, NULL, NULL);
+ 	if (dfd < 0)
+ 		goto lclose;
+@@ -875,13 +880,6 @@ pid_t fork(void)
+ 	rsetsockopt(dfd, IPPROTO_TCP, TCP_NODELAY, &param, sizeof param);
+ 	set_rsocket_options(dfd);
+ 
+-	msg = 0;
+-	ret = real.write(sfd, &msg, sizeof msg);
+-	if (ret != sizeof msg) {
+-		rclose(dfd);
+-		goto lclose;
+-	}
+-
+ 	copysockopts(dfd, sfd, &rs, &real);
+ 	real.shutdown(sfd, SHUT_RDWR);
+ 	real.close(sfd);
