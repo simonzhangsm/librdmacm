@@ -471,9 +471,8 @@ static int connect_fork(int socket, const struct sockaddr *addr, socklen_t addrl
 	flags = real.fcntl(fd, F_GETFD);
 	real.fcntl(fd, F_SETFD, 0);
 	ret = real.connect(fd, addr, addrlen);
-	if (ret) {
+	if (ret)
 		return ret;
-	}
 
 	ret = real.recv(fd, &msg, sizeof msg, MSG_PEEK);
 	if ((ret != sizeof msg) || msg) {
