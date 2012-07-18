@@ -1,5 +1,5 @@
 Bottom: 1f4485c0b98410aa12e6f2832d81210b64ac5c0f
-Top:    25795c71de349a280df948e9098a56a50c76435e
+Top:    c096dcff0d5d97207fb65f8ca607b8a29148e67e
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-18 09:01:43 -0700
 
@@ -106,10 +106,31 @@ index f824af3..e429ad6 100644
  		goto lclose;
  
 diff --git a/src/rsocket.c b/src/rsocket.c
-index ed125b3..003b7d8 100644
+index ed125b3..68361f5 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
-@@ -602,16 +602,19 @@ int raccept(int socket, struct sockaddr *addr, socklen_t *addrlen)
+@@ -425,10 +425,12 @@ static int rs_create_ep(struct rsocket *rs)
+ 
+ 	rs_set_qp_size(rs);
+ 	ret = rs_init_bufs(rs);
++	printf("rs create ep init bufs %d\n", ret);
+ 	if (ret)
+ 		return ret;
+ 
+ 	ret = rs_create_cq(rs);
++	printf("rs create ep - create cq %d\n", ret);
+ 	if (ret)
+ 		return ret;
+ 
+@@ -445,6 +447,7 @@ static int rs_create_ep(struct rsocket *rs)
+ 	qp_attr.cap.max_inline_data = rs->sq_inline;
+ 
+ 	ret = rdma_create_qp(rs->cm_id, NULL, &qp_attr);
++	printf("rs create ep - create qp %d\n", ret);
+ 	if (ret)
+ 		return ret;
+ 
+@@ -602,16 +605,19 @@ int raccept(int socket, struct sockaddr *addr, socklen_t *addrlen)
  	struct rs_conn_data *creq, cresp;
  	int ret;
  
@@ -129,7 +150,7 @@ index ed125b3..003b7d8 100644
  	if (ret < 0)
  		goto err;
  
-@@ -625,6 +628,7 @@ int raccept(int socket, struct sockaddr *addr, socklen_t *addrlen)
+@@ -625,6 +631,7 @@ int raccept(int socket, struct sockaddr *addr, socklen_t *addrlen)
  		rs_set_nonblocking(new_rs, O_NONBLOCK);
  
  	ret = rs_create_ep(new_rs);
@@ -137,7 +158,7 @@ index ed125b3..003b7d8 100644
  	if (ret)
  		goto err;
  
-@@ -632,6 +636,7 @@ int raccept(int socket, struct sockaddr *addr, socklen_t *addrlen)
+@@ -632,6 +639,7 @@ int raccept(int socket, struct sockaddr *addr, socklen_t *addrlen)
  	param = new_rs->cm_id->event->param.conn;
  	rs_set_conn_data(new_rs, &param, &cresp);
  	ret = rdma_accept(new_rs->cm_id, &param);
