@@ -467,7 +467,6 @@ static int server_connect(void)
 
 	if (use_fork)
 		fork_pid = fork();
-
 	if (!fork_pid)
 		set_options(rs);
 	return ret;
@@ -558,10 +557,11 @@ static int run(void)
 			init_latency_test(test_size[i].size);
 			run_test();
 		}
-		rs_shutdown(rs, SHUT_RDWR);
+		if (!fork_pid)
+			rs_shutdown(rs, SHUT_RDWR);
 		rs_close(rs);
 
-		if (use_fork && !fork_pid)
+		if (!dst_addr && use_fork && !fork_pid)
 			goto free;
 
 		optimization = opt_bandwidth;
@@ -583,7 +583,8 @@ static int run(void)
 			ret = run_test();
 	}
 
-	rs_shutdown(rs, SHUT_RDWR);
+	if (!fork_pid)
+		rs_shutdown(rs, SHUT_RDWR);
 	rs_close(rs);
 free:
 	free(buf);
