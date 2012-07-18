@@ -1,5 +1,5 @@
 Bottom: b24f77c1e42563bf836b89a48ab6228495436490
-Top:    4f509e4d5734c0779509a899a2a333341d675ac7
+Top:    d828c8304e1d729bdba3e1f75df1041761f4f158
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-18 09:01:43 -0700
 
@@ -9,10 +9,18 @@ debug fork
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index e901d13..9d217e9 100644
+index e901d13..b261c89 100644
 --- a/src/preload.c
 +++ b/src/preload.c
-@@ -463,18 +463,22 @@ static int connect_fork(int socket, const struct sockaddr *addr, socklen_t addrl
+@@ -48,6 +48,7 @@
+ #include <netinet/tcp.h>
+ #include <unistd.h>
+ #include <semaphore.h>
++#include <stdio.h>
+ 
+ #include <rdma/rdma_cma.h>
+ #include <rdma/rdma_verbs.h>
+@@ -463,18 +464,22 @@ static int connect_fork(int socket, const struct sockaddr *addr, socklen_t addrl
  	int fd, ret;
  	uint32_t msg;
  
@@ -35,7 +43,7 @@ index e901d13..9d217e9 100644
  	if (ret < 0)
  		return ret;
  
-@@ -827,11 +831,14 @@ pid_t fork(void)
+@@ -827,11 +832,14 @@ pid_t fork(void)
  	uint32_t msg;
  
  	init_preload();
@@ -50,7 +58,7 @@ index e901d13..9d217e9 100644
  	len = sizeof sin6;
  	ret = real.getsockname(sfd, (struct sockaddr *) &sin6, &len);
  	if (ret)
-@@ -840,10 +847,12 @@ pid_t fork(void)
+@@ -840,10 +848,12 @@ pid_t fork(void)
  	memset(&sin6.sin6_addr, 0, sizeof sin6.sin6_addr);
  
  	sem = sem_open("/rsocket_fork", O_CREAT, 0644, 1);
@@ -63,7 +71,7 @@ index e901d13..9d217e9 100644
  	if (lfd < 0)
  		goto sclose;
  
-@@ -852,14 +861,17 @@ pid_t fork(void)
+@@ -852,14 +862,17 @@ pid_t fork(void)
  
  	sem_wait(sem);
  	ret = rbind(lfd, (struct sockaddr *) &sin6, sizeof sin6);
@@ -81,7 +89,7 @@ index e901d13..9d217e9 100644
  	if (dfd < 0)
  		goto lclose;
  
-@@ -869,6 +881,7 @@ pid_t fork(void)
+@@ -869,6 +882,7 @@ pid_t fork(void)
  
  	msg = 0;
  	ret = real.write(sfd, &msg, sizeof msg);
