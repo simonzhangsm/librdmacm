@@ -1,5 +1,5 @@
 Bottom: c0306f4628b14e75db3da212b4a99875f49be65f
-Top:    c3cf2f5759614f2ebce8277cf3fac4f7c1643d05
+Top:    94fad5ac7a70819178822801a6a0dc686831107d
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-13 15:25:53 -0700
 
@@ -17,7 +17,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index d2058e2..5b6b50a 100644
+index d2058e2..2c07cc2 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -46,6 +46,8 @@
@@ -172,7 +172,7 @@ index d2058e2..5b6b50a 100644
  	}
  
  	return real.connect(fd, addr, addrlen);
-@@ -754,3 +812,86 @@ int fcntl(int socket, int cmd, ... /* arg */)
+@@ -754,3 +812,87 @@ int fcntl(int socket, int cmd, ... /* arg */)
  	va_end(args);
  	return ret;
  }
@@ -210,7 +210,8 @@ index d2058e2..5b6b50a 100644
 +	sin6.sin6_flowinfo = sin6.sin6_scope_id = 0;
 +	memset(&sin6.sin6_addr, 0, sizeof sin6.sin6_addr);
 +
-+	sem = sem_open("/rsocket_fork", O_CREAT | O_RDWR, S_IRWXU, 1);
++	sem = sem_open("/rsocket_fork", O_CREAT | O_RDWR,
++		       S_IRWXU | S_IRWXG, 1);
 +	if (sem == SEM_FAILED)
 +		goto out;
 +
