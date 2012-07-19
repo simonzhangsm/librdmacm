@@ -1,5 +1,5 @@
 Bottom: 7683fa697371afc1116e378e4f1b6c848ead85aa
-Top:    31c0cf47f562afc290796ba3e9791f672a7d5d8b
+Top:    95b121ec32dc0d0d10c0de528bba1ae1ed0075b1
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-19 10:09:48 -0700
 
@@ -19,7 +19,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/cma.c b/src/cma.c
-index bad8bce..e2772fa 100755
+index bad8bce..65b52bf 100755
 --- a/src/cma.c
 +++ b/src/cma.c
 @@ -76,6 +76,7 @@ struct cma_device {
@@ -124,8 +124,8 @@ index bad8bce..e2772fa 100755
 +static void ucma_put_device(struct cma_device *cma_dev)
 +{
 +	pthread_mutex_lock(&mut);
-+	if (!--cma_dev->verbs_refcnt)
-+		ibv_dealloc_pd(cma_dev_array[i].pd)
++	if (!--cma_dev->refcnt)
++		ibv_dealloc_pd(cma_dev->pd);
 +	pthread_mutex_unlock(&mut);
  }
  
