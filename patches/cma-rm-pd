@@ -1,0 +1,21 @@
+Bottom: 7ec243f3149e9a1ff1d5183f18e30d2458e354d6
+Top:    7ec243f3149e9a1ff1d5183f18e30d2458e354d6
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-07-19 10:09:48 -0700
+
+librdmacm: Only allocate verbs resources when needed
+
+The librdmacm allocates a PD per device on initialization.  Although
+we need to maintain the device list while the library is loaded
+(see rdma_get_devices), we can reduce the overhead by only allocating
+verbs resources when they are needed.
+
+This allows the rsocket preload library to support fork for
+applications that spawn connections off to child processes.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
