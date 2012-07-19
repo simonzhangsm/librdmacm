@@ -131,7 +131,6 @@ static int verbs_refcnt;
 static void ucma_cleanup(void)
 {
 	ucma_ib_cleanup();
-	ucma_release_verbs();
 
 	if (cma_dev_cnt) {
 		while (cma_dev_cnt--) {
@@ -349,7 +348,7 @@ void rdma_destroy_event_channel(struct rdma_event_channel *channel)
 static int ucma_get_device(struct cma_id_private *id_priv, uint64_t guid)
 {
 	struct cma_device *cma_dev;
-	int i;
+	int i, ret = 0;
 
 	for (i = 0; i < cma_dev_cnt; i++) {
 		cma_dev = &cma_dev_array[i];
@@ -364,15 +363,16 @@ match:
 		cma_dev->pd = ibv_alloc_pd(cma_dev_array[i].verbs);
 		if (!cma_dev->pd) {
 			cma_dev->refcnt--;
-			pthread_mutex_unlock(&mut);
-			return ERR(ENOMEM);
+			ret = ERR(ENOMEM);
+			goto out;
 		}
 	}
-	pthread_mutex_unlock(&mut);
 	id_priv->cma_dev = cma_dev;
 	id_priv->id.verbs = cma_dev->verbs;
 	id_priv->id.pd = cma_dev->pd;
-	return 0;
+out:
+	pthread_mutex_unlock(&mut);
+	return ret;
 }
 
 static void ucma_put_device(struct cma_device *cma_dev)
@@ -385,6 +385,8 @@ static void ucma_put_device(struct cma_device *cma_dev)
 
 static void ucma_free_id(struct cma_id_private *id_priv)
 {
+	if (id_priv->cma_dev)
+		ucma_put_device(id_priv->cma_dev);
 	pthread_cond_destroy(&id_priv->cond);
 	pthread_mutex_destroy(&id_priv->mut);
 	if (id_priv->id.route.path_rec)
