@@ -1,5 +1,5 @@
 Bottom: 7683fa697371afc1116e378e4f1b6c848ead85aa
-Top:    95b121ec32dc0d0d10c0de528bba1ae1ed0075b1
+Top:    c8846aeda5a7df646fc7288b1944956da799963f
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-19 10:09:48 -0700
 
@@ -19,7 +19,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/cma.c b/src/cma.c
-index bad8bce..65b52bf 100755
+index bad8bce..5280620 100755
 --- a/src/cma.c
 +++ b/src/cma.c
 @@ -76,6 +76,7 @@ struct cma_device {
@@ -30,15 +30,7 @@ index bad8bce..65b52bf 100755
  	int		    max_qpsize;
  	uint8_t		    max_initiator_depth;
  	uint8_t		    max_responder_resources;
-@@ -122,6 +123,7 @@ static int cma_dev_cnt;
- static pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
- static int abi_ver = RDMA_USER_CM_MAX_ABI_VERSION;
- int af_ib_support;
-+static int verbs_refcnt;
- 
- #define container_of(ptr, type, field) \
- 	((type *) ((void *)ptr - offsetof(type, field)))
-@@ -132,7 +134,8 @@ static void ucma_cleanup(void)
+@@ -132,7 +133,8 @@ static void ucma_cleanup(void)
  
  	if (cma_dev_cnt) {
  		while (cma_dev_cnt--) {
@@ -48,7 +40,7 @@ index bad8bce..65b52bf 100755
  			ibv_close_device(cma_dev_array[cma_dev_cnt].verbs);
  		}
  
-@@ -235,7 +238,7 @@ int ucma_init(void)
+@@ -235,7 +237,7 @@ int ucma_init(void)
  		goto err2;
  	}
  		
@@ -57,7 +49,7 @@ index bad8bce..65b52bf 100755
  	if (!cma_dev_array) {
  		ret = ERR(ENOMEM);
  		goto err2;
-@@ -252,13 +255,6 @@ int ucma_init(void)
+@@ -252,13 +254,6 @@ int ucma_init(void)
  			goto err3;
  		}
  
@@ -71,7 +63,7 @@ index bad8bce..65b52bf 100755
  		i++;
  		ret = ibv_query_device(cma_dev->verbs, &attr);
  		if (ret) {
-@@ -280,10 +276,8 @@ int ucma_init(void)
+@@ -280,10 +275,8 @@ int ucma_init(void)
  	return 0;
  
  err3:
@@ -83,7 +75,7 @@ index bad8bce..65b52bf 100755
  	free(cma_dev_array);
  err2:
  	ibv_free_device_list(dev_list);
-@@ -354,23 +348,45 @@ void rdma_destroy_event_channel(struct rdma_event_channel *channel)
+@@ -354,23 +347,45 @@ void rdma_destroy_event_channel(struct rdma_event_channel *channel)
  static int ucma_get_device(struct cma_id_private *id_priv, uint64_t guid)
  {
  	struct cma_device *cma_dev;
