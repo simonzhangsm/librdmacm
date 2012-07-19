@@ -378,8 +378,8 @@ out:
 static void ucma_put_device(struct cma_device *cma_dev)
 {
 	pthread_mutex_lock(&mut);
-	if (!--cma_dev->verbs_refcnt)
-		ibv_dealloc_pd(cma_dev_array[i].pd)
+	if (!--cma_dev->refcnt)
+		ibv_dealloc_pd(cma_dev->pd);
 	pthread_mutex_unlock(&mut);
 }
 
