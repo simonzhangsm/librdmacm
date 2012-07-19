@@ -1,5 +1,5 @@
-Bottom: fac77e11574baf1034f2881bef2086f2f30ac95a
-Top:    7b0876f9f10ef25f4263299f13c467795f023180
+Bottom: e0b82367be775902f3588a79dd714486d21646b3
+Top:    552216c4c92cac1034077b23311e7374f0379b5d
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-18 09:01:43 -0700
 
@@ -9,10 +9,10 @@ debug fork
 ---
 
 diff --git a/examples/rstream.c b/examples/rstream.c
-index 8595657..a699e0a 100644
+index befb7c6..545328b 100644
 --- a/examples/rstream.c
 +++ b/examples/rstream.c
-@@ -181,6 +181,7 @@ static void show_perf(void)
+@@ -182,6 +182,7 @@ static void show_perf(void)
  
  static int size_to_count(int size)
  {
