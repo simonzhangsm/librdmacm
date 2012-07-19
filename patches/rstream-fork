@@ -1,5 +1,5 @@
 Bottom: 06618864b863228d0a358680b7f0aeafe4237c7b
-Top:    1944ff9455330a5668da3d69575cd2e1928f07dc
+Top:    e0b82367be775902f3588a79dd714486d21646b3
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-17 15:32:54 -0700
 
@@ -11,10 +11,18 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/rstream.c b/examples/rstream.c
-index 48e2771..490caa5 100644
+index 48e2771..befb7c6 100644
 --- a/examples/rstream.c
 +++ b/examples/rstream.c
-@@ -84,6 +84,8 @@ static int verify;
+@@ -36,6 +36,7 @@
+ #include <sys/types.h>
+ #include <sys/socket.h>
+ #include <sys/time.h>
++#include <sys/wait.h>
+ #include <netdb.h>
+ #include <fcntl.h>
+ #include <unistd.h>
+@@ -84,6 +85,8 @@ static int verify;
  static int flags = MSG_DONTWAIT;
  static int poll_timeout = 0;
  static int custom;
@@ -23,7 +31,7 @@ index 48e2771..490caa5 100644
  static enum rs_optimization optimization;
  static int size_option;
  static int iterations = 1;
-@@ -463,7 +465,10 @@ static int server_connect(void)
+@@ -463,7 +466,10 @@ static int server_connect(void)
  		perror("raccept");
  	}
  
@@ -35,7 +43,7 @@ index 48e2771..490caa5 100644
  	return ret;
  }
  
-@@ -546,20 +551,26 @@ static int run(void)
+@@ -546,20 +552,26 @@ static int run(void)
  		if (ret)
  			goto free;
  
@@ -65,7 +73,7 @@ index 48e2771..490caa5 100644
  			if (test_size[i].option > size_option)
  				continue;
  			init_bandwidth_test(test_size[i].size);
-@@ -570,10 +581,14 @@ static int run(void)
+@@ -570,10 +582,14 @@ static int run(void)
  		if (ret)
  			goto free;
  
@@ -82,7 +90,7 @@ index 48e2771..490caa5 100644
  	rs_close(rs);
  free:
  	free(buf);
-@@ -593,6 +608,10 @@ static int set_test_opt(char *optarg)
+@@ -593,6 +609,10 @@ static int set_test_opt(char *optarg)
  		case 'b':
  			flags &= ~MSG_DONTWAIT;
  			break;
@@ -93,7 +101,7 @@ index 48e2771..490caa5 100644
  		case 'n':
  			flags |= MSG_DONTWAIT;
  			break;
-@@ -613,6 +632,9 @@ static int set_test_opt(char *optarg)
+@@ -613,6 +633,9 @@ static int set_test_opt(char *optarg)
  			flags |= MSG_DONTWAIT;
  		} else if (!strncasecmp("verify", optarg, 6)) {
  			verify = 1;
@@ -103,7 +111,7 @@ index 48e2771..490caa5 100644
  		} else {
  			return -1;
  		}
-@@ -671,6 +693,7 @@ int main(int argc, char **argv)
+@@ -671,6 +694,7 @@ int main(int argc, char **argv)
  			printf("\t    s|sockets - use standard tcp/ip sockets\n");
  			printf("\t    a|async - asynchronous operation (use poll)\n");
  			printf("\t    b|blocking - use blocking calls\n");
