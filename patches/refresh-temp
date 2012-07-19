@@ -1,0 +1,21 @@
+Bottom: 95b121ec32dc0d0d10c0de528bba1ae1ed0075b1
+Top:    c8846aeda5a7df646fc7288b1944956da799963f
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-07-19 14:22:04 -0700
+
+Refresh of cma-rm-pd
+
+---
+
+diff --git a/src/cma.c b/src/cma.c
+index 65b52bf..5280620 100755
+--- a/src/cma.c
++++ b/src/cma.c
+@@ -123,7 +123,6 @@ static int cma_dev_cnt;
+ static pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
+ static int abi_ver = RDMA_USER_CM_MAX_ABI_VERSION;
+ int af_ib_support;
+-static int verbs_refcnt;
+ 
+ #define container_of(ptr, type, field) \
+ 	((type *) ((void *)ptr - offsetof(type, field)))
