@@ -557,7 +557,9 @@ static int run(void)
 			init_latency_test(test_size[i].size);
 			run_test();
 		}
-		if (!fork_pid)
+		if (fork_pid)
+			wait(NULL);
+		else
 			rs_shutdown(rs, SHUT_RDWR);
 		rs_close(rs);
 
@@ -583,7 +585,9 @@ static int run(void)
 			ret = run_test();
 	}
 
-	if (!fork_pid)
+	if (fork_pid)
+		wait(NULL);
+	else
 		rs_shutdown(rs, SHUT_RDWR);
 	rs_close(rs);
 free:
