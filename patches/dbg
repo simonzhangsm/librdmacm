@@ -1,5 +1,5 @@
-Bottom: d4337025c44cc87a2920926b41cda9157e72672f
-Top:    745e8e2433831ce376d98dc3e50d6fb82aae2d20
+Bottom: fac77e11574baf1034f2881bef2086f2f30ac95a
+Top:    7b0876f9f10ef25f4263299f13c467795f023180
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-18 09:01:43 -0700
 
@@ -21,7 +21,7 @@ index 8595657..a699e0a 100644
  		return 100;
  	else if (size >= 100000)
 diff --git a/src/cma.c b/src/cma.c
-index 65b52bf..17ea75d 100755
+index 5280620..54b804e 100755
 --- a/src/cma.c
 +++ b/src/cma.c
 @@ -48,6 +48,7 @@
@@ -32,7 +32,7 @@ index 65b52bf..17ea75d 100755
  
  #include "cma.h"
  #include <infiniband/driver.h>
-@@ -142,6 +143,7 @@ static void ucma_cleanup(void)
+@@ -141,6 +142,7 @@ static void ucma_cleanup(void)
  		free(cma_dev_array);
  		cma_dev_cnt = 0;
  	}
@@ -40,7 +40,7 @@ index 65b52bf..17ea75d 100755
  }
  
  static int check_abi_version(void)
-@@ -215,6 +217,7 @@ int ucma_init(void)
+@@ -214,6 +216,7 @@ int ucma_init(void)
  	if (cma_dev_cnt)
  		return 0;
  
