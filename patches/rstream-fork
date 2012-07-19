@@ -1,5 +1,5 @@
 Bottom: 06618864b863228d0a358680b7f0aeafe4237c7b
-Top:    fac77e11574baf1034f2881bef2086f2f30ac95a
+Top:    1944ff9455330a5668da3d69575cd2e1928f07dc
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-17 15:32:54 -0700
 
@@ -11,7 +11,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/rstream.c b/examples/rstream.c
-index 48e2771..8595657 100644
+index 48e2771..490caa5 100644
 --- a/examples/rstream.c
 +++ b/examples/rstream.c
 @@ -84,6 +84,8 @@ static int verify;
@@ -35,7 +35,7 @@ index 48e2771..8595657 100644
  	return ret;
  }
  
-@@ -546,20 +551,24 @@ static int run(void)
+@@ -546,20 +551,26 @@ static int run(void)
  		if (ret)
  			goto free;
  
@@ -47,7 +47,9 @@ index 48e2771..8595657 100644
  			run_test();
  		}
 -		rs_shutdown(rs, SHUT_RDWR);
-+		if (!fork_pid)
++		if (fork_pid)
++			wait(NULL);
++		else
 +			rs_shutdown(rs, SHUT_RDWR);
  		rs_close(rs);
  
@@ -63,7 +65,7 @@ index 48e2771..8595657 100644
  			if (test_size[i].option > size_option)
  				continue;
  			init_bandwidth_test(test_size[i].size);
-@@ -570,10 +579,12 @@ static int run(void)
+@@ -570,10 +581,14 @@ static int run(void)
  		if (ret)
  			goto free;
  
@@ -73,12 +75,14 @@ index 48e2771..8595657 100644
  	}
  
 -	rs_shutdown(rs, SHUT_RDWR);
-+	if (!fork_pid)
++	if (fork_pid)
++		wait(NULL);
++	else
 +		rs_shutdown(rs, SHUT_RDWR);
  	rs_close(rs);
  free:
  	free(buf);
-@@ -593,6 +604,10 @@ static int set_test_opt(char *optarg)
+@@ -593,6 +608,10 @@ static int set_test_opt(char *optarg)
  		case 'b':
  			flags &= ~MSG_DONTWAIT;
  			break;
@@ -89,7 +93,7 @@ index 48e2771..8595657 100644
  		case 'n':
  			flags |= MSG_DONTWAIT;
  			break;
-@@ -613,6 +628,9 @@ static int set_test_opt(char *optarg)
+@@ -613,6 +632,9 @@ static int set_test_opt(char *optarg)
  			flags |= MSG_DONTWAIT;
  		} else if (!strncasecmp("verify", optarg, 6)) {
  			verify = 1;
@@ -99,7 +103,7 @@ index 48e2771..8595657 100644
  		} else {
  			return -1;
  		}
-@@ -671,6 +689,7 @@ int main(int argc, char **argv)
+@@ -671,6 +693,7 @@ int main(int argc, char **argv)
  			printf("\t    s|sockets - use standard tcp/ip sockets\n");
  			printf("\t    a|async - asynchronous operation (use poll)\n");
  			printf("\t    b|blocking - use blocking calls\n");
