@@ -1,5 +1,5 @@
-Bottom: d8f9277a23df3bd370254e83e9b085ac6d5b3522
-Top:    aededacb19a5e40c9a4c34babce2d25d3ade4276
+Bottom: d4337025c44cc87a2920926b41cda9157e72672f
+Top:    745e8e2433831ce376d98dc3e50d6fb82aae2d20
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-18 09:01:43 -0700
 
@@ -21,7 +21,7 @@ index 8595657..a699e0a 100644
  		return 100;
  	else if (size >= 100000)
 diff --git a/src/cma.c b/src/cma.c
-index e2772fa..9a4508a 100755
+index 65b52bf..17ea75d 100755
 --- a/src/cma.c
 +++ b/src/cma.c
 @@ -48,6 +48,7 @@
