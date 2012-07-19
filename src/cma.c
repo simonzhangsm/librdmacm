@@ -123,7 +123,6 @@ static int cma_dev_cnt;
 static pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
 static int abi_ver = RDMA_USER_CM_MAX_ABI_VERSION;
 int af_ib_support;
-static int verbs_refcnt;
 
 #define container_of(ptr, type, field) \
 	((type *) ((void *)ptr - offsetof(type, field)))
