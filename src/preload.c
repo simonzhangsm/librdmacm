@@ -491,6 +491,7 @@ static int connect_fork(int socket, const struct sockaddr *addr, socklen_t addrl
 		return ret;
 
 	real.close(fd);
+	printf("connect_fork - connecting rsocket");
 	return rconnect(ret, addr, addrlen);
 }
 
@@ -901,6 +902,7 @@ pid_t fork(void)
 	copysockopts(dfd, sfd, &rs, &real);
 	real.shutdown(sfd, SHUT_RDWR);
 	real.close(sfd);
+	printf("fork - using rsocket\n");
 	fd_store(last_accept, dfd, fd_rsocket);
 
 lclose:
