@@ -1,5 +1,5 @@
 Bottom: 7683fa697371afc1116e378e4f1b6c848ead85aa
-Top:    8be788d836cc93c7da4ef5d9221d97c9784be146
+Top:    31c0cf47f562afc290796ba3e9791f672a7d5d8b
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-19 10:09:48 -0700
 
@@ -19,7 +19,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/cma.c b/src/cma.c
-index bad8bce..a190dee 100755
+index bad8bce..e2772fa 100755
 --- a/src/cma.c
 +++ b/src/cma.c
 @@ -76,6 +76,7 @@ struct cma_device {
@@ -38,11 +38,7 @@ index bad8bce..a190dee 100755
  
  #define container_of(ptr, type, field) \
  	((type *) ((void *)ptr - offsetof(type, field)))
-@@ -129,10 +131,12 @@ int af_ib_support;
- static void ucma_cleanup(void)
- {
- 	ucma_ib_cleanup();
-+	ucma_release_verbs();
+@@ -132,7 +134,8 @@ static void ucma_cleanup(void)
  
  	if (cma_dev_cnt) {
  		while (cma_dev_cnt--) {
@@ -52,7 +48,7 @@ index bad8bce..a190dee 100755
  			ibv_close_device(cma_dev_array[cma_dev_cnt].verbs);
  		}
  
-@@ -235,7 +239,7 @@ int ucma_init(void)
+@@ -235,7 +238,7 @@ int ucma_init(void)
  		goto err2;
  	}
  		
@@ -61,7 +57,7 @@ index bad8bce..a190dee 100755
  	if (!cma_dev_array) {
  		ret = ERR(ENOMEM);
  		goto err2;
-@@ -252,13 +256,6 @@ int ucma_init(void)
+@@ -252,13 +255,6 @@ int ucma_init(void)
  			goto err3;
  		}
  
@@ -75,7 +71,7 @@ index bad8bce..a190dee 100755
  		i++;
  		ret = ibv_query_device(cma_dev->verbs, &attr);
  		if (ret) {
-@@ -280,10 +277,8 @@ int ucma_init(void)
+@@ -280,10 +276,8 @@ int ucma_init(void)
  	return 0;
  
  err3:
@@ -87,7 +83,12 @@ index bad8bce..a190dee 100755
  	free(cma_dev_array);
  err2:
  	ibv_free_device_list(dev_list);
-@@ -358,15 +353,34 @@ static int ucma_get_device(struct cma_id_private *id_priv, uint64_t guid)
+@@ -354,23 +348,45 @@ void rdma_destroy_event_channel(struct rdma_event_channel *channel)
+ static int ucma_get_device(struct cma_id_private *id_priv, uint64_t guid)
+ {
+ 	struct cma_device *cma_dev;
+-	int i;
++	int i, ret = 0;
  
  	for (i = 0; i < cma_dev_cnt; i++) {
  		cma_dev = &cma_dev_array[i];
@@ -108,15 +109,16 @@ index bad8bce..a190dee 100755
 +		cma_dev->pd = ibv_alloc_pd(cma_dev_array[i].verbs);
 +		if (!cma_dev->pd) {
 +			cma_dev->refcnt--;
-+			pthread_mutex_unlock(&mut);
-+			return ERR(ENOMEM);
++			ret = ERR(ENOMEM);
++			goto out;
 +		}
 +	}
-+	pthread_mutex_unlock(&mut);
 +	id_priv->cma_dev = cma_dev;
 +	id_priv->id.verbs = cma_dev->verbs;
 +	id_priv->id.pd = cma_dev->pd;
-+	return 0;
++out:
++	pthread_mutex_unlock(&mut);
++	return ret;
 +}
 +
 +static void ucma_put_device(struct cma_device *cma_dev)
@@ -128,3 +130,9 @@ index bad8bce..a190dee 100755
  }
  
  static void ucma_free_id(struct cma_id_private *id_priv)
+ {
++	if (id_priv->cma_dev)
++		ucma_put_device(id_priv->cma_dev);
+ 	pthread_cond_destroy(&id_priv->cond);
+ 	pthread_mutex_destroy(&id_priv->mut);
+ 	if (id_priv->id.route.path_rec)
