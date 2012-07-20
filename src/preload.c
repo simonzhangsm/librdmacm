@@ -386,6 +386,7 @@ int socket(int domain, int type, int protocol)
 	if (index < 0)
 		return index;
 
+	printf("socket\n");
 	recursive = 1;
 	ret = rsocket(domain, type, protocol);
 	recursive = 0;
@@ -400,6 +401,7 @@ int socket(int domain, int type, int protocol)
 			fd_store(index, ret, fd_rsocket);
 			set_rsocket_options(ret);
 		}
+		printf("socket - %d\n", index);
 		return index;
 	}
 	fd_close(index, &ret);
@@ -431,6 +433,7 @@ int bind(int socket, const struct sockaddr *addr, socklen_t addrlen)
 int listen(int socket, int backlog)
 {
 	int fd;
+	printf("listen %d\n", socket);
 	return (fd_get(socket, &fd) == fd_rsocket) ?
 		rlisten(fd, backlog) : real.listen(fd, backlog);
 }
@@ -455,6 +458,7 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
 
 		fd_store(index, ret, type);
 		last_accept = (type == fd_fork) ? index : -1;
+		printf("accept %d\n", socket);
 		return index;
 	} else {
 		last_accept = -1;
@@ -500,6 +504,7 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
 	struct sockaddr_in *sin;
 	int fd, ret;
 
+	printf("conect %d\n", socket);
 	switch (fd_get(socket, &fd)) {
 	case fd_fork:
 		return connect_fork(socket, addr, addrlen);
