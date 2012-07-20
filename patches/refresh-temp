@@ -1,0 +1,53 @@
+Bottom: fc0d4fef187ee5bca74ac50c3bb7806917a0a428
+Top:    666a13482ed38495f414616597d974158f974a48
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-07-19 17:35:33 -0700
+
+Refresh of dbg
+
+---
+
+diff --git a/src/preload.c b/src/preload.c
+index 47e1e64..983ffe1 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -386,6 +386,7 @@ int socket(int domain, int type, int protocol)
+ 	if (index < 0)
+ 		return index;
+ 
++	printf("socket\n");
+ 	recursive = 1;
+ 	ret = rsocket(domain, type, protocol);
+ 	recursive = 0;
+@@ -400,6 +401,7 @@ int socket(int domain, int type, int protocol)
+ 			fd_store(index, ret, fd_rsocket);
+ 			set_rsocket_options(ret);
+ 		}
++		printf("socket - %d\n", index);
+ 		return index;
+ 	}
+ 	fd_close(index, &ret);
+@@ -431,6 +433,7 @@ int bind(int socket, const struct sockaddr *addr, socklen_t addrlen)
+ int listen(int socket, int backlog)
+ {
+ 	int fd;
++	printf("listen %d\n", socket);
+ 	return (fd_get(socket, &fd) == fd_rsocket) ?
+ 		rlisten(fd, backlog) : real.listen(fd, backlog);
+ }
+@@ -455,6 +458,7 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
+ 
+ 		fd_store(index, ret, type);
+ 		last_accept = (type == fd_fork) ? index : -1;
++		printf("accept %d\n", socket);
+ 		return index;
+ 	} else {
+ 		last_accept = -1;
+@@ -500,6 +504,7 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
+ 	struct sockaddr_in *sin;
+ 	int fd, ret;
+ 
++	printf("conect %d\n", socket);
+ 	switch (fd_get(socket, &fd)) {
+ 	case fd_fork:
+ 		return connect_fork(socket, addr, addrlen);
