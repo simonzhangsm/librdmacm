@@ -1,0 +1,20 @@
+Bottom: e0b82367be775902f3588a79dd714486d21646b3
+Top:    e0b82367be775902f3588a79dd714486d21646b3
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-07-19 17:09:29 -0700
+
+rspreload: Move fork handling to first data transfer
+
+Instead of hooking fork and migrating the last accepted
+connection to rsockets, perform the migration when the socket
+first tries to send or receive data.
+
+This is necessary to handle more complex cases of fork, where
+the child process establishes connections.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
