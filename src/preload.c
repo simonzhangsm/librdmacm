@@ -536,8 +536,8 @@ static void fork_passive(int socket)
 		goto lclose;
 
 	msg = 0;
-	ret = real.write(sfd, &msg, sizeof msg);
-	if (ret != sizeof msg)
+	len = real.write(sfd, &msg, sizeof msg);
+	if (len != sizeof msg)
 		goto lclose;
 
 	dfd = raccept(lfd, NULL, NULL);
