@@ -1,0 +1,212 @@
+Bottom: e0b82367be775902f3588a79dd714486d21646b3
+Top:    64f842716d428bde944b1d88a9c26dc0d4dbd189
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-07-23 11:50:04 -0700
+
+Refresh of fork-xfer
+
+---
+
+diff --git a/src/preload.c b/src/preload.c
+index f824af3..7086997 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -96,7 +96,6 @@ static int sq_size;
+ static int rq_size;
+ static int sq_inline;
+ static int fork_support;
+-static int last_accept = -1;
+ 
+ enum fd_type {
+ 	fd_normal,
+@@ -453,15 +452,20 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
+ 		}
+ 
+ 		fd_store(index, ret, type);
+-		last_accept = (type == fd_fork) ? index : -1;
+ 		return index;
+ 	} else {
+-		last_accept = -1;
+ 		return real.accept(fd, addr, addrlen);
+ 	}
+ }
+ 
+-static int connect_fork(int socket, const struct sockaddr *addr, socklen_t addrlen)
++/*
++ * We can't fork RDMA connections and pass them from the parent to the child
++ * process.  Instead, we need to establish the RDMA connection after calling
++ * fork.  To do this, we delay establishing the RDMA connection until we try
++ * to send/receive on the server side.  On the client side, we don't expect
++ * to fork, so we switch from a TCP connection to an rsocket when connecting.
++ */
++static int fork_active(int socket, const struct sockaddr *addr, socklen_t addrlen)
+ {
+ 	int fd, ret;
+ 	uint32_t msg;
+@@ -489,6 +493,71 @@ static int connect_fork(int socket, const struct sockaddr *addr, socklen_t addrl
+ 	return rconnect(ret, addr, addrlen);
+ }
+ 
++static int fork_passive(int socket)
++{
++	struct sockaddr_in6 sin6;
++	sem_t *sem;
++	int lfd, sfd, dfd, ret, param;
++	socklen_t len;
++	uint32_t msg;
++
++	len = sizeof sin6;
++	ret = real.getsockname(sfd, (struct sockaddr *) &sin6, &len);
++	if (ret)
++		goto out;
++	sin6.sin6_flowinfo = sin6.sin6_scope_id = 0;
++	memset(&sin6.sin6_addr, 0, sizeof sin6.sin6_addr);
++
++	sem = sem_open("/rsocket_fork", O_CREAT | O_RDWR,
++		       S_IRWXU | S_IRWXG, 1);
++	if (sem == SEM_FAILED)
++		goto out;
++
++	lfd = rsocket(sin6.sin6_family, SOCK_STREAM, 0);
++	if (lfd < 0)
++		goto sclose;
++
++	param = 1;
++	rsetsockopt(lfd, SOL_SOCKET, SO_REUSEADDR, &param, sizeof param);
++
++	sem_wait(sem);
++	ret = rbind(lfd, (struct sockaddr *) &sin6, sizeof sin6);
++	if (ret)
++		goto lclose;
++
++	ret = rlisten(lfd, 1);
++	if (ret)
++		goto lclose;
++
++	msg = 0;
++	ret = real.write(sfd, &msg, sizeof msg);
++	if (ret != sizeof msg)
++		goto lclose;
++
++	dfd = raccept(lfd, NULL, NULL);
++	if (dfd < 0)
++		goto lclose;
++
++	param = 1;
++	rsetsockopt(dfd, IPPROTO_TCP, TCP_NODELAY, &param, sizeof param);
++	set_rsocket_options(dfd);
++
++	copysockopts(dfd, sfd, &rs, &real);
++	real.shutdown(sfd, SHUT_RDWR);
++	real.close(sfd);
++	fd_store(socket, dfd, fd_rsocket);
++
++lclose:
++	rclose(lfd);
++	sem_post(sem);
++sclose:
++	sem_close(sem);
++out:
++	if (ret)
++		fd_store(socket, sfd, fd_normal);
++	return ret;
++}
++
+ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
+ {
+ 	struct sockaddr_in *sin;
+@@ -496,7 +565,7 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
+ 
+ 	switch (fd_get(socket, &fd)) {
+ 	case fd_fork:
+-		return connect_fork(socket, addr, addrlen);
++		return fork_active(socket, addr, addrlen);
+ 	case fd_rsocket:
+ 		sin = (struct sockaddr_in *) addr;
+ 		if (ntohs(sin->sin_port) > 1024) {
+@@ -812,85 +881,3 @@ int fcntl(int socket, int cmd, ... /* arg */)
+ 	va_end(args);
+ 	return ret;
+ }
+-
+-/*
+- * We can't fork RDMA connections and pass them from the parent to the child
+- * process.  Intercept the fork call, and if we're the child establish the
+- * RDMA connection after calling fork.  The assumption is that the last
+- * connection accepted by the server will be processed by the child after the
+- * fork call.
+- *
+- * It would be better to establishing the RDMA connection once the child
+- * process tries to use the connection after the fork call (i.e. in a read
+- * or write call), rather than making the previous assumption.
+- */
+-pid_t fork(void)
+-{
+-	struct sockaddr_in6 sin6;
+-	pid_t pid;
+-	sem_t *sem;
+-	int lfd, sfd, dfd, ret, param;
+-	socklen_t len;
+-	uint32_t msg;
+-
+-	init_preload();
+-	pid = real.fork();
+-	if (pid || !fork_support || (last_accept < 0) ||
+-	    (fd_get(last_accept, &sfd) != fd_fork))
+-		goto out;
+-
+-	len = sizeof sin6;
+-	ret = real.getsockname(sfd, (struct sockaddr *) &sin6, &len);
+-	if (ret)
+-		goto out;
+-	sin6.sin6_flowinfo = sin6.sin6_scope_id = 0;
+-	memset(&sin6.sin6_addr, 0, sizeof sin6.sin6_addr);
+-
+-	sem = sem_open("/rsocket_fork", O_CREAT | O_RDWR,
+-		       S_IRWXU | S_IRWXG, 1);
+-	if (sem == SEM_FAILED)
+-		goto out;
+-
+-	lfd = rsocket(sin6.sin6_family, SOCK_STREAM, 0);
+-	if (lfd < 0)
+-		goto sclose;
+-
+-	param = 1;
+-	rsetsockopt(lfd, SOL_SOCKET, SO_REUSEADDR, &param, sizeof param);
+-
+-	sem_wait(sem);
+-	ret = rbind(lfd, (struct sockaddr *) &sin6, sizeof sin6);
+-	if (ret)
+-		goto lclose;
+-
+-	ret = rlisten(lfd, 1);
+-	if (ret)
+-		goto lclose;
+-
+-	msg = 0;
+-	ret = real.write(sfd, &msg, sizeof msg);
+-	if (ret != sizeof msg)
+-		goto lclose;
+-
+-	dfd = raccept(lfd, NULL, NULL);
+-	if (dfd < 0)
+-		goto lclose;
+-
+-	param = 1;
+-	rsetsockopt(dfd, IPPROTO_TCP, TCP_NODELAY, &param, sizeof param);
+-	set_rsocket_options(dfd);
+-
+-	copysockopts(dfd, sfd, &rs, &real);
+-	real.shutdown(sfd, SHUT_RDWR);
+-	real.close(sfd);
+-	fd_store(last_accept, dfd, fd_rsocket);
+-
+-lclose:
+-	rclose(lfd);
+-	sem_post(sem);
+-sclose:
+-	sem_close(sem);
+-out:
+-	last_accept = -1;
+-	return pid;
+-}
