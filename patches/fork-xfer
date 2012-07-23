@@ -1,5 +1,5 @@
 Bottom: e0b82367be775902f3588a79dd714486d21646b3
-Top:    701bfad47cfeefb22f51e3977fe3629945359257
+Top:    dd3e337c812c828bd16fb07d95a805d5eaaccc91
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-19 17:09:29 -0700
 
@@ -18,7 +18,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index f824af3..82a4125 100644
+index f824af3..79340c6 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -96,7 +96,6 @@ static int sq_size;
@@ -100,8 +100,8 @@ index f824af3..82a4125 100644
 +		goto lclose;
 +
 +	msg = 0;
-+	ret = real.write(sfd, &msg, sizeof msg);
-+	if (ret != sizeof msg)
++	len = real.write(sfd, &msg, sizeof msg);
++	if (len != sizeof msg)
 +		goto lclose;
 +
 +	dfd = raccept(lfd, NULL, NULL);
