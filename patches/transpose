@@ -3,13 +3,17 @@ Top:    47adffa1c470a8413209e0679e601e328605b9da
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-16 14:17:58 -0700
 
-rspreload: Make socket_fallback() call more generic
+librspreload: Make socket_fallback() call more generic
 
 socket_fallback is used to switch from an rsocket to a normal
 socket in the case of failures.  Rename the call and make it
 more generic, so that it can switch between an rsocket and
 a normal socket in either direction.  This will be used to
 support fork().
+
+As part of this change, we move the list of hooked and rsocket
+calls into structures, versus maintaining a large number of
+static variables.
 
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
