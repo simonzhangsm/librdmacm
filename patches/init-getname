@@ -1,0 +1,18 @@
+Bottom: a645d25e6d21e31afe2da3f99b55be8c8e6f4ca6
+Top:    a645d25e6d21e31afe2da3f99b55be8c8e6f4ca6
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-07-24 14:13:55 -0700
+
+rspreload: Call init from getsockname()
+
+netperf for some unknown reason calls getsockname() using a
+hard coded value of 0, without first allocating a socket.
+This causes the rsocket preload library to crash, since the
+library has not been properly initialized.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
