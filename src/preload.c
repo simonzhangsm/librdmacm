@@ -83,7 +83,6 @@ struct socket_calls {
 	int (*getsockopt)(int socket, int level, int optname,
 			  void *optval, socklen_t *optlen);
 	int (*fcntl)(int socket, int cmd, ... /* arg */);
-	pid_t (*fork)(void);
 };
 
 static struct socket_calls real;
@@ -253,7 +252,6 @@ static void init_preload(void)
 	real.setsockopt = dlsym(RTLD_NEXT, "setsockopt");
 	real.getsockopt = dlsym(RTLD_NEXT, "getsockopt");
 	real.fcntl = dlsym(RTLD_NEXT, "fcntl");
-	real.fork = dlsym(RTLD_NEXT, "fork");
 
 	rs.socket = dlsym(RTLD_DEFAULT, "rsocket");
 	rs.bind = dlsym(RTLD_DEFAULT, "rbind");
