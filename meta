@@ -1,12 +1,12 @@
 Version: 1
-Previous: ff9969c4883aa4da01ae52ee4d111751b043161b
-Head: 6fe19c8ba560c3aa57c25ba8ffa0602e7b7c6786
+Previous: 8705005cdd07502271a693311347567162ffcfc3
+Head: a7ef240ffb610387e695dbe2dc5ee264ae5faaa7
 Applied:
   cma-rm-pd: 2ffda7f2991395570b9e776ff5ae256ca9684771
   transpose: 3e52eb22f44eafaefa95c4674bc5665a94e15694
   fork: 6fe19c8ba560c3aa57c25ba8ffa0602e7b7c6786
+  rstream-fork: a7ef240ffb610387e695dbe2dc5ee264ae5faaa7
 Unapplied:
-  rstream-fork: e968946ba3b1b6f18b00c54621068ba3996362df
   init-getname: 0b5ff94aacdd00d2a3e8a8a548249d43c88dc719
   dbg: 3ec7b3dd2db8422fd840e3cee062c629e7b8f5b6
   waitall-buggy: c49c6b56c55385774065f5aa2704078e6ae0ceb8
