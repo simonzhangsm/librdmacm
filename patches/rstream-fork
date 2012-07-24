@@ -10,6 +10,8 @@ connections in a child process.  The server continues
 to run until all child processes have completed their
 tests.
 
+Fork support requires use of the librspreload library.
+
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
