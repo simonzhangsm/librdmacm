@@ -5,6 +5,11 @@ Date:   2012-07-17 15:32:54 -0700
 
 rstream: Add option to test fork support
 
+If the user specifies '-T f', rstream will process
+connections in a child process.  The server continues
+to run until all child processes have completed their
+tests.
+
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
