@@ -1,0 +1,13 @@
+Bottom: dd3e337c812c828bd16fb07d95a805d5eaaccc91
+Top:    dd3e337c812c828bd16fb07d95a805d5eaaccc91
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-07-24 10:15:06 -0700
+
+indexer: Allow use of index 0
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
