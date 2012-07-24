@@ -5,13 +5,28 @@ Date:   2012-07-24 11:40:10 -0700
 
 librspreload: Support server apps that call fork()
 
-Provide limited support for applications that call fork() after
-accepting a connection.
+Provide limited support for applications that call fork().  To
+handle fork(), we establish connections using normal sockets.
+The socket is later converted to an rsocket when the user
+makes the first call to a data transfer function (e.g. send,
+recv, read, write, etc.).
 
 Fork support is indicated by setting the environment variable
-RDMAV_FORK_SAFE.
+RDMAV_FORK_SAFE = 1.  When set, the preload library will delay
+converting to an rsocket until the user attemts to send or receive
+data on the socket.  To convert from a normal socket to an
+rsocket, the preload library must inject a message on the
+normal socket to synchronize between the client and server.  As
+a result, if the rsocket connection fails, the ability to
+silently fallback to the normal socket may be compromised.  Fork
+support is disabled by default.
+
+The current implementation works for simple test apps under
+ideal conditions.  Although it supports nonblocking sockets, it
+uses blocking rsockets when migrating connections.
 
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
 
 ---
 
