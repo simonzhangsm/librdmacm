@@ -1,5 +1,5 @@
 Bottom: a645d25e6d21e31afe2da3f99b55be8c8e6f4ca6
-Top:    a645d25e6d21e31afe2da3f99b55be8c8e6f4ca6
+Top:    9ac57390fafeb98c18db72a4b2a0198a58383713
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-24 14:13:55 -0700
 
@@ -15,4 +15,15 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 ---
 
-
+diff --git a/src/preload.c b/src/preload.c
+index e88c958..c8ad747 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -841,6 +841,7 @@ int getpeername(int socket, struct sockaddr *addr, socklen_t *addrlen)
+ int getsockname(int socket, struct sockaddr *addr, socklen_t *addrlen)
+ {
+ 	int fd;
++	init_preload();
+ 	return (fd_get(socket, &fd) == fd_rsocket) ?
+ 		rgetsockname(fd, addr, addrlen) :
+ 		real.getsockname(fd, addr, addrlen);
