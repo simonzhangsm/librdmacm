@@ -13,7 +13,7 @@ recv, read, write, etc.).
 
 Fork support is indicated by setting the environment variable
 RDMAV_FORK_SAFE = 1.  When set, the preload library will delay
-converting to an rsocket until the user attemts to send or receive
+converting to an rsocket until the user attempts to send or receive
 data on the socket.  To convert from a normal socket to an
 rsocket, the preload library must inject a message on the
 normal socket to synchronize between the client and server.  As
