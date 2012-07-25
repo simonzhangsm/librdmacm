@@ -391,6 +391,7 @@ int socket(int domain, int type, int protocol)
 		if (fork_support) {
 			rclose(ret);
 			ret = real.socket(domain, type, protocol);
+			printf("socket - fork support - real socket %d\n", ret);
 			if (ret < 0)
 				return ret;
 			fd_store(index, ret, fd_fork);
@@ -398,7 +399,7 @@ int socket(int domain, int type, int protocol)
 			fd_store(index, ret, fd_rsocket);
 			set_rsocket_options(ret);
 		}
-		printf("socket - %d\n", index);
+		printf("socket - return %d\n", index);
 		return index;
 	}
 	fd_close(index, &ret);
@@ -409,6 +410,7 @@ real:
 int bind(int socket, const struct sockaddr *addr, socklen_t addrlen)
 {
 	int fd;
+	printf("bind %d\n", socket);
 	return (fd_get(socket, &fd) == fd_rsocket) ?
 		rbind(fd, addr, addrlen) : real.bind(fd, addr, addrlen);
 }
@@ -426,6 +428,7 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
 	int fd, index, ret;
 	enum fd_type type;
 
+	printf("accept %d\n", socket);
 	type = fd_get(socket, &fd);
 	if (type == fd_rsocket || type == fd_fork) {
 		index = fd_open();
@@ -434,11 +437,14 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
 
 		ret = (type == fd_rsocket) ? raccept(fd, addr, addrlen) :
 					     real.accept(fd, addr, addrlen);
+		printf("accept %d, new index %d new socket %d err %s\n",
+			socket, index, ret, strerr(errno));
 		if (ret < 0) {
 			fd_close(index, &fd);
 			return ret;
 		}
 
+		printf("accept %d, new index %d new socket %d\n", socket, index, ret);
 		fd_store(index, ret, type);
 		return index;
 	} else {
