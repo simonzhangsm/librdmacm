@@ -1,0 +1,13 @@
+Bottom: 9ac57390fafeb98c18db72a4b2a0198a58383713
+Top:    9ac57390fafeb98c18db72a4b2a0198a58383713
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-07-25 11:11:56 -0700
+
+rsockets: Enable support for privileged ports
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
