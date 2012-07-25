@@ -1,5 +1,5 @@
 Bottom: 2d7d36989522b9e010497256793038fb2cb5aa9e
-Top:    6a80dbc9a9422453e6bcd2724cd614a7768cb5e7
+Top:    d02cc7716cf9826fa0d5cc49b028d9a4ad2c229f
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-18 09:01:43 -0700
 
@@ -49,7 +49,7 @@ index 5280620..54b804e 100755
  	if (cma_dev_cnt) {
  		pthread_mutex_unlock(&mut);
 diff --git a/src/preload.c b/src/preload.c
-index 52eaf1a..bc95da8 100644
+index 52eaf1a..370e8bc 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -48,6 +48,7 @@
@@ -123,7 +123,7 @@ index 52eaf1a..bc95da8 100644
  		fd_store(index, ret, type);
  		return index;
  	} else {
-@@ -455,14 +465,17 @@ static int fork_active(int socket, const struct sockaddr *addr, socklen_t addrle
+@@ -455,25 +465,33 @@ static int fork_active(int socket, const struct sockaddr *addr, socklen_t addrle
  	uint32_t msg;
  	long flags;
  
@@ -136,12 +136,16 @@ index 52eaf1a..bc95da8 100644
  	if (ret)
  		return ret;
  
- 	ret = real.recv(fd, &msg, sizeof msg, MSG_PEEK);
+-	ret = real.recv(fd, &msg, sizeof msg, MSG_PEEK);
++	do {
++		ret = real.recv(fd, &msg, sizeof msg, MSG_PEEK);
++	} while (!ret);
 +	printf("connect_fork - real recv %d msg %d\n", ret, msg);
  	if ((ret != sizeof msg) || msg) {
++		printf("connect_fork - falling back to normal socket\n");
  		fd_store(socket, fd, fd_normal);
  		return 0;
-@@ -470,10 +483,12 @@ static int fork_active(int socket, const struct sockaddr *addr, socklen_t addrle
+ 	}
  
  	real.fcntl(fd, F_SETFL, flags);
  	ret = transpose_socket(socket, fd_rsocket);
@@ -154,7 +158,43 @@ index 52eaf1a..bc95da8 100644
  	return rconnect(ret, addr, addrlen);
  }
  
-@@ -570,6 +585,7 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
+@@ -485,10 +503,12 @@ static void fork_passive(int socket)
+ 	socklen_t len;
+ 	uint32_t msg;
+ 
++	printf("fork_passive\n");
+ 	fd_get(socket, &sfd);
+ 
+ 	len = sizeof sin6;
+ 	ret = real.getsockname(sfd, (struct sockaddr *) &sin6, &len);
++	printf("fork_passive - getsockname %d (%s)\n", ret, strerror(errno));
+ 	if (ret)
+ 		goto out;
+ 	sin6.sin6_flowinfo = sin6.sin6_scope_id = 0;
+@@ -496,12 +516,14 @@ static void fork_passive(int socket)
+ 
+ 	sem = sem_open("/rsocket_fork", O_CREAT | O_RDWR,
+ 		       S_IRWXU | S_IRWXG, 1);
++	printf("fork_passive - sem_open %p (%s)\n", (void *) sem, strerror(errno));
+ 	if (sem == SEM_FAILED) {
+ 		ret = -1;
+ 		goto out;
+ 	}
+ 
+ 	lfd = rsocket(sin6.sin6_family, SOCK_STREAM, 0);
++	printf("fork_passive - rsocket %d (%s)\n", lfd, strerror(errno));
+ 	if (lfd < 0) {
+ 		ret  = lfd;
+ 		goto sclose;
+@@ -512,6 +534,7 @@ static void fork_passive(int socket)
+ 
+ 	sem_wait(sem);
+ 	ret = rbind(lfd, (struct sockaddr *) &sin6, sizeof sin6);
++	printf("fork_passive - rbind %d (%s)\n", ret, strerror(errno));
+ 	if (ret)
+ 		goto lclose;
+ 
+@@ -570,6 +593,7 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
  {
  	int fd, ret;
  
