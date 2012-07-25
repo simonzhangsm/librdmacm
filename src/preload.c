@@ -96,6 +96,7 @@ static int sq_size;
 static int rq_size;
 static int sq_inline;
 static int fork_support;
+static FILE *log;
 
 enum fd_type {
 	fd_normal,
@@ -279,6 +280,7 @@ static void init_preload(void)
 	rs.fcntl = dlsym(RTLD_DEFAULT, "rfcntl");
 
 	getenv_options();
+	log = fopen("/var/log/rs.log", "w");
 	init = 1;
 out:
 	pthread_mutex_unlock(&mut);
@@ -383,7 +385,7 @@ int socket(int domain, int type, int protocol)
 	if (index < 0)
 		return index;
 
-	printf("socket\n");
+	fprintf(log, "socket\n");fflush(log);
 	recursive = 1;
 	ret = rsocket(domain, type, protocol);
 	recursive = 0;
@@ -391,7 +393,7 @@ int socket(int domain, int type, int protocol)
 		if (fork_support) {
 			rclose(ret);
 			ret = real.socket(domain, type, protocol);
-			printf("socket - fork support - real socket %d\n", ret);
+			fprintf(log, "socket - fork support - real socket %d\n", ret);fflush(log);
 			if (ret < 0)
 				return ret;
 			fd_store(index, ret, fd_fork);
@@ -399,7 +401,7 @@ int socket(int domain, int type, int protocol)
 			fd_store(index, ret, fd_rsocket);
 			set_rsocket_options(ret);
 		}
-		printf("socket - return %d\n", index);
+		fprintf(log, "socket - return %d\n", index);fflush(log);
 		return index;
 	}
 	fd_close(index, &ret);
@@ -410,7 +412,7 @@ real:
 int bind(int socket, const struct sockaddr *addr, socklen_t addrlen)
 {
 	int fd;
-	printf("bind %d\n", socket);
+	fprintf(log, "bind %d\n", socket);fflush(log);
 	return (fd_get(socket, &fd) == fd_rsocket) ?
 		rbind(fd, addr, addrlen) : real.bind(fd, addr, addrlen);
 }
@@ -418,7 +420,7 @@ int bind(int socket, const struct sockaddr *addr, socklen_t addrlen)
 int listen(int socket, int backlog)
 {
 	int fd;
-	printf("listen %d\n", socket);
+	fprintf(log, "listen %d\n", socket);fflush(log);
 	return (fd_get(socket, &fd) == fd_rsocket) ?
 		rlisten(fd, backlog) : real.listen(fd, backlog);
 }
@@ -428,7 +430,7 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
 	int fd, index, ret;
 	enum fd_type type;
 
-	printf("accept %d\n", socket);
+	fprintf(log, "accept %d\n", socket);fflush(log);
 	type = fd_get(socket, &fd);
 	if (type == fd_rsocket || type == fd_fork) {
 		index = fd_open();
@@ -437,14 +439,14 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
 
 		ret = (type == fd_rsocket) ? raccept(fd, addr, addrlen) :
 					     real.accept(fd, addr, addrlen);
-		printf("accept %d, new index %d new socket %d err %s\n",
-			socket, index, ret, strerror(errno));
+		fprintf(log, "accept %d, new index %d new socket %d err %s\n",
+			socket, index, ret, strerror(errno));fflush(log);
 		if (ret < 0) {
 			fd_close(index, &fd);
 			return ret;
 		}
 
-		printf("accept %d, new index %d new socket %d\n", socket, index, ret);
+		fprintf(log, "accept %d, new index %d new socket %d\n", socket, index, ret);fflush(log);
 		fd_store(index, ret, type);
 		return index;
 	} else {
@@ -465,33 +467,31 @@ static int fork_active(int socket, const struct sockaddr *addr, socklen_t addrle
 	uint32_t msg;
 	long flags;
 
-	printf("connect_fork\n");
+	fprintf(log, "connect_fork\n");fflush(log);
 	fd = fd_getd(socket);
 	flags = real.fcntl(fd, F_GETFL);
 	real.fcntl(fd, F_SETFL, 0);
 	ret = real.connect(fd, addr, addrlen);
-	printf("connect_fork - real connect %d %s\n", ret, strerror(errno));
+	fprintf(log, "connect_fork - real connect %d %s\n", ret, strerror(errno));fflush(log);
 	if (ret)
 		return ret;
 
-	do {
-		ret = real.recv(fd, &msg, sizeof msg, MSG_PEEK);
-	} while (!ret);
-	printf("connect_fork - real recv %d msg %d\n", ret, msg);
+	ret = real.recv(fd, &msg, sizeof msg, MSG_PEEK);
+	fprintf(log, "connect_fork - real recv %d msg %d\n", ret, msg);fflush(log);
 	if ((ret != sizeof msg) || msg) {
-		printf("connect_fork - falling back to normal socket\n");
+		fprintf(log, "connect_fork - falling back to normal socket\n");fflush(log);
 		fd_store(socket, fd, fd_normal);
 		return 0;
 	}
 
 	real.fcntl(fd, F_SETFL, flags);
 	ret = transpose_socket(socket, fd_rsocket);
-	printf("connect_fork - transpose socket %d\n", ret);
+	fprintf(log, "connect_fork - transpose socket %d\n", ret);fflush(log);
 	if (ret < 0)
 		return ret;
 
 	real.close(fd);
-	printf("connect_fork - connecting rsocket");
+	fprintf(log, "connect_fork - connecting rsocket");fflush(log);
 	return rconnect(ret, addr, addrlen);
 }
 
@@ -503,12 +503,12 @@ static void fork_passive(int socket)
 	socklen_t len;
 	uint32_t msg;
 
-	printf("fork_passive\n");
+	fprintf(log, "fork_passive\n");fflush(log);
 	fd_get(socket, &sfd);
 
 	len = sizeof sin6;
 	ret = real.getsockname(sfd, (struct sockaddr *) &sin6, &len);
-	printf("fork_passive - getsockname %d (%s)\n", ret, strerror(errno));
+	fprintf(log, "fork_passive - getsockname %d (%s)\n", ret, strerror(errno));fflush(log);
 	if (ret)
 		goto out;
 	sin6.sin6_flowinfo = sin6.sin6_scope_id = 0;
@@ -516,14 +516,14 @@ static void fork_passive(int socket)
 
 	sem = sem_open("/rsocket_fork", O_CREAT | O_RDWR,
 		       S_IRWXU | S_IRWXG, 1);
-	printf("fork_passive - sem_open %p (%s)\n", (void *) sem, strerror(errno));
+	fprintf(log, "fork_passive - sem_open %p (%s)\n", (void *) sem, strerror(errno));fflush(log);
 	if (sem == SEM_FAILED) {
 		ret = -1;
 		goto out;
 	}
 
 	lfd = rsocket(sin6.sin6_family, SOCK_STREAM, 0);
-	printf("fork_passive - rsocket %d (%s)\n", lfd, strerror(errno));
+	fprintf(log, "fork_passive - rsocket %d (%s)\n", lfd, strerror(errno));fflush(log);
 	if (lfd < 0) {
 		ret  = lfd;
 		goto sclose;
@@ -534,7 +534,7 @@ static void fork_passive(int socket)
 
 	sem_wait(sem);
 	ret = rbind(lfd, (struct sockaddr *) &sin6, sizeof sin6);
-	printf("fork_passive - rbind %d (%s)\n", ret, strerror(errno));
+	fprintf(log, "fork_passive - rbind %d (%s)\n", ret, strerror(errno));fflush(log);
 	if (ret)
 		goto lclose;
 
@@ -593,7 +593,7 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
 {
 	int fd, ret;
 
-	printf("conect %d\n", socket);
+	fprintf(log, "conect %d\n", socket);
 	switch (fd_get(socket, &fd)) {
 	case fd_fork:
 		return fork_active(socket, addr, addrlen);
