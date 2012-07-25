@@ -1,5 +1,5 @@
 Bottom: 2d7d36989522b9e010497256793038fb2cb5aa9e
-Top:    8754908f54691ebf8eb338a5cf23c230a90d34d4
+Top:    6a80dbc9a9422453e6bcd2724cd614a7768cb5e7
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-18 09:01:43 -0700
 
@@ -49,7 +49,7 @@ index 5280620..54b804e 100755
  	if (cma_dev_cnt) {
  		pthread_mutex_unlock(&mut);
 diff --git a/src/preload.c b/src/preload.c
-index 52eaf1a..6f8e4f8 100644
+index 52eaf1a..bc95da8 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -48,6 +48,7 @@
@@ -113,7 +113,7 @@ index 52eaf1a..6f8e4f8 100644
  		ret = (type == fd_rsocket) ? raccept(fd, addr, addrlen) :
  					     real.accept(fd, addr, addrlen);
 +		printf("accept %d, new index %d new socket %d err %s\n",
-+			socket, index, ret, strerr(errno));
++			socket, index, ret, strerror(errno));
  		if (ret < 0) {
  			fd_close(index, &fd);
  			return ret;
