@@ -438,7 +438,7 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
 		ret = (type == fd_rsocket) ? raccept(fd, addr, addrlen) :
 					     real.accept(fd, addr, addrlen);
 		printf("accept %d, new index %d new socket %d err %s\n",
-			socket, index, ret, strerr(errno));
+			socket, index, ret, strerror(errno));
 		if (ret < 0) {
 			fd_close(index, &fd);
 			return ret;
