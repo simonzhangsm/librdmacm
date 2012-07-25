@@ -1,5 +1,5 @@
 Bottom: 2d7d36989522b9e010497256793038fb2cb5aa9e
-Top:    3b5b8e1557fedc1a739d19b10a2301d6d2461fe4
+Top:    8754908f54691ebf8eb338a5cf23c230a90d34d4
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-18 09:01:43 -0700
 
@@ -49,7 +49,7 @@ index 5280620..54b804e 100755
  	if (cma_dev_cnt) {
  		pthread_mutex_unlock(&mut);
 diff --git a/src/preload.c b/src/preload.c
-index 52eaf1a..9b205f9 100644
+index 52eaf1a..6f8e4f8 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -48,6 +48,7 @@
@@ -68,15 +68,31 @@ index 52eaf1a..9b205f9 100644
  	recursive = 1;
  	ret = rsocket(domain, type, protocol);
  	recursive = 0;
-@@ -396,6 +398,7 @@ int socket(int domain, int type, int protocol)
+@@ -389,6 +391,7 @@ int socket(int domain, int type, int protocol)
+ 		if (fork_support) {
+ 			rclose(ret);
+ 			ret = real.socket(domain, type, protocol);
++			printf("socket - fork support - real socket %d\n", ret);
+ 			if (ret < 0)
+ 				return ret;
+ 			fd_store(index, ret, fd_fork);
+@@ -396,6 +399,7 @@ int socket(int domain, int type, int protocol)
  			fd_store(index, ret, fd_rsocket);
  			set_rsocket_options(ret);
  		}
-+		printf("socket - %d\n", index);
++		printf("socket - return %d\n", index);
  		return index;
  	}
  	fd_close(index, &ret);
-@@ -413,6 +416,7 @@ int bind(int socket, const struct sockaddr *addr, socklen_t addrlen)
+@@ -406,6 +410,7 @@ real:
+ int bind(int socket, const struct sockaddr *addr, socklen_t addrlen)
+ {
+ 	int fd;
++	printf("bind %d\n", socket);
+ 	return (fd_get(socket, &fd) == fd_rsocket) ?
+ 		rbind(fd, addr, addrlen) : real.bind(fd, addr, addrlen);
+ }
+@@ -413,6 +418,7 @@ int bind(int socket, const struct sockaddr *addr, socklen_t addrlen)
  int listen(int socket, int backlog)
  {
  	int fd;
@@ -84,7 +100,30 @@ index 52eaf1a..9b205f9 100644
  	return (fd_get(socket, &fd) == fd_rsocket) ?
  		rlisten(fd, backlog) : real.listen(fd, backlog);
  }
-@@ -455,14 +459,17 @@ static int fork_active(int socket, const struct sockaddr *addr, socklen_t addrle
+@@ -422,6 +428,7 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
+ 	int fd, index, ret;
+ 	enum fd_type type;
+ 
++	printf("accept %d\n", socket);
+ 	type = fd_get(socket, &fd);
+ 	if (type == fd_rsocket || type == fd_fork) {
+ 		index = fd_open();
+@@ -430,11 +437,14 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
+ 
+ 		ret = (type == fd_rsocket) ? raccept(fd, addr, addrlen) :
+ 					     real.accept(fd, addr, addrlen);
++		printf("accept %d, new index %d new socket %d err %s\n",
++			socket, index, ret, strerr(errno));
+ 		if (ret < 0) {
+ 			fd_close(index, &fd);
+ 			return ret;
+ 		}
+ 
++		printf("accept %d, new index %d new socket %d\n", socket, index, ret);
+ 		fd_store(index, ret, type);
+ 		return index;
+ 	} else {
+@@ -455,14 +465,17 @@ static int fork_active(int socket, const struct sockaddr *addr, socklen_t addrle
  	uint32_t msg;
  	long flags;
  
@@ -102,7 +141,7 @@ index 52eaf1a..9b205f9 100644
  	if ((ret != sizeof msg) || msg) {
  		fd_store(socket, fd, fd_normal);
  		return 0;
-@@ -470,10 +477,12 @@ static int fork_active(int socket, const struct sockaddr *addr, socklen_t addrle
+@@ -470,10 +483,12 @@ static int fork_active(int socket, const struct sockaddr *addr, socklen_t addrle
  
  	real.fcntl(fd, F_SETFL, flags);
  	ret = transpose_socket(socket, fd_rsocket);
@@ -115,7 +154,7 @@ index 52eaf1a..9b205f9 100644
  	return rconnect(ret, addr, addrlen);
  }
  
-@@ -570,6 +579,7 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
+@@ -570,6 +585,7 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
  {
  	int fd, ret;
  
