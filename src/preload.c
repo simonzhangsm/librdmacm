@@ -798,9 +798,12 @@ int select(int nfds, fd_set *readfds, fd_set *writefds,
 	return ret;
 }
 
+#include <stdio.h>
+
 int shutdown(int socket, int how)
 {
 	int fd;
+	printf("shutdown how %s\n", how == SHUT_RDWR ? "RDWR" : how == SHUT_RD ? "RD" : "WR");
 	return (fd_get(socket, &fd) == fd_rsocket) ?
 		rshutdown(fd, how) : real.shutdown(fd, how);
 }
