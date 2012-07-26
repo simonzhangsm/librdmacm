@@ -1,5 +1,5 @@
 Bottom: 2d7d36989522b9e010497256793038fb2cb5aa9e
-Top:    4f6b6265d543312f4e8c9d74b6522b4168986bb9
+Top:    7af76078e335d5acccea9e83cb4e86eea842ce74
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-26 15:35:32 -0700
 
@@ -13,10 +13,10 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index 52eaf1a..996d8e0 100644
+index 52eaf1a..515cc10 100644
 --- a/src/preload.c
 +++ b/src/preload.c
-@@ -798,9 +798,12 @@ int select(int nfds, fd_set *readfds, fd_set *writefds,
+@@ -798,9 +798,13 @@ int select(int nfds, fd_set *readfds, fd_set *writefds,
  	return ret;
  }
  
@@ -26,6 +26,7 @@ index 52eaf1a..996d8e0 100644
  {
  	int fd;
 +	printf("shutdown how %s\n", how == SHUT_RDWR ? "RDWR" : how == SHUT_RD ? "RD" : "WR");
++	fflush(stdout);
  	return (fd_get(socket, &fd) == fd_rsocket) ?
  		rshutdown(fd, how) : real.shutdown(fd, how);
  }
