@@ -132,6 +132,8 @@ union rs_wr_id {
 	};
 };
 
+#define RS_RECV_WR_ID (~((uint64_t) 0))
+
 /*
  * rsocket states are ordered as passive, connecting, connected, disconnected.
  */
@@ -418,6 +420,19 @@ err1:
 	return -1;
 }
 
+static inline int
+rs_post_recv(struct rsocket *rs)
+{
+	struct ibv_recv_wr wr, *bad;
+
+	wr.wr_id = RS_RECV_WR_ID;
+	wr.next = NULL;
+	wr.sg_list = NULL;
+	wr.num_sge = 0;
+
+	return rdma_seterrno(ibv_post_recv(rs->cm_id->qp, &wr, &bad));
+}
+
 static int rs_create_ep(struct rsocket *rs)
 {
 	struct ibv_qp_init_attr qp_attr;
@@ -449,7 +464,7 @@ static int rs_create_ep(struct rsocket *rs)
 		return ret;
 
 	for (i = 0; i < rs->rq_size; i++) {
-		ret = rdma_post_recvv(rs->cm_id, NULL, NULL, 0);
+		ret = rs_post_recv(rs);
 		if (ret)
 			return ret;
 	}
@@ -881,7 +896,7 @@ static int rs_poll_cq(struct rsocket *rs)
 	int ret, rcnt = 0;
 
 	while ((ret = ibv_poll_cq(rs->cm_id->recv_cq, 1, &wc)) > 0) {
-		if (wc.opcode == IBV_WC_RECV_RDMA_WITH_IMM) {
+		if (wc.wr_id == RS_RECV_WR_ID) {
 			if (wc.status != IBV_WC_SUCCESS)
 				continue;
 			rcnt++;
@@ -923,7 +938,7 @@ static int rs_poll_cq(struct rsocket *rs)
 
 	if (rs->state & rs_connected) {
 		while (!ret && rcnt--)
-			ret = rdma_post_recvv(rs->cm_id, NULL, NULL, 0);
+			ret = rs_post_recv(rs);
 
 		if (ret) {
 			rs->state = rs_error;
@@ -1708,6 +1723,7 @@ int rshutdown(int socket, int how)
 	int ctrl, ret = 0;
 
 	rs = idm_at(&idm, socket);
+	printf("rshutdown %d - %p {\n", socket, rs);
 	if (how == SHUT_RD) {
 		rs_shutdown_state(rs, rs_connect_rd);
 		return 0;
@@ -1726,7 +1742,9 @@ int rshutdown(int socket, int how)
 				RS_CTRL_SHUTDOWN : RS_CTRL_DISCONNECT;
 		}
 		if (!rs_can_send_ctrl(rs)) {
+			printf("  rshutdown - need ctrl msg %d - %p\n", socket, rs);
 			ret = rs_process_cq(rs, 0, rs_can_send_ctrl);
+			printf("  rshutdown - have ctrl msg %d - %p\n", socket, rs);
 			if (ret)
 				return ret;
 		}
@@ -1735,14 +1753,21 @@ int rshutdown(int socket, int how)
 		ret = rs_post_write(rs, 0, NULL, 0,
 				    rs_msg_set(RS_OP_CTRL, ctrl),
 				    0, 0, 0);
+		if (ret)
+			printf("rs_post_write failed %d %s\n", ret, strerror(errno));
 	}
 
 	if (!rs_all_sends_done(rs) && !(rs->state & rs_error))
+	{
+		printf("  rshutdown - need sends %d - %p\n", socket, rs);
 		rs_process_cq(rs, 0, rs_all_sends_done);
+		printf("  rshutdown - have sends %d - %p\n", socket, rs);
+	}
 
 	if ((rs->fd_flags & O_NONBLOCK) && (rs->state & rs_connected))
 		rs_set_nonblocking(rs, 1);
 
+	printf("} rshutdown %d - %p\n", socket, rs);
 	return 0;
 }
 
@@ -1751,9 +1776,11 @@ int rclose(int socket)
 	struct rsocket *rs;
 
 	rs = idm_at(&idm, socket);
+	printf("rclose %d - %p {\n", socket, rs);
 	if (rs->state & rs_connected)
 		rshutdown(socket, SHUT_RDWR);
 
+	printf("} rclose %d - %p\n", socket, rs);
 	rs_free(rs);
 	return 0;
 }
