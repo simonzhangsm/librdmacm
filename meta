@@ -1,6 +1,6 @@
 Version: 1
-Previous: 6f503b39bc7ecc09dba3035e6e8200ebf9fed17b
-Head: 1e1686bf1447d0d5fe11c29cabd94c38bd5c1ff7
+Previous: 961be909264e03c7770904dbb67c9cb0518c05ef
+Head: 4c91eafde3cd8143b4c28493a672a420c112fc62
 Applied:
   cma-rm-pd: 2ffda7f2991395570b9e776ff5ae256ca9684771
   transpose: 3e52eb22f44eafaefa95c4674bc5665a94e15694
@@ -8,8 +8,7 @@ Applied:
   rstream-fork: a1d261650896286989c5197199da7729b3d61fa5
   init-getname: 7d988863b218d1b66e3739ec4b6f51acc72b2334
   rs-ftp: 28e0744eb89227fbeded485fbad64010b9edf0f6
-  mpi-finalize: ae46429bed49504d5f3f89bb2e9b9840acca819b
-  refresh-temp: 1e1686bf1447d0d5fe11c29cabd94c38bd5c1ff7
+  mpi-finalize: 4c91eafde3cd8143b4c28493a672a420c112fc62
 Unapplied:
   dbg: 0c269855776d3001e37da8c8afe283c20e1d6cd6
   waitall-buggy: c49c6b56c55385774065f5aa2704078e6ae0ceb8
