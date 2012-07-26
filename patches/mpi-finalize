@@ -1,0 +1,15 @@
+Bottom: 2d7d36989522b9e010497256793038fb2cb5aa9e
+Top:    2d7d36989522b9e010497256793038fb2cb5aa9e
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-07-26 15:35:32 -0700
+
+rsockets: Fix shutdown
+
+mpi finalize hangs - fix it
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
