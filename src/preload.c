@@ -801,7 +801,6 @@ int select(int nfds, fd_set *readfds, fd_set *writefds,
 int shutdown(int socket, int how)
 {
 	int fd;
-	fflush(stdout);
 	return (fd_get(socket, &fd) == fd_rsocket) ?
 		rshutdown(fd, how) : real.shutdown(fd, how);
 }
