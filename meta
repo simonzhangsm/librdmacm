@@ -1,6 +1,6 @@
 Version: 1
-Previous: 961be909264e03c7770904dbb67c9cb0518c05ef
-Head: 4c91eafde3cd8143b4c28493a672a420c112fc62
+Previous: ea57c636b79a5bff58f028dd7bc7894c19f0bfe9
+Head: 26ad23fa0897c2a401b3eb66011c68cacd55736e
 Applied:
   cma-rm-pd: 2ffda7f2991395570b9e776ff5ae256ca9684771
   transpose: 3e52eb22f44eafaefa95c4674bc5665a94e15694
@@ -9,6 +9,7 @@ Applied:
   init-getname: 7d988863b218d1b66e3739ec4b6f51acc72b2334
   rs-ftp: 28e0744eb89227fbeded485fbad64010b9edf0f6
   mpi-finalize: 4c91eafde3cd8143b4c28493a672a420c112fc62
+  refresh-temp: 26ad23fa0897c2a401b3eb66011c68cacd55736e
 Unapplied:
   dbg: 0c269855776d3001e37da8c8afe283c20e1d6cd6
   waitall-buggy: c49c6b56c55385774065f5aa2704078e6ae0ceb8
