@@ -1,5 +1,5 @@
 Bottom: 2d7d36989522b9e010497256793038fb2cb5aa9e
-Top:    9cdfa8fc338b5927493ad5770aa1d2d9bd7f4cc6
+Top:    886009990f4d52636c380f5b4c4f051be1a8608f
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-26 15:35:32 -0700
 
@@ -13,10 +13,45 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index ed125b3..d374af7 100644
+index ed125b3..784d3f8 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
-@@ -1708,6 +1708,7 @@ int rshutdown(int socket, int how)
+@@ -132,6 +132,7 @@ union rs_wr_id {
+ 	};
+ };
+ 
++#define RS_RECV_WR_ID ~NULL
+ /*
+  * rsocket states are ordered as passive, connecting, connected, disconnected.
+  */
+@@ -449,7 +450,7 @@ static int rs_create_ep(struct rsocket *rs)
+ 		return ret;
+ 
+ 	for (i = 0; i < rs->rq_size; i++) {
+-		ret = rdma_post_recvv(rs->cm_id, NULL, NULL, 0);
++		ret = rdma_post_recvv(rs->cm_id, RS_RECV_WR_ID, NULL, 0);
+ 		if (ret)
+ 			return ret;
+ 	}
+@@ -881,7 +882,7 @@ static int rs_poll_cq(struct rsocket *rs)
+ 	int ret, rcnt = 0;
+ 
+ 	while ((ret = ibv_poll_cq(rs->cm_id->recv_cq, 1, &wc)) > 0) {
+-		if (wc.opcode == IBV_WC_RECV_RDMA_WITH_IMM) {
++		if (wc.wr_id == RS_RECV_WR_ID) {
+ 			if (wc.status != IBV_WC_SUCCESS)
+ 				continue;
+ 			rcnt++;
+@@ -923,7 +924,7 @@ static int rs_poll_cq(struct rsocket *rs)
+ 
+ 	if (rs->state & rs_connected) {
+ 		while (!ret && rcnt--)
+-			ret = rdma_post_recvv(rs->cm_id, NULL, NULL, 0);
++			ret = rdma_post_recvv(rs->cm_id, RS_RECV_WR_ID, NULL, 0);
+ 
+ 		if (ret) {
+ 			rs->state = rs_error;
+@@ -1708,6 +1709,7 @@ int rshutdown(int socket, int how)
  	int ctrl, ret = 0;
  
  	rs = idm_at(&idm, socket);
@@ -24,7 +59,7 @@ index ed125b3..d374af7 100644
  	if (how == SHUT_RD) {
  		rs_shutdown_state(rs, rs_connect_rd);
  		return 0;
-@@ -1726,7 +1727,9 @@ int rshutdown(int socket, int how)
+@@ -1726,7 +1728,9 @@ int rshutdown(int socket, int how)
  				RS_CTRL_SHUTDOWN : RS_CTRL_DISCONNECT;
  		}
  		if (!rs_can_send_ctrl(rs)) {
@@ -34,7 +69,7 @@ index ed125b3..d374af7 100644
  			if (ret)
  				return ret;
  		}
-@@ -1735,14 +1738,21 @@ int rshutdown(int socket, int how)
+@@ -1735,14 +1739,21 @@ int rshutdown(int socket, int how)
  		ret = rs_post_write(rs, 0, NULL, 0,
  				    rs_msg_set(RS_OP_CTRL, ctrl),
  				    0, 0, 0);
@@ -56,7 +91,7 @@ index ed125b3..d374af7 100644
  	return 0;
  }
  
-@@ -1751,9 +1761,11 @@ int rclose(int socket)
+@@ -1751,9 +1762,11 @@ int rclose(int socket)
  	struct rsocket *rs;
  
  	rs = idm_at(&idm, socket);
