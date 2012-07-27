@@ -3,9 +3,21 @@ Top:    34a422e20b6864421c4dcbf249875027c9956b02
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-26 15:35:32 -0700
 
-rsockets: Fix shutdown
+rsockets: Use wr_id to determine completion type
 
-mpi finalize hangs - fix it
+If a work request has completed in error, the completion type
+field is undefined.  Use the wr_id to determine if the failed
+completion was a send or receive.
+
+This fixes an issue where MPI can hang during finalize.  With
+both sides of a connection shutting down simultaneously, one
+side may complete quicker and delete its QP before the other
+side receives an acknowledgement to their disconnect message.
+Eventually, the disconnect message will time out, but because
+the completion type field is undefined, it may be processed
+as a failed receive, rather than a failed send.  The end
+result is that the second side hangs waiting for the send to
+complete.
 
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
