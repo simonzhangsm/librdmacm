@@ -1,0 +1,23 @@
+Bottom: b5df9cc04d6e7629ae937bfe9bbc3c7da5193ea0
+Top:    b5df9cc04d6e7629ae937bfe9bbc3c7da5193ea0
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-07-27 10:46:42 -0700
+
+rsocket: Improve disconnect time under normal conditions
+
+When both sides of a connection attempt to close at the same
+time, one of the two sides can easily get an error when sending
+a disconnect message.  This results in that side hanging
+during close until the send times out.  (The time out is caused
+by the remote side destroying its QP.)
+
+We can reduce the chance of this occurring by immediately
+assuming that the disconnect has been successful once we've
+received the remote side's disconnect message.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
