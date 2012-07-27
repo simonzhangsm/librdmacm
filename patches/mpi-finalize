@@ -19,6 +19,9 @@ as a failed receive, rather than a failed send.  The end
 result is that the second side hangs waiting for the send to
 complete.
 
+This problem showed up more easily after commit
+2e5b0fc95964f74ea59dd725e849027faa0cd526, but existed beforehand.
+
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
