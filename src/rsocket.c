@@ -1741,9 +1741,7 @@ int rshutdown(int socket, int how)
 				RS_CTRL_SHUTDOWN : RS_CTRL_DISCONNECT;
 		}
 		if (!rs_can_send_ctrl(rs)) {
-			printf("  rshutdown - need ctrl msg %d - %p\n", socket, rs);
 			ret = rs_process_cq(rs, 0, rs_can_send_ctrl);
-			printf("  rshutdown - have ctrl msg %d - %p\n", socket, rs);
 			if (ret)
 				return ret;
 		}
