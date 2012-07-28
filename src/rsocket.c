@@ -124,13 +124,6 @@ struct rs_conn_data {
 	struct rs_sge	  data_buf;
 };
 
-enum {
-	RS_WR_RECV,
-	RS_WR_DATA,
-	RS_WR_CTRL,
-	RS_WR_DISCONNECT
-};
-
 #define RS_RECV_WR_ID (~((uint64_t) 0))
 
 /*
