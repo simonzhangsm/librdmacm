@@ -1,0 +1,27 @@
+Bottom: fffced6494cfa5fc5f9da5527d93fb7fe504bd86
+Top:    d24dd0fae6823a86b3a40de76ff29ff00831ae09
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-07-27 17:57:23 -0700
+
+Refresh of fast-disc
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 908b00c..b9105a1 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -124,13 +124,6 @@ struct rs_conn_data {
+ 	struct rs_sge	  data_buf;
+ };
+ 
+-enum {
+-	RS_WR_RECV,
+-	RS_WR_DATA,
+-	RS_WR_CTRL,
+-	RS_WR_DISCONNECT
+-};
+-
+ #define RS_RECV_WR_ID (~((uint64_t) 0))
+ 
+ /*
