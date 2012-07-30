@@ -13,7 +13,8 @@ by the remote side destroying its QP.)
 
 We can reduce the chance of this occurring by immediately
 assuming that the disconnect has been successful once we've
-received the remote side's disconnect message.
+received the remote side's disconnect message, or we've
+polled a send completion for the local disconnect message.
 
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 

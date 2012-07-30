@@ -1,11 +1,10 @@
 Version: 1
-Previous: 455875f4735cd7ee9d08a34dbd9857adbe1fcf8d
-Head: 2a0717b4cd4893b8df485742b6e92dbb6dea95eb
+Previous: d16b31f92eb5308d741add0222fae199a2d5425a
+Head: b8f3b02178571b9db3f31520c49b85c0fdc4bf65
 Applied:
   rs-ftp: 772f3c0addc0837fffce837760caef3dce59bce1
   check-id: f997b1b02f5e4d46a8571b9c1601c6929ebcd808
-  fast-disc: 0ffd19c51708020b9fb79195cd120a6ecee84c95
-  refresh-temp: 2a0717b4cd4893b8df485742b6e92dbb6dea95eb
+  fast-disc: b8f3b02178571b9db3f31520c49b85c0fdc4bf65
 Unapplied:
   dbg: 0c269855776d3001e37da8c8afe283c20e1d6cd6
   waitall-buggy: c49c6b56c55385774065f5aa2704078e6ae0ceb8
