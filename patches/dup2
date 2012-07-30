@@ -1,0 +1,16 @@
+Bottom: d24dd0fae6823a86b3a40de76ff29ff00831ae09
+Top:    d24dd0fae6823a86b3a40de76ff29ff00831ae09
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-07-30 16:06:32 -0700
+
+rspreload: Support dup2 calls
+
+vsftpd requires dup2() support.  To handle dup2, we need to add
+reference count tracking to the preload fd's.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
