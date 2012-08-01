@@ -1,5 +1,5 @@
-Bottom: d24dd0fae6823a86b3a40de76ff29ff00831ae09
-Top:    5770132465e02e074374c2198a8f7ee3aad036ea
+Bottom: c4f9e56fde30641b69e81060e3981b0df33f49c2
+Top:    6c3a4d4cc0146d11acbd41ec30ac983f004e11c7
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-30 16:06:32 -0700
 
@@ -14,7 +14,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index 52eaf1a..e230a56 100644
+index a680143..4b891a1 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -886,3 +886,10 @@ int fcntl(int socket, int cmd, ... /* arg */)
