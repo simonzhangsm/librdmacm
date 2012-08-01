@@ -1,0 +1,24 @@
+Bottom: d24dd0fae6823a86b3a40de76ff29ff00831ae09
+Top:    5770132465e02e074374c2198a8f7ee3aad036ea
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-01 14:14:07 -0700
+
+Refresh of dup2
+
+---
+
+diff --git a/src/preload.c b/src/preload.c
+index 52eaf1a..e230a56 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -886,3 +886,10 @@ int fcntl(int socket, int cmd, ... /* arg */)
+ 	va_end(args);
+ 	return ret;
+ }
++
++int dup2(int oldfd, int newfd)
++{
++	int fd;
++	return (fd_get(oldfd, &fd) == fd_rsocket) ?
++		: dup2(oldfd, newfd);
++}
