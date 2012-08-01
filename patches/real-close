@@ -1,0 +1,18 @@
+Bottom: d24dd0fae6823a86b3a40de76ff29ff00831ae09
+Top:    d24dd0fae6823a86b3a40de76ff29ff00831ae09
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-01 16:26:11 -0700
+
+rspreload: Call real.close in fd_close
+
+The index into the preload lookup table is obtained by opening
+/dev/null and use the returned value.  When closing the file,
+use the real close call and not the preload close call.  This
+is a minor optimization, but clarifies the expected operation.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
