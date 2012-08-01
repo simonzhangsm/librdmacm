@@ -886,3 +886,10 @@ int fcntl(int socket, int cmd, ... /* arg */)
 	va_end(args);
 	return ret;
 }
+
+int dup2(int oldfd, int newfd)
+{
+	int fd;
+	return (fd_get(oldfd, &fd) == fd_rsocket) ?
+		: dup2(oldfd, newfd);
+}
