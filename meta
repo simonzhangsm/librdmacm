@@ -1,10 +1,7 @@
 Version: 1
-Previous: add9a663342b24b652ddfc1a14f751bf07d5cd49
+Previous: f603404a9dbf19518876fedd08521664723bc46a
 Head: b8f3b02178571b9db3f31520c49b85c0fdc4bf65
 Applied:
-  rs-ftp: 772f3c0addc0837fffce837760caef3dce59bce1
-  check-id: f997b1b02f5e4d46a8571b9c1601c6929ebcd808
-  fast-disc: b8f3b02178571b9db3f31520c49b85c0fdc4bf65
 Unapplied:
   dup2: bb9d29b2fc3c8906fcc7a0b205e9130a60fc16f2
   dbg: 0c269855776d3001e37da8c8afe283c20e1d6cd6
