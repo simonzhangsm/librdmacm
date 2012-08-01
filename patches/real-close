@@ -1,5 +1,5 @@
 Bottom: d24dd0fae6823a86b3a40de76ff29ff00831ae09
-Top:    d24dd0fae6823a86b3a40de76ff29ff00831ae09
+Top:    c4f9e56fde30641b69e81060e3981b0df33f49c2
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-01 16:26:11 -0700
 
@@ -15,4 +15,25 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 ---
 
-
+diff --git a/src/preload.c b/src/preload.c
+index 52eaf1a..a680143 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -131,7 +131,7 @@ static int fd_open(void)
+ 	return index;
+ 
+ err2:
+-	close(index);
++	real.close(index);
+ err1:
+ 	free(fdi);
+ 	return ret;
+@@ -187,7 +187,7 @@ static enum fd_type fd_close(int index, int *fd)
+ 		idm_clear(&idm, index);
+ 		*fd = fdi->fd;
+ 		type = fdi->type;
+-		close(index);
++		real.close(index);
+ 		free(fdi);
+ 	} else {
+ 		*fd = index;
