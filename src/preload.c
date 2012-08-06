@@ -922,6 +922,9 @@ int dup2(int oldfd, int newfd)
 	int ret;
 
 	oldfdi = idm_lookup(&idm, oldfd);
+	if (oldfdi && oldfdi->type == fd_fork)
+		fork_passive(oldfd);
+
 	newfdi = idm_lookup(&idm, newfd);
 	if (newfdi) {
 		 /* newfd cannot have been dup'ed directly */
