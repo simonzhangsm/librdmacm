@@ -1,5 +1,5 @@
 Bottom: c4f9e56fde30641b69e81060e3981b0df33f49c2
-Top:    1ba59f6f7d9886c4ce5b8aa5fa06f770d53b8bf2
+Top:    7b4509e39407700f2b83499e2db1b89ccde97650
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-30 16:06:32 -0700
 
@@ -65,7 +65,7 @@ index cedc0c3..6c3df27 100644
  int ucma_max_qpsize(struct rdma_cm_id *id);
  int ucma_complete(struct rdma_cm_id *id);
 diff --git a/src/preload.c b/src/preload.c
-index a680143..b716e66 100644
+index a680143..ff7d2d0 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -83,6 +83,7 @@ struct socket_calls {
@@ -80,21 +80,22 @@ index a680143..b716e66 100644
  struct fd_info {
  	enum fd_type type;
  	int fd;
-+	struct fd_info *dupfdi;
++	int dupfd;
 +	atomic_t refcnt;
  };
  
  static int fd_open(void)
-@@ -122,6 +125,8 @@ static int fd_open(void)
+@@ -122,6 +125,9 @@ static int fd_open(void)
  		goto err1;
  	}
  
++	fdi->dupfd = -1;
 +	atomic_init(&fdi->refcnt);
 +	atomic_set(&fdi->refcnt, 1);
  	pthread_mutex_lock(&mut);
  	ret = idm_set(&idm, index, fdi);
  	pthread_mutex_unlock(&mut);
-@@ -252,6 +257,7 @@ static void init_preload(void)
+@@ -252,6 +258,7 @@ static void init_preload(void)
  	real.setsockopt = dlsym(RTLD_NEXT, "setsockopt");
  	real.getsockopt = dlsym(RTLD_NEXT, "getsockopt");
  	real.fcntl = dlsym(RTLD_NEXT, "fcntl");
@@ -102,7 +103,37 @@ index a680143..b716e66 100644
  
  	rs.socket = dlsym(RTLD_DEFAULT, "rsocket");
  	rs.bind = dlsym(RTLD_DEFAULT, "rbind");
-@@ -886,3 +892,45 @@ int fcntl(int socket, int cmd, ... /* arg */)
+@@ -807,9 +814,27 @@ int shutdown(int socket, int how)
+ 
+ int close(int socket)
+ {
+-	int fd;
++	struct fd_info *fdi;
++
+ 	init_preload();
+-	return (fd_close(socket, &fd) == fd_rsocket) ? rclose(fd) : real.close(fd);
++	fdi = idm_lookup(&idm, socket);
++	if (!fdi)
++		return real.close(socket);
++
++	if (fdi->dupfd != -1) {
++		ret = close(fdi->dupfd);
++		if (ret)
++			return ret;
++	}
++
++	if (atomic_dec(&fdi->refcnt))
++		return 0;
++
++	idm_clear(&idm, socket);
++	real.close(socket);
++	ret = (fdi->type == fd_rsocket) ? rclose(fdi->fd) : real.close(fdi->fd);
++	free(fdi);
++	return ret;
+ }
+ 
+ int getpeername(int socket, struct sockaddr *addr, socklen_t *addrlen)
+@@ -886,3 +911,48 @@ int fcntl(int socket, int cmd, ... /* arg */)
  	va_end(args);
  	return ret;
  }
@@ -138,11 +169,14 @@ index a680143..b716e66 100644
 +	idm_set(&idm, newfd, newfdi);
 +	pthread_mutex_unlock(&mut);
 +
-+	if (oldfdi->dupfdi)
-+		oldfdi = oldfdi->dupfdi;
 +	newfdi->fd = oldfdi->fd;
 +	newfdi->type = oldfdi->type;
-+	newfdi->dupfdi = oldfdi;
++	if (oldfdi->dupfd != -1) {
++		newfdi->dupfd = oldfdi->dupfd;
++		oldfdi = idm_lookup(&idm, oldfdi->dupfd);
++	} else {
++		newfdi->dupfd = oldfd;
++	}
 +	atomic_init(&newfdi->refcnt);
 +	atomic_set(&newfdi->refcnt, 1);
 +	atomic_inc(&oldfdi->refcnt);
