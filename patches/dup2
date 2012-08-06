@@ -1,5 +1,5 @@
 Bottom: c4f9e56fde30641b69e81060e3981b0df33f49c2
-Top:    7b4509e39407700f2b83499e2db1b89ccde97650
+Top:    7ab13a709c32c18a6a63e3cfe6aa048dca0c2c2a
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-30 16:06:32 -0700
 
@@ -65,7 +65,7 @@ index cedc0c3..6c3df27 100644
  int ucma_max_qpsize(struct rdma_cm_id *id);
  int ucma_complete(struct rdma_cm_id *id);
 diff --git a/src/preload.c b/src/preload.c
-index a680143..ff7d2d0 100644
+index a680143..b3cf6ac 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -83,6 +83,7 @@ struct socket_calls {
@@ -103,12 +103,13 @@ index a680143..ff7d2d0 100644
  
  	rs.socket = dlsym(RTLD_DEFAULT, "rsocket");
  	rs.bind = dlsym(RTLD_DEFAULT, "rbind");
-@@ -807,9 +814,27 @@ int shutdown(int socket, int how)
+@@ -807,9 +814,28 @@ int shutdown(int socket, int how)
  
  int close(int socket)
  {
 -	int fd;
 +	struct fd_info *fdi;
++	int ret;
 +
  	init_preload();
 -	return (fd_close(socket, &fd) == fd_rsocket) ? rclose(fd) : real.close(fd);
@@ -133,7 +134,7 @@ index a680143..ff7d2d0 100644
  }
  
  int getpeername(int socket, struct sockaddr *addr, socklen_t *addrlen)
-@@ -886,3 +911,48 @@ int fcntl(int socket, int cmd, ... /* arg */)
+@@ -886,3 +912,48 @@ int fcntl(int socket, int cmd, ... /* arg */)
  	va_end(args);
  	return ret;
  }
@@ -159,7 +160,7 @@ index a680143..ff7d2d0 100644
 +	if (!oldfdi || ret != newfd)
 +		return ret;
 +
-+	newfdi = calloc(1, sizeof *fdi);
++	newfdi = calloc(1, sizeof *newfdi);
 +	if (!newfdi) {
 +		close(newfd);
 +		return ERR(ENOMEM);
