@@ -1,0 +1,78 @@
+Bottom: 1ba59f6f7d9886c4ce5b8aa5fa06f770d53b8bf2
+Top:    7b4509e39407700f2b83499e2db1b89ccde97650
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-06 15:06:17 -0700
+
+Refresh of dup2
+
+---
+
+diff --git a/src/preload.c b/src/preload.c
+index b716e66..ff7d2d0 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -106,7 +106,7 @@ enum fd_type {
+ struct fd_info {
+ 	enum fd_type type;
+ 	int fd;
+-	struct fd_info *dupfdi;
++	int dupfd;
+ 	atomic_t refcnt;
+ };
+ 
+@@ -125,6 +125,7 @@ static int fd_open(void)
+ 		goto err1;
+ 	}
+ 
++	fdi->dupfd = -1;
+ 	atomic_init(&fdi->refcnt);
+ 	atomic_set(&fdi->refcnt, 1);
+ 	pthread_mutex_lock(&mut);
+@@ -813,9 +814,27 @@ int shutdown(int socket, int how)
+ 
+ int close(int socket)
+ {
+-	int fd;
++	struct fd_info *fdi;
++
+ 	init_preload();
+-	return (fd_close(socket, &fd) == fd_rsocket) ? rclose(fd) : real.close(fd);
++	fdi = idm_lookup(&idm, socket);
++	if (!fdi)
++		return real.close(socket);
++
++	if (fdi->dupfd != -1) {
++		ret = close(fdi->dupfd);
++		if (ret)
++			return ret;
++	}
++
++	if (atomic_dec(&fdi->refcnt))
++		return 0;
++
++	idm_clear(&idm, socket);
++	real.close(socket);
++	ret = (fdi->type == fd_rsocket) ? rclose(fdi->fd) : real.close(fdi->fd);
++	free(fdi);
++	return ret;
+ }
+ 
+ int getpeername(int socket, struct sockaddr *addr, socklen_t *addrlen)
+@@ -924,11 +943,14 @@ int dup2(int oldfd, int newfd)
+ 	idm_set(&idm, newfd, newfdi);
+ 	pthread_mutex_unlock(&mut);
+ 
+-	if (oldfdi->dupfdi)
+-		oldfdi = oldfdi->dupfdi;
+ 	newfdi->fd = oldfdi->fd;
+ 	newfdi->type = oldfdi->type;
+-	newfdi->dupfdi = oldfdi;
++	if (oldfdi->dupfd != -1) {
++		newfdi->dupfd = oldfdi->dupfd;
++		oldfdi = idm_lookup(&idm, oldfdi->dupfd);
++	} else {
++		newfdi->dupfd = oldfd;
++	}
+ 	atomic_init(&newfdi->refcnt);
+ 	atomic_set(&newfdi->refcnt, 1);
+ 	atomic_inc(&oldfdi->refcnt);
