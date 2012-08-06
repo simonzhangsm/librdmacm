@@ -815,6 +815,7 @@ int shutdown(int socket, int how)
 int close(int socket)
 {
 	struct fd_info *fdi;
+	int ret;
 
 	init_preload();
 	fdi = idm_lookup(&idm, socket);
@@ -933,7 +934,7 @@ int dup2(int oldfd, int newfd)
 	if (!oldfdi || ret != newfd)
 		return ret;
 
-	newfdi = calloc(1, sizeof *fdi);
+	newfdi = calloc(1, sizeof *newfdi);
 	if (!newfdi) {
 		close(newfd);
 		return ERR(ENOMEM);
