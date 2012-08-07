@@ -1,0 +1,26 @@
+Bottom: 427327f6d7f80a4a3fd819feac923c9113a18154
+Top:    1db36b1ec8bc6cb382c9b444bf6057015721abf3
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-07 13:53:29 -0700
+
+Refresh of dbg-out
+
+---
+
+diff --git a/src/preload.c b/src/preload.c
+index d606273..3e524b4 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -967,10 +967,11 @@ int dup2(int oldfd, int newfd)
+ 	return newfd;
+ }
+ 
+-int fstat(int socket, struct stat *buf)
++int __fxstat64(int ver, int socket, struct stat *buf)
+ {
+ 	int fd, ret;
+ 
++	init_preload();
+ 	fprintf(fout, "fstat socket %d\n", socket);
+ 	if (fd_get(socket, &fd) == fd_rsocket) {
+ 		ret = real.fstat(socket, buf);
