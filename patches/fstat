@@ -1,5 +1,5 @@
-Bottom: fdd492cdb13406bafcf14c37b554b2de76a99d5b
-Top:    799d9bfcd5b6545c40e5e19c7b50907bd25ed616
+Bottom: 7cfa8b8bbb7449eac973ab817f043b3f1a3850b7
+Top:    7bf18695fef78ce1cf020b98bda96e2687917519
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-07 09:37:24 -0700
 
@@ -13,7 +13,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index 085e8b4..749857e 100644
+index b18d310..33eb9a3 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -84,6 +84,7 @@ struct socket_calls {
@@ -32,7 +32,7 @@ index 085e8b4..749857e 100644
  
  	rs.socket = dlsym(RTLD_DEFAULT, "rsocket");
  	rs.bind = dlsym(RTLD_DEFAULT, "rbind");
-@@ -960,3 +962,17 @@ int dup2(int oldfd, int newfd)
+@@ -961,3 +963,17 @@ int dup2(int oldfd, int newfd)
  	atomic_inc(&oldfdi->refcnt);
  	return newfd;
  }
