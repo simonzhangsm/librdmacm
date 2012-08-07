@@ -1,0 +1,15 @@
+Bottom: fdd492cdb13406bafcf14c37b554b2de76a99d5b
+Top:    fdd492cdb13406bafcf14c37b554b2de76a99d5b
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-07 09:37:24 -0700
+
+rspreload: Add fstat support
+
+vsftpd calls fstat on a socket.  Fake it out.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
