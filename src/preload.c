@@ -973,7 +973,8 @@ int __fxstat64(int ver, int socket, struct stat64 *buf)
 	int fd, ret;
 
 	init_preload();
-	fprintf(fout, "fxstat64 socket %d\n", socket);
+	fprintf(fout, "fxstat64 socket %d - fd %d type %d\n",
+		socket, fd_getd(socket), fd_gett(socket));
 	if (fd_get(socket, &fd) == fd_rsocket) {
 		ret = real.fxstat64(ver, socket, buf);
 		fprintf(fout, "fxstat64 - rsocket %d\n", ret);
