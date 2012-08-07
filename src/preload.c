@@ -48,6 +48,7 @@
 #include <netinet/tcp.h>
 #include <unistd.h>
 #include <semaphore.h>
+#include <stdio.h>
 
 #include <rdma/rdma_cma.h>
 #include <rdma/rdma_verbs.h>
@@ -97,6 +98,8 @@ static int sq_size;
 static int rq_size;
 static int sq_inline;
 static int fork_support;
+
+static FILE *fout;
 
 enum fd_type {
 	fd_normal,
@@ -286,6 +289,7 @@ static void init_preload(void)
 	rs.getsockopt = dlsym(RTLD_DEFAULT, "rgetsockopt");
 	rs.fcntl = dlsym(RTLD_DEFAULT, "rfcntl");
 
+	fout = fopen("rs-out.txt", "w+");
 	getenv_options();
 	init = 1;
 out:
@@ -968,12 +972,17 @@ int __fxstat64(int ver, int socket, struct stat64 *buf)
 {
 	int fd, ret;
 
+	init_preload();
+	fprintf(fout, "fxstat64 socket %d\n", socket);
 	if (fd_get(socket, &fd) == fd_rsocket) {
 		ret = real.fxstat64(ver, socket, buf);
+		fprintf(fout, "fxstat64 - rsocket %d\n", ret);
 		if (!ret)
 			buf->st_mode = (buf->st_mode & ~S_IFMT) | __S_IFSOCK;
 	} else {
 		ret = real.fxstat64(ver, fd, buf);
+		fprintf(fout, "fxstat64 - normal %d\n", ret);
 	}
+	fflush(fout);
 	return ret;
 }
