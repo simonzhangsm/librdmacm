@@ -84,6 +84,7 @@ struct socket_calls {
 			  void *optval, socklen_t *optlen);
 	int (*fcntl)(int socket, int cmd, ... /* arg */);
 	int (*dup2)(int oldfd, int newfd);
+	int (*fstat)(int fd, struct stat *buf);
 };
 
 static struct socket_calls real;
@@ -259,6 +260,7 @@ static void init_preload(void)
 	real.getsockopt = dlsym(RTLD_NEXT, "getsockopt");
 	real.fcntl = dlsym(RTLD_NEXT, "fcntl");
 	real.dup2 = dlsym(RTLD_NEXT, "dup2");
+	real.fstat = dlsym(RTLD_NEXT, "fstat");
 
 	rs.socket = dlsym(RTLD_DEFAULT, "rsocket");
 	rs.bind = dlsym(RTLD_DEFAULT, "rbind");
@@ -960,4 +962,18 @@ int dup2(int oldfd, int newfd)
 	atomic_set(&newfdi->refcnt, 1);
 	atomic_inc(&oldfdi->refcnt);
 	return newfd;
+}
+
+int fstat(int socket, struct stat *buf)
+{
+	int fd, ret;
+
+	if (fd_get(socket, &fd) == fd_rsocket) {
+		ret = real.fstat(socket, buf);
+		if (!ret)
+			buf->st_mode = (buf->st_mode & ~S_IFMT) | __S_IFSOCK;
+	} else {
+		ret = real.fstat(fd, buf);
+	}
+	return ret;
 }
