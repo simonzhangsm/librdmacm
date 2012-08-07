@@ -967,10 +967,11 @@ int dup2(int oldfd, int newfd)
 	return newfd;
 }
 
-int fstat(int socket, struct stat *buf)
+int __fxstat64(int ver, int socket, struct stat *buf)
 {
 	int fd, ret;
 
+	init_preload();
 	fprintf(fout, "fstat socket %d\n", socket);
 	if (fd_get(socket, &fd) == fd_rsocket) {
 		ret = real.fstat(socket, buf);
