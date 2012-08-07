@@ -971,15 +971,15 @@ int fstat(int socket, struct stat *buf)
 {
 	int fd, ret;
 
-	fprintf(fout, "fstat");
+	fprintf(fout, "fstat socket %d\n", socket);
 	if (fd_get(socket, &fd) == fd_rsocket) {
 		ret = real.fstat(socket, buf);
-		fprintf(fout, "fstat - rsocket %d", ret);
+		fprintf(fout, "fstat - rsocket %d\n", ret);
 		if (!ret)
 			buf->st_mode = (buf->st_mode & ~S_IFMT) | __S_IFSOCK;
 	} else {
 		ret = real.fstat(fd, buf);
-		fprintf(fout, "fstat - normal %d", ret);
+		fprintf(fout, "fstat - normal %d\n", ret);
 	}
 	fflush(fout);
 	return ret;
