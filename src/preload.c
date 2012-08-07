@@ -921,6 +921,7 @@ int dup2(int oldfd, int newfd)
 	struct fd_info *oldfdi, *newfdi;
 	int ret;
 
+	init_preload();
 	oldfdi = idm_lookup(&idm, oldfd);
 	if (oldfdi && oldfdi->type == fd_fork)
 		fork_passive(oldfd);
