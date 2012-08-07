@@ -99,7 +99,7 @@ static int rq_size;
 static int sq_inline;
 static int fork_support;
 
-static FILE fout;
+static FILE *fout;
 
 enum fd_type {
 	fd_normal,
