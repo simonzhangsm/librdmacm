@@ -1,5 +1,5 @@
 Bottom: 799d9bfcd5b6545c40e5e19c7b50907bd25ed616
-Top:    c408747c0e5c24a1315850f4934c3397b2381a9e
+Top:    2eb494d99a798d8027fb436887977340a27bc96c
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-07 11:08:30 -0700
 
@@ -9,7 +9,7 @@ support for debug prints
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index 749857e..c1f68a6 100644
+index 749857e..55ee535 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -48,6 +48,7 @@
@@ -37,11 +37,20 @@ index 749857e..c1f68a6 100644
  	getenv_options();
  	init = 1;
  out:
-@@ -967,6 +971,7 @@ int fstat(int socket, struct stat *buf)
+@@ -967,12 +971,16 @@ int fstat(int socket, struct stat *buf)
  {
  	int fd, ret;
  
 +	fprintf(fout, "fstat");
  	if (fd_get(socket, &fd) == fd_rsocket) {
  		ret = real.fstat(socket, buf);
++		fprintf(fout, "fstat - rsocket %d", ret);
  		if (!ret)
+ 			buf->st_mode = (buf->st_mode & ~S_IFMT) | __S_IFSOCK;
+ 	} else {
+ 		ret = real.fstat(fd, buf);
++		fprintf(fout, "fstat - normal %d", ret);
+ 	}
++	fflush(fout);
+ 	return ret;
+ }
