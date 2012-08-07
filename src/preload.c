@@ -970,7 +970,7 @@ int fstat(int socket, struct stat *buf)
 	if (fd_get(socket, &fd) == fd_rsocket) {
 		ret = real.fstat(socket, buf);
 		if (!ret)
-			buf->st_mode |= __S_IFSOCK;
+			buf->st_mode = (buf->st_mode & ~S_IFMT) | __S_IFSOCK;
 	} else {
 		ret = real.fstat(fd, buf);
 	}
