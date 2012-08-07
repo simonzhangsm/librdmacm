@@ -87,6 +87,8 @@ struct socket_calls {
 	int (*fcntl)(int socket, int cmd, ... /* arg */);
 	int (*dup2)(int oldfd, int newfd);
 	ssize_t (*sendfile)(int out_fd, int in_fd, off_t *offset, size_t count);
+	int (*fxstat64)(int ver, int fd, struct stat64 *buf);
+	int (*fxstat)(int ver, int fd, struct stat *buf);
 };
 
 static struct socket_calls real;
@@ -280,6 +282,8 @@ static void init_preload(void)
 	real.fcntl = dlsym(RTLD_NEXT, "fcntl");
 	real.dup2 = dlsym(RTLD_NEXT, "dup2");
 	real.sendfile = dlsym(RTLD_NEXT, "sendfile");
+	real.fxstat64 = dlsym(RTLD_NEXT, "__fxstat64");
+	real.fxstat = dlsym(RTLD_NEXT, "__fxstat");
 
 	rs.socket = dlsym(RTLD_DEFAULT, "rsocket");
 	rs.bind = dlsym(RTLD_DEFAULT, "rbind");
@@ -1032,4 +1036,24 @@ ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count)
 		lseek(in_fd, ret, SEEK_CUR);
 	munmap(file_addr, count);
 	return ret;
+}
+
+int __fxstat64(int ver, int socket, struct stat64 *buf)
+{
+//	int fd, ret;
+
+//	if (fd_get(socket, &fd) == fd_rsocket) {
+//		ret = real.fxstat64(ver, socket, buf);
+//		if (!ret)
+//			buf->st_mode = (buf->st_mode & ~S_IFMT) | __S_IFSOCK;
+//	} else {
+//		ret = real.fxstat64(ver, fd, buf);
+//	}
+//	return ret;
+	return real.fxstat64(ver, socket, buf);
+}
+
+int __fxstat(int ver, int socket, struct stat *buf)
+{
+	return real.fxstat(ver, socket, buf);
 }
