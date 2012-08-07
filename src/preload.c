@@ -85,7 +85,7 @@ struct socket_calls {
 			  void *optval, socklen_t *optlen);
 	int (*fcntl)(int socket, int cmd, ... /* arg */);
 	int (*dup2)(int oldfd, int newfd);
-	int (*fstat)(int fd, struct stat *buf);
+	int (*fxstat64)(int ver, int fd, struct stat64 *buf);
 };
 
 static struct socket_calls real;
@@ -263,7 +263,7 @@ static void init_preload(void)
 	real.getsockopt = dlsym(RTLD_NEXT, "getsockopt");
 	real.fcntl = dlsym(RTLD_NEXT, "fcntl");
 	real.dup2 = dlsym(RTLD_NEXT, "dup2");
-	real.fstat = dlsym(RTLD_NEXT, "fstat");
+	real.fxstat64 = dlsym(RTLD_NEXT, "__fxstat64");
 
 	rs.socket = dlsym(RTLD_DEFAULT, "rsocket");
 	rs.bind = dlsym(RTLD_DEFAULT, "rbind");
@@ -968,20 +968,20 @@ int dup2(int oldfd, int newfd)
 	return newfd;
 }
 
-int __fxstat64(int ver, int socket, struct stat *buf)
+int __fxstat64(int ver, int socket, struct stat64 *buf)
 {
 	int fd, ret;
 
 	init_preload();
-	fprintf(fout, "fstat socket %d\n", socket);
+	fprintf(fout, "fxstat64 socket %d\n", socket);
 	if (fd_get(socket, &fd) == fd_rsocket) {
-		ret = real.fstat(socket, buf);
-		fprintf(fout, "fstat - rsocket %d\n", ret);
+		ret = real.fxstat64(ver, socket, buf);
+		fprintf(fout, "fxstat64 - rsocket %d\n", ret);
 		if (!ret)
 			buf->st_mode = (buf->st_mode & ~S_IFMT) | __S_IFSOCK;
 	} else {
-		ret = real.fstat(fd, buf);
-		fprintf(fout, "fstat - normal %d\n", ret);
+		ret = real.fxstat64(ver, fd, buf);
+		fprintf(fout, "fxstat64 - normal %d\n", ret);
 	}
 	fflush(fout);
 	return ret;
