@@ -1,5 +1,5 @@
 Bottom: c4f9e56fde30641b69e81060e3981b0df33f49c2
-Top:    fdd492cdb13406bafcf14c37b554b2de76a99d5b
+Top:    7cfa8b8bbb7449eac973ab817f043b3f1a3850b7
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-07-30 16:06:32 -0700
 
@@ -65,7 +65,7 @@ index cedc0c3..6c3df27 100644
  int ucma_max_qpsize(struct rdma_cm_id *id);
  int ucma_complete(struct rdma_cm_id *id);
 diff --git a/src/preload.c b/src/preload.c
-index a680143..085e8b4 100644
+index a680143..b18d310 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -83,6 +83,7 @@ struct socket_calls {
@@ -134,7 +134,7 @@ index a680143..085e8b4 100644
  }
  
  int getpeername(int socket, struct sockaddr *addr, socklen_t *addrlen)
-@@ -886,3 +912,51 @@ int fcntl(int socket, int cmd, ... /* arg */)
+@@ -886,3 +912,52 @@ int fcntl(int socket, int cmd, ... /* arg */)
  	va_end(args);
  	return ret;
  }
@@ -147,6 +147,7 @@ index a680143..085e8b4 100644
 +	struct fd_info *oldfdi, *newfdi;
 +	int ret;
 +
++	init_preload();
 +	oldfdi = idm_lookup(&idm, oldfd);
 +	if (oldfdi && oldfdi->type == fd_fork)
 +		fork_passive(oldfd);
