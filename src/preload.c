@@ -48,6 +48,7 @@
 #include <netinet/tcp.h>
 #include <unistd.h>
 #include <semaphore.h>
+#include <stdio.h>
 
 #include <rdma/rdma_cma.h>
 #include <rdma/rdma_verbs.h>
@@ -84,7 +85,7 @@ struct socket_calls {
 			  void *optval, socklen_t *optlen);
 	int (*fcntl)(int socket, int cmd, ... /* arg */);
 	int (*dup2)(int oldfd, int newfd);
-	int (*fstat)(int fd, struct stat *buf);
+	int (*fxstat64)(int ver, int fd, struct stat64 *buf);
 };
 
 static struct socket_calls real;
@@ -97,6 +98,8 @@ static int sq_size;
 static int rq_size;
 static int sq_inline;
 static int fork_support;
+
+static FILE *fout;
 
 enum fd_type {
 	fd_normal,
@@ -260,7 +263,7 @@ static void init_preload(void)
 	real.getsockopt = dlsym(RTLD_NEXT, "getsockopt");
 	real.fcntl = dlsym(RTLD_NEXT, "fcntl");
 	real.dup2 = dlsym(RTLD_NEXT, "dup2");
-	real.fstat = dlsym(RTLD_NEXT, "fstat");
+	real.fxstat64 = dlsym(RTLD_NEXT, "__fxstat64");
 
 	rs.socket = dlsym(RTLD_DEFAULT, "rsocket");
 	rs.bind = dlsym(RTLD_DEFAULT, "rbind");
@@ -286,6 +289,7 @@ static void init_preload(void)
 	rs.getsockopt = dlsym(RTLD_DEFAULT, "rgetsockopt");
 	rs.fcntl = dlsym(RTLD_DEFAULT, "rfcntl");
 
+	fout = fopen("rs-out.txt", "w+");
 	getenv_options();
 	init = 1;
 out:
@@ -964,16 +968,21 @@ int dup2(int oldfd, int newfd)
 	return newfd;
 }
 
-int fstat(int socket, struct stat *buf)
+int __fxstat64(int ver, int socket, struct stat64 *buf)
 {
 	int fd, ret;
 
+	init_preload();
+	fprintf(fout, "fxstat64 socket %d\n", socket);
 	if (fd_get(socket, &fd) == fd_rsocket) {
-		ret = real.fstat(socket, buf);
+		ret = real.fxstat64(ver, socket, buf);
+		fprintf(fout, "fxstat64 - rsocket %d\n", ret);
 		if (!ret)
 			buf->st_mode = (buf->st_mode & ~S_IFMT) | __S_IFSOCK;
 	} else {
-		ret = real.fstat(fd, buf);
+		ret = real.fxstat64(ver, fd, buf);
+		fprintf(fout, "fxstat64 - normal %d\n", ret);
 	}
+	fflush(fout);
 	return ret;
 }
