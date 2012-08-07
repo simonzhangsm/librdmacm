@@ -1,0 +1,27 @@
+Bottom: c408747c0e5c24a1315850f4934c3397b2381a9e
+Top:    2eb494d99a798d8027fb436887977340a27bc96c
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-07 11:29:28 -0700
+
+Refresh of dbg-out
+
+---
+
+diff --git a/src/preload.c b/src/preload.c
+index c1f68a6..55ee535 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -974,10 +974,13 @@ int fstat(int socket, struct stat *buf)
+ 	fprintf(fout, "fstat");
+ 	if (fd_get(socket, &fd) == fd_rsocket) {
+ 		ret = real.fstat(socket, buf);
++		fprintf(fout, "fstat - rsocket %d", ret);
+ 		if (!ret)
+ 			buf->st_mode = (buf->st_mode & ~S_IFMT) | __S_IFSOCK;
+ 	} else {
+ 		ret = real.fstat(fd, buf);
++		fprintf(fout, "fstat - normal %d", ret);
+ 	}
++	fflush(fout);
+ 	return ret;
+ }
