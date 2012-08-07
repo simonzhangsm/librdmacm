@@ -1,0 +1,46 @@
+Bottom: a70e486d7fb3d18adace33aea325353d847f6b41
+Top:    eac016fea8796703d0b5f91538d93aaa3dbcd3ac
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-07 11:10:29 -0700
+
+Refresh of dbg-out
+
+---
+
+diff --git a/src/preload.c b/src/preload.c
+index b9c32e6..37b23c5 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -48,6 +48,7 @@
+ #include <netinet/tcp.h>
+ #include <unistd.h>
+ #include <semaphore.h>
++#include <stdio.h>
+ 
+ #include <rdma/rdma_cma.h>
+ #include <rdma/rdma_verbs.h>
+@@ -98,6 +99,8 @@ static int rq_size;
+ static int sq_inline;
+ static int fork_support;
+ 
++static FILE fout;
++
+ enum fd_type {
+ 	fd_normal,
+ 	fd_rsocket,
+@@ -286,6 +289,7 @@ static void init_preload(void)
+ 	rs.getsockopt = dlsym(RTLD_DEFAULT, "rgetsockopt");
+ 	rs.fcntl = dlsym(RTLD_DEFAULT, "rfcntl");
+ 
++	fout = fopen("rs-out.txt", "w+");
+ 	getenv_options();
+ 	init = 1;
+ out:
+@@ -967,6 +971,7 @@ int fstat(int socket, struct stat *buf)
+ {
+ 	int fd, ret;
+ 
++	fprintf(fout, "fstat");
+ 	if (fd_get(socket, &fd) == fd_rsocket) {
+ 		ret = real.fstat(socket, buf);
+ 		if (!ret)
