@@ -1,0 +1,15 @@
+Bottom: 50835e142dc27f9d7b745b34a0d7c1416c75a0b7
+Top:    50835e142dc27f9d7b745b34a0d7c1416c75a0b7
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-07 21:25:00 -0700
+
+rsockets: Support SO_OOBINLINE
+
+We don't support urgent data, so just return success.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
