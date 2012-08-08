@@ -1,9 +1,10 @@
 Version: 1
-Previous: b3eeb5cb4dd57259906c3f14c824810dee5f91cb
-Head: ca5813e7cf95dee5933fc417e4a34d26f2b01824
+Previous: c2975b91f8e2cc4fe49c5b038055922844bf7097
+Head: 1bc11aabfd85f0763819b21e3321afbcc884513b
 Applied:
   real-close: 3409f8d6af187d25c63a5d1f8ee8bff5f14555e2
   dup2: ca5813e7cf95dee5933fc417e4a34d26f2b01824
+  oobinline: 1bc11aabfd85f0763819b21e3321afbcc884513b
 Unapplied:
   fstat: 07e07a6ee41d57eb20b3b71b1d8098408fc1de03
   dbg-out: e2940be2ceb62a8d2765a10656e98152ef8b3707
