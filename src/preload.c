@@ -611,6 +611,8 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
 {
 	int fd, ret;
 
+	fprintf(fout, "%d connect %d\n", (int)syscall(SYS_gettid), socket);
+	fflush(fout);
 	switch (fd_get(socket, &fd)) {
 	case fd_fork:
 		return fork_active(socket, addr, addrlen);
