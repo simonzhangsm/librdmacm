@@ -1,5 +1,5 @@
 Bottom: 6bbb92f637582964eea7a287f91549c84da9571a
-Top:    0449301a511d37b585d312ac34d727ba2987e824
+Top:    0382bfbc76f972809dc6224e88bb2a5833ff6631
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-07 21:30:48 -0700
 
@@ -8,7 +8,7 @@ support for debug prints
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index 53f8543..2165147 100644
+index 53f8543..abe9471 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -48,6 +48,8 @@
@@ -148,17 +148,7 @@ index 53f8543..2165147 100644
  	switch (fd_get(socket, &fd)) {
  	case fd_fork:
  		return fork_active(socket, addr, addrlen);
-@@ -628,6 +662,9 @@ ssize_t read(int socket, void *buf, size_t count)
- {
- 	int fd;
- 	init_preload();
-+	fprintf(fout, "%d read %d real fd %d type %d\n",
-+		(int)syscall(SYS_gettid), socket, fd_getd(socket), fd_gett(socket));
-+	fflush(fout);
- 	return (fd_fork_get(socket, &fd) == fd_rsocket) ?
- 		rread(fd, buf, count) : real.read(fd, buf, count);
- }
-@@ -820,18 +857,29 @@ int close(int socket)
+@@ -820,18 +854,29 @@ int close(int socket)
  	int ret;
  
  	init_preload();
@@ -188,7 +178,7 @@ index 53f8543..2165147 100644
  
  	idm_clear(&idm, socket);
  	real.close(socket);
-@@ -924,6 +972,8 @@ int dup2(int oldfd, int newfd)
+@@ -924,6 +969,8 @@ int dup2(int oldfd, int newfd)
  	int ret;
  
  	init_preload();
@@ -197,7 +187,7 @@ index 53f8543..2165147 100644
  	oldfdi = idm_lookup(&idm, oldfd);
  	if (oldfdi && oldfdi->type == fd_fork)
  		fork_passive(oldfd);
-@@ -961,6 +1011,9 @@ int dup2(int oldfd, int newfd)
+@@ -961,6 +1008,9 @@ int dup2(int oldfd, int newfd)
  	atomic_init(&newfdi->refcnt);
  	atomic_set(&newfdi->refcnt, 1);
  	atomic_inc(&oldfdi->refcnt);
@@ -207,7 +197,7 @@ index 53f8543..2165147 100644
  	return newfd;
  }
  
-@@ -968,12 +1021,19 @@ int __fxstat64(int ver, int socket, struct stat64 *buf)
+@@ -968,12 +1018,19 @@ int __fxstat64(int ver, int socket, struct stat64 *buf)
  {
  	int fd, ret;
  
