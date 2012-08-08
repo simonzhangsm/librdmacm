@@ -1,0 +1,23 @@
+Bottom: 0449301a511d37b585d312ac34d727ba2987e824
+Top:    0382bfbc76f972809dc6224e88bb2a5833ff6631
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-08 14:26:51 -0700
+
+Refresh of dbg-out
+
+---
+
+diff --git a/src/preload.c b/src/preload.c
+index 2165147..abe9471 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -662,9 +662,6 @@ ssize_t read(int socket, void *buf, size_t count)
+ {
+ 	int fd;
+ 	init_preload();
+-	fprintf(fout, "%d read %d real fd %d type %d\n",
+-		(int)syscall(SYS_gettid), socket, fd_getd(socket), fd_gett(socket));
+-	fflush(fout);
+ 	return (fd_fork_get(socket, &fd) == fd_rsocket) ?
+ 		rread(fd, buf, count) : real.read(fd, buf, count);
+ }
