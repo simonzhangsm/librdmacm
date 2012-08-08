@@ -1,0 +1,21 @@
+Bottom: f808773d213c6b0b6ecbaff3f68d99d199d218b8
+Top:    5623cf863fc9cc2ced3b180c705ed739b95978f8
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-07 22:10:13 -0700
+
+Refresh of dbg-out
+
+---
+
+diff --git a/src/preload.c b/src/preload.c
+index fdb25ac..458362d 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -1012,6 +1012,7 @@ int __fxstat64(int ver, int socket, struct stat64 *buf)
+ 	init_preload();
+ 	fprintf(fout, "%d fxstat64 socket %d - fd %d type %d\n",
+ 			syscall(SYS_gettid), socket, fd_getd(socket), fd_gett(socket));
++	fflush(fout);
+ 	if (fd_get(socket, &fd) == fd_rsocket) {
+ 		ret = real.fxstat64(ver, socket, buf);
+ 		fprintf(fout, "%d fxstat64 - rsocket %d\n", syscall(SYS_gettid), ret);
