@@ -1,5 +1,5 @@
 Bottom: 6bbb92f637582964eea7a287f91549c84da9571a
-Top:    5623cf863fc9cc2ced3b180c705ed739b95978f8
+Top:    ed2f9afb0d122614fb6b76d78e385a49be99b24f
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-07 21:30:48 -0700
 
@@ -8,7 +8,7 @@ support for debug prints
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index 53f8543..458362d 100644
+index 53f8543..939325a 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -48,6 +48,8 @@
@@ -139,25 +139,47 @@ index 53f8543..458362d 100644
  
  lclose:
  	rclose(lfd);
-@@ -628,6 +660,8 @@ ssize_t read(int socket, void *buf, size_t count)
+@@ -628,6 +660,9 @@ ssize_t read(int socket, void *buf, size_t count)
  {
  	int fd;
  	init_preload();
-+	fprintf(fout, "%d read %d read fd %d\n", syscall(SYS_gettid), socket, fd_getd(socket));
++	fprintf(fout, "%d read %d real fd %d type %d\n",
++		syscall(SYS_gettid), socket, fd_getd(socket), fd_gett(socket));
 +	fflush(fout);
  	return (fd_fork_get(socket, &fd) == fd_rsocket) ?
  		rread(fd, buf, count) : real.read(fd, buf, count);
  }
-@@ -820,6 +854,8 @@ int close(int socket)
+@@ -820,18 +855,29 @@ int close(int socket)
  	int ret;
  
  	init_preload();
-+	fprintf(fout, "%d close %d real fd %d\n", syscall(SYS_gettid), socket, fd_getd(socket));
++	fprintf(fout, "%d close %d real fd %d type %d\n",
++		syscall(SYS_gettid), socket, fd_getd(socket), fd_gett(socket));
 +	fflush(fout);
  	fdi = idm_lookup(&idm, socket);
  	if (!fdi)
  		return real.close(socket);
-@@ -924,6 +960,8 @@ int dup2(int oldfd, int newfd)
+ 
+ 	if (fdi->dupfd != -1) {
++		fprintf(fout, "%d closing dupfd %d\n",
++			syscall(SYS_gettid), fdi->dupfd);
++		fflush(fout);
+ 		ret = close(fdi->dupfd);
+ 		if (ret)
+ 			return ret;
+ 	}
+ 
+ 	if (atomic_dec(&fdi->refcnt))
++	{
++		fprintf(fout, "%d close - still have ref %d\n",
++			syscall(SYS_gettid), atomic_get(&fdi->refcnt));
++		fflush(fout);
+ 		return 0;
++	}
+ 
+ 	idm_clear(&idm, socket);
+ 	real.close(socket);
+@@ -924,6 +970,8 @@ int dup2(int oldfd, int newfd)
  	int ret;
  
  	init_preload();
@@ -166,7 +188,7 @@ index 53f8543..458362d 100644
  	oldfdi = idm_lookup(&idm, oldfd);
  	if (oldfdi && oldfdi->type == fd_fork)
  		fork_passive(oldfd);
-@@ -961,6 +999,9 @@ int dup2(int oldfd, int newfd)
+@@ -961,6 +1009,9 @@ int dup2(int oldfd, int newfd)
  	atomic_init(&newfdi->refcnt);
  	atomic_set(&newfdi->refcnt, 1);
  	atomic_inc(&oldfdi->refcnt);
@@ -176,7 +198,7 @@ index 53f8543..458362d 100644
  	return newfd;
  }
  
-@@ -968,12 +1009,19 @@ int __fxstat64(int ver, int socket, struct stat64 *buf)
+@@ -968,12 +1019,19 @@ int __fxstat64(int ver, int socket, struct stat64 *buf)
  {
  	int fd, ret;
  
