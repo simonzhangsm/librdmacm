@@ -442,6 +442,8 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
 	enum fd_type type;
 
 	type = fd_get(socket, &fd);
+	fprintf(fout, "%d accept fd %d\n", syscall(SYS_gettid), socket);
+	fflush(fout);
 	if (type == fd_rsocket || type == fd_fork) {
 		index = fd_open();
 		if (index < 0)
@@ -454,6 +456,8 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
 			return ret;
 		}
 
+		fprintf(fout, "%d accept fd %d new fd\n", syscall(SYS_gettid), socket, index);
+		fflush(fout);
 		fd_store(index, ret, type);
 		return index;
 	} else {
