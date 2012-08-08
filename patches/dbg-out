@@ -1,5 +1,5 @@
 Bottom: 6bbb92f637582964eea7a287f91549c84da9571a
-Top:    0382bfbc76f972809dc6224e88bb2a5833ff6631
+Top:    b8e33c8cc997f75f8237040667ce4e1659e75b0d
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-07 21:30:48 -0700
 
@@ -8,7 +8,7 @@ support for debug prints
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index 53f8543..abe9471 100644
+index 53f8543..5ab023a 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -48,6 +48,8 @@
@@ -37,7 +37,15 @@ index 53f8543..abe9471 100644
  	getenv_options();
  	init = 1;
  out:
-@@ -391,6 +396,8 @@ int socket(int domain, int type, int protocol)
+@@ -383,6 +388,7 @@ int socket(int domain, int type, int protocol)
+ 	static __thread int recursive;
+ 	int index, ret;
+ 
++	fprintf(fout, "%d socket\n", (int)syscall(SYS_gettid));
+ 	if (recursive)
+ 		goto real;
+ 
+@@ -391,6 +397,8 @@ int socket(int domain, int type, int protocol)
  	if (index < 0)
  		return index;
  
@@ -46,7 +54,7 @@ index 53f8543..abe9471 100644
  	recursive = 1;
  	ret = rsocket(domain, type, protocol);
  	recursive = 0;
-@@ -405,6 +412,9 @@ int socket(int domain, int type, int protocol)
+@@ -405,6 +413,9 @@ int socket(int domain, int type, int protocol)
  			fd_store(index, ret, fd_rsocket);
  			set_rsocket_options(ret);
  		}
@@ -56,7 +64,7 @@ index 53f8543..abe9471 100644
  		return index;
  	}
  	fd_close(index, &ret);
-@@ -415,6 +425,8 @@ real:
+@@ -415,6 +426,8 @@ real:
  int bind(int socket, const struct sockaddr *addr, socklen_t addrlen)
  {
  	int fd;
@@ -65,7 +73,7 @@ index 53f8543..abe9471 100644
  	return (fd_get(socket, &fd) == fd_rsocket) ?
  		rbind(fd, addr, addrlen) : real.bind(fd, addr, addrlen);
  }
-@@ -422,6 +434,8 @@ int bind(int socket, const struct sockaddr *addr, socklen_t addrlen)
+@@ -422,6 +435,8 @@ int bind(int socket, const struct sockaddr *addr, socklen_t addrlen)
  int listen(int socket, int backlog)
  {
  	int fd;
@@ -74,7 +82,7 @@ index 53f8543..abe9471 100644
  	return (fd_get(socket, &fd) == fd_rsocket) ?
  		rlisten(fd, backlog) : real.listen(fd, backlog);
  }
-@@ -432,6 +446,8 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
+@@ -432,6 +447,8 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
  	enum fd_type type;
  
  	type = fd_get(socket, &fd);
@@ -83,7 +91,7 @@ index 53f8543..abe9471 100644
  	if (type == fd_rsocket || type == fd_fork) {
  		index = fd_open();
  		if (index < 0)
-@@ -444,6 +460,9 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
+@@ -444,6 +461,9 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
  			return ret;
  		}
  
@@ -93,7 +101,7 @@ index 53f8543..abe9471 100644
  		fd_store(index, ret, type);
  		return index;
  	} else {
-@@ -465,6 +484,8 @@ static int fork_active(int socket, const struct sockaddr *addr, socklen_t addrle
+@@ -465,6 +485,8 @@ static int fork_active(int socket, const struct sockaddr *addr, socklen_t addrle
  	long flags;
  
  	fd = fd_getd(socket);
@@ -102,7 +110,7 @@ index 53f8543..abe9471 100644
  	flags = real.fcntl(fd, F_GETFL);
  	real.fcntl(fd, F_SETFL, 0);
  	ret = real.connect(fd, addr, addrlen);
-@@ -495,6 +516,8 @@ static void fork_passive(int socket)
+@@ -495,6 +517,8 @@ static void fork_passive(int socket)
  	uint32_t msg;
  
  	fd_get(socket, &sfd);
@@ -111,7 +119,7 @@ index 53f8543..abe9471 100644
  
  	len = sizeof sin6;
  	ret = real.getsockname(sfd, (struct sockaddr *) &sin6, &len);
-@@ -527,11 +550,17 @@ static void fork_passive(int socket)
+@@ -527,11 +551,17 @@ static void fork_passive(int socket)
  	ret = rlisten(lfd, 1);
  	if (ret)
  		goto lclose;
@@ -129,7 +137,7 @@ index 53f8543..abe9471 100644
  
  	dfd = raccept(lfd, NULL, NULL);
  	if (dfd < 0) {
-@@ -547,6 +576,9 @@ static void fork_passive(int socket)
+@@ -547,6 +577,9 @@ static void fork_passive(int socket)
  	real.shutdown(sfd, SHUT_RDWR);
  	real.close(sfd);
  	fd_store(socket, dfd, fd_rsocket);
@@ -139,7 +147,7 @@ index 53f8543..abe9471 100644
  
  lclose:
  	rclose(lfd);
-@@ -579,6 +611,8 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
+@@ -579,6 +612,8 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
  {
  	int fd, ret;
  
@@ -148,7 +156,7 @@ index 53f8543..abe9471 100644
  	switch (fd_get(socket, &fd)) {
  	case fd_fork:
  		return fork_active(socket, addr, addrlen);
-@@ -820,18 +854,29 @@ int close(int socket)
+@@ -820,18 +855,29 @@ int close(int socket)
  	int ret;
  
  	init_preload();
@@ -178,7 +186,7 @@ index 53f8543..abe9471 100644
  
  	idm_clear(&idm, socket);
  	real.close(socket);
-@@ -924,6 +969,8 @@ int dup2(int oldfd, int newfd)
+@@ -924,6 +970,8 @@ int dup2(int oldfd, int newfd)
  	int ret;
  
  	init_preload();
@@ -187,7 +195,7 @@ index 53f8543..abe9471 100644
  	oldfdi = idm_lookup(&idm, oldfd);
  	if (oldfdi && oldfdi->type == fd_fork)
  		fork_passive(oldfd);
-@@ -961,6 +1008,9 @@ int dup2(int oldfd, int newfd)
+@@ -961,6 +1009,9 @@ int dup2(int oldfd, int newfd)
  	atomic_init(&newfdi->refcnt);
  	atomic_set(&newfdi->refcnt, 1);
  	atomic_inc(&oldfdi->refcnt);
@@ -197,7 +205,7 @@ index 53f8543..abe9471 100644
  	return newfd;
  }
  
-@@ -968,12 +1018,19 @@ int __fxstat64(int ver, int socket, struct stat64 *buf)
+@@ -968,12 +1019,19 @@ int __fxstat64(int ver, int socket, struct stat64 *buf)
  {
  	int fd, ret;
  
