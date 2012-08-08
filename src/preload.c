@@ -456,7 +456,7 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
 			return ret;
 		}
 
-		fprintf(fout, "%d accept fd %d new fd\n", syscall(SYS_gettid), socket, index);
+		fprintf(fout, "%d accept fd %d new fd %d\n", syscall(SYS_gettid), socket, index);
 		fflush(fout);
 		fd_store(index, ret, type);
 		return index;
