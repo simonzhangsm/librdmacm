@@ -1,5 +1,5 @@
 Bottom: 6bbb92f637582964eea7a287f91549c84da9571a
-Top:    ed2f9afb0d122614fb6b76d78e385a49be99b24f
+Top:    fa1eec5fa4fe4b1b52f28c77f055b6791b5b8ab6
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-07 21:30:48 -0700
 
@@ -8,7 +8,7 @@ support for debug prints
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index 53f8543..939325a 100644
+index 53f8543..27e244e 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -48,6 +48,8 @@
@@ -41,7 +41,7 @@ index 53f8543..939325a 100644
  	if (index < 0)
  		return index;
  
-+	fprintf(fout, "%d socket %d\n", syscall(SYS_gettid), index);
++	fprintf(fout, "%d socket %d\n", (int)syscall(SYS_gettid), index);
 +	fflush(fout);
  	recursive = 1;
  	ret = rsocket(domain, type, protocol);
@@ -51,7 +51,7 @@ index 53f8543..939325a 100644
  			set_rsocket_options(ret);
  		}
 +		fprintf(fout, "%d socket %d real fd %d type %d\n",
-+				syscall(SYS_gettid), index, ret, fd_gett(index));
++				(int)syscall(SYS_gettid), index, ret, fd_gett(index));
 +		fflush(fout);
  		return index;
  	}
@@ -60,7 +60,7 @@ index 53f8543..939325a 100644
  int bind(int socket, const struct sockaddr *addr, socklen_t addrlen)
  {
  	int fd;
-+	fprintf(fout, "%d bind %d\n", syscall(SYS_gettid), socket);
++	fprintf(fout, "%d bind %d\n", (int)syscall(SYS_gettid), socket);
 +	fflush(fout);
  	return (fd_get(socket, &fd) == fd_rsocket) ?
  		rbind(fd, addr, addrlen) : real.bind(fd, addr, addrlen);
@@ -69,7 +69,7 @@ index 53f8543..939325a 100644
  int listen(int socket, int backlog)
  {
  	int fd;
-+	fprintf(fout, "%d listen %d\n", syscall(SYS_gettid), socket);
++	fprintf(fout, "%d listen %d\n", (int)syscall(SYS_gettid), socket);
 +	fflush(fout);
  	return (fd_get(socket, &fd) == fd_rsocket) ?
  		rlisten(fd, backlog) : real.listen(fd, backlog);
@@ -78,7 +78,7 @@ index 53f8543..939325a 100644
  	enum fd_type type;
  
  	type = fd_get(socket, &fd);
-+	fprintf(fout, "%d accept %d\n", syscall(SYS_gettid), socket);
++	fprintf(fout, "%d accept %d\n", (int)syscall(SYS_gettid), socket);
 +	fflush(fout);
  	if (type == fd_rsocket || type == fd_fork) {
  		index = fd_open();
@@ -88,7 +88,7 @@ index 53f8543..939325a 100644
  		}
  
 +		fprintf(fout, "%d accept %d new fd %d new real fd %d\n",
-+			syscall(SYS_gettid), socket, index, ret);
++			(int)syscall(SYS_gettid), socket, index, ret);
 +		fflush(fout);
  		fd_store(index, ret, type);
  		return index;
@@ -97,7 +97,7 @@ index 53f8543..939325a 100644
  	long flags;
  
  	fd = fd_getd(socket);
-+	fprintf(fout, "%d fork_active - %d fd %d\n", syscall(SYS_gettid), socket, fd);
++	fprintf(fout, "%d fork_active - %d fd %d\n", (int)syscall(SYS_gettid), socket, fd);
 +	fflush(fout);
  	flags = real.fcntl(fd, F_GETFL);
  	real.fcntl(fd, F_SETFL, 0);
@@ -106,7 +106,7 @@ index 53f8543..939325a 100644
  	uint32_t msg;
  
  	fd_get(socket, &sfd);
-+	fprintf(fout, "%d fork_passive %d real fd %d\n", syscall(SYS_gettid), socket, sfd);
++	fprintf(fout, "%d fork_passive %d real fd %d\n", (int)syscall(SYS_gettid), socket, sfd);
 +	fflush(fout);
  
  	len = sizeof sin6;
@@ -115,14 +115,14 @@ index 53f8543..939325a 100644
  	ret = rlisten(lfd, 1);
  	if (ret)
  		goto lclose;
-+	fprintf(fout, "%d fork_passive %d, listening for fork\n", syscall(SYS_gettid), socket);
++	fprintf(fout, "%d fork_passive %d, listening for fork\n", (int)syscall(SYS_gettid), socket);
 +	fflush(fout);
  
  	msg = 0;
  	len = real.write(sfd, &msg, sizeof msg);
  	if (len != sizeof msg)
 +	{
-+		fprintf(fout, "%d fork_passive - %d write failed\n", syscall(SYS_gettid), socket);
++		fprintf(fout, "%d fork_passive - %d write failed\n", (int)syscall(SYS_gettid), socket);
 +		fflush(fout);
  		goto lclose;
 +	}
@@ -134,7 +134,7 @@ index 53f8543..939325a 100644
  	real.close(sfd);
  	fd_store(socket, dfd, fd_rsocket);
 +	fprintf(fout, "%d fork_passive success %d new fd %d old fd %d\n",
-+		syscall(SYS_gettid), socket, dfd, sfd);
++		(int)syscall(SYS_gettid), socket, dfd, sfd);
 +	fflush(fout);
  
  lclose:
@@ -144,7 +144,7 @@ index 53f8543..939325a 100644
  	int fd;
  	init_preload();
 +	fprintf(fout, "%d read %d real fd %d type %d\n",
-+		syscall(SYS_gettid), socket, fd_getd(socket), fd_gett(socket));
++		(int)syscall(SYS_gettid), socket, fd_getd(socket), fd_gett(socket));
 +	fflush(fout);
  	return (fd_fork_get(socket, &fd) == fd_rsocket) ?
  		rread(fd, buf, count) : real.read(fd, buf, count);
@@ -154,7 +154,7 @@ index 53f8543..939325a 100644
  
  	init_preload();
 +	fprintf(fout, "%d close %d real fd %d type %d\n",
-+		syscall(SYS_gettid), socket, fd_getd(socket), fd_gett(socket));
++		(int)syscall(SYS_gettid), socket, fd_getd(socket), fd_gett(socket));
 +	fflush(fout);
  	fdi = idm_lookup(&idm, socket);
  	if (!fdi)
@@ -162,7 +162,7 @@ index 53f8543..939325a 100644
  
  	if (fdi->dupfd != -1) {
 +		fprintf(fout, "%d closing dupfd %d\n",
-+			syscall(SYS_gettid), fdi->dupfd);
++			(int)syscall(SYS_gettid), fdi->dupfd);
 +		fflush(fout);
  		ret = close(fdi->dupfd);
  		if (ret)
@@ -172,7 +172,7 @@ index 53f8543..939325a 100644
  	if (atomic_dec(&fdi->refcnt))
 +	{
 +		fprintf(fout, "%d close - still have ref %d\n",
-+			syscall(SYS_gettid), atomic_get(&fdi->refcnt));
++			(int)syscall(SYS_gettid), atomic_get(&fdi->refcnt));
 +		fflush(fout);
  		return 0;
 +	}
@@ -183,7 +183,7 @@ index 53f8543..939325a 100644
  	int ret;
  
  	init_preload();
-+	fprintf(fout, "%d dup2 %d -> %d\n", syscall(SYS_gettid), oldfd, newfd);
++	fprintf(fout, "%d dup2 %d -> %d\n", (int)syscall(SYS_gettid), oldfd, newfd);
 +	fflush(fout);
  	oldfdi = idm_lookup(&idm, oldfd);
  	if (oldfdi && oldfdi->type == fd_fork)
@@ -193,7 +193,7 @@ index 53f8543..939325a 100644
  	atomic_set(&newfdi->refcnt, 1);
  	atomic_inc(&oldfdi->refcnt);
 +	fprintf(fout, "%d dup2 %d -> %d, real fd %d type %d\n",
-+		syscall(SYS_gettid), oldfd, newfd, newfdi->fd, newfdi->type);
++		(int)syscall(SYS_gettid), oldfd, newfd, newfdi->fd, newfdi->type);
 +	fflush(fout);
  	return newfd;
  }
@@ -204,16 +204,16 @@ index 53f8543..939325a 100644
  
 +	init_preload();
 +	fprintf(fout, "%d fxstat64 socket %d - fd %d type %d\n",
-+			syscall(SYS_gettid), socket, fd_getd(socket), fd_gett(socket));
++			(int)syscall(SYS_gettid), socket, fd_getd(socket), fd_gett(socket));
 +	fflush(fout);
  	if (fd_get(socket, &fd) == fd_rsocket) {
  		ret = real.fxstat64(ver, socket, buf);
-+		fprintf(fout, "%d fxstat64 - rsocket %d\n", syscall(SYS_gettid), ret);
++		fprintf(fout, "%d fxstat64 - rsocket %d\n", (int)syscall(SYS_gettid), ret);
  		if (!ret)
  			buf->st_mode = (buf->st_mode & ~S_IFMT) | __S_IFSOCK;
  	} else {
  		ret = real.fxstat64(ver, fd, buf);
-+		fprintf(fout, "%d fxstat64 - normal %d\n", syscall(SYS_gettid), ret);
++		fprintf(fout, "%d fxstat64 - normal %d\n", (int)syscall(SYS_gettid), ret);
  	}
 +	fflush(fout);
  	return ret;
