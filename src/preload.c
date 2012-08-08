@@ -388,6 +388,7 @@ int socket(int domain, int type, int protocol)
 	static __thread int recursive;
 	int index, ret;
 
+	fprintf(fout, "%d socket\n", (int)syscall(SYS_gettid));
 	if (recursive)
 		goto real;
 
