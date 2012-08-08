@@ -1,5 +1,5 @@
 Bottom: 6bbb92f637582964eea7a287f91549c84da9571a
-Top:    fa1eec5fa4fe4b1b52f28c77f055b6791b5b8ab6
+Top:    0449301a511d37b585d312ac34d727ba2987e824
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-07 21:30:48 -0700
 
@@ -8,7 +8,7 @@ support for debug prints
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index 53f8543..27e244e 100644
+index 53f8543..2165147 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -48,6 +48,8 @@
@@ -139,7 +139,16 @@ index 53f8543..27e244e 100644
  
  lclose:
  	rclose(lfd);
-@@ -628,6 +660,9 @@ ssize_t read(int socket, void *buf, size_t count)
+@@ -579,6 +611,8 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
+ {
+ 	int fd, ret;
+ 
++	fprintf(fout, "%d connect %d\n", (int)syscall(SYS_gettid), socket);
++	fflush(fout);
+ 	switch (fd_get(socket, &fd)) {
+ 	case fd_fork:
+ 		return fork_active(socket, addr, addrlen);
+@@ -628,6 +662,9 @@ ssize_t read(int socket, void *buf, size_t count)
  {
  	int fd;
  	init_preload();
@@ -149,7 +158,7 @@ index 53f8543..27e244e 100644
  	return (fd_fork_get(socket, &fd) == fd_rsocket) ?
  		rread(fd, buf, count) : real.read(fd, buf, count);
  }
-@@ -820,18 +855,29 @@ int close(int socket)
+@@ -820,18 +857,29 @@ int close(int socket)
  	int ret;
  
  	init_preload();
@@ -179,7 +188,7 @@ index 53f8543..27e244e 100644
  
  	idm_clear(&idm, socket);
  	real.close(socket);
-@@ -924,6 +970,8 @@ int dup2(int oldfd, int newfd)
+@@ -924,6 +972,8 @@ int dup2(int oldfd, int newfd)
  	int ret;
  
  	init_preload();
@@ -188,7 +197,7 @@ index 53f8543..27e244e 100644
  	oldfdi = idm_lookup(&idm, oldfd);
  	if (oldfdi && oldfdi->type == fd_fork)
  		fork_passive(oldfd);
-@@ -961,6 +1009,9 @@ int dup2(int oldfd, int newfd)
+@@ -961,6 +1011,9 @@ int dup2(int oldfd, int newfd)
  	atomic_init(&newfdi->refcnt);
  	atomic_set(&newfdi->refcnt, 1);
  	atomic_inc(&oldfdi->refcnt);
@@ -198,7 +207,7 @@ index 53f8543..27e244e 100644
  	return newfd;
  }
  
-@@ -968,12 +1019,19 @@ int __fxstat64(int ver, int socket, struct stat64 *buf)
+@@ -968,12 +1021,19 @@ int __fxstat64(int ver, int socket, struct stat64 *buf)
  {
  	int fd, ret;
  
