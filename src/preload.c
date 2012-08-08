@@ -660,7 +660,8 @@ ssize_t read(int socket, void *buf, size_t count)
 {
 	int fd;
 	init_preload();
-	fprintf(fout, "%d read %d read fd %d\n", syscall(SYS_gettid), socket, fd_getd(socket));
+	fprintf(fout, "%d read %d real fd %d type %d\n",
+		syscall(SYS_gettid), socket, fd_getd(socket), fd_gett(socket));
 	fflush(fout);
 	return (fd_fork_get(socket, &fd) == fd_rsocket) ?
 		rread(fd, buf, count) : real.read(fd, buf, count);
@@ -854,20 +855,29 @@ int close(int socket)
 	int ret;
 
 	init_preload();
-	fprintf(fout, "%d close %d real fd %d\n", syscall(SYS_gettid), socket, fd_getd(socket));
+	fprintf(fout, "%d close %d real fd %d type %d\n",
+		syscall(SYS_gettid), socket, fd_getd(socket), fd_gett(socket));
 	fflush(fout);
 	fdi = idm_lookup(&idm, socket);
 	if (!fdi)
 		return real.close(socket);
 
 	if (fdi->dupfd != -1) {
+		fprintf(fout, "%d closing dupfd %d\n",
+			syscall(SYS_gettid), fdi->dupfd);
+		fflush(fout);
 		ret = close(fdi->dupfd);
 		if (ret)
 			return ret;
 	}
 
 	if (atomic_dec(&fdi->refcnt))
+	{
+		fprintf(fout, "%d close - still have ref %d\n",
+			syscall(SYS_gettid), atomic_get(&fdi->refcnt));
+		fflush(fout);
 		return 0;
+	}
 
 	idm_clear(&idm, socket);
 	real.close(socket);
