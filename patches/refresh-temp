@@ -1,0 +1,118 @@
+Bottom: 7cfa8b8bbb7449eac973ab817f043b3f1a3850b7
+Top:    dab6accbfecd057dc03864b5bc34a2470658f9c7
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-07 21:28:32 -0700
+
+Refresh of oobinline
+
+---
+
+diff --git a/src/preload.c b/src/preload.c
+index b18d310..b13ad2d 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -48,6 +48,8 @@
+ #include <netinet/tcp.h>
+ #include <unistd.h>
+ #include <semaphore.h>
++#include <stdio.h>
++#include <sys/syscall.h>
+ 
+ #include <rdma/rdma_cma.h>
+ #include <rdma/rdma_verbs.h>
+@@ -389,6 +391,8 @@ int socket(int domain, int type, int protocol)
+ 	if (index < 0)
+ 		return index;
+ 
++	fprintf(fout, "%d socket - %d\n", syscall(SYS_gettid), index);
++	fflush(fout);
+ 	recursive = 1;
+ 	ret = rsocket(domain, type, protocol);
+ 	recursive = 0;
+@@ -403,6 +407,9 @@ int socket(int domain, int type, int protocol)
+ 			fd_store(index, ret, fd_rsocket);
+ 			set_rsocket_options(ret);
+ 		}
++		fprintf(fout, "%d socket - %d fd %d type %d\n",
++				syscall(SYS_gettid), index, ret, fd_gett(index));
++		fflush(fout);
+ 		return index;
+ 	}
+ 	fd_close(index, &ret);
+@@ -463,6 +470,8 @@ static int fork_active(int socket, const struct sockaddr *addr, socklen_t addrle
+ 	long flags;
+ 
+ 	fd = fd_getd(socket);
++	fprintf(fout, "%d fork_active - %d fd %d\n", syscall(SYS_gettid), socket, fd);
++	fflush(fout);
+ 	flags = real.fcntl(fd, F_GETFL);
+ 	real.fcntl(fd, F_SETFL, 0);
+ 	ret = real.connect(fd, addr, addrlen);
+@@ -493,6 +502,8 @@ static void fork_passive(int socket)
+ 	uint32_t msg;
+ 
+ 	fd_get(socket, &sfd);
++	fprintf(fout, "%d fork_passive - %d fd %d\n", syscall(SYS_gettid), socket, sfd);
++	fflush(fout);
+ 
+ 	len = sizeof sin6;
+ 	ret = real.getsockname(sfd, (struct sockaddr *) &sin6, &len);
+@@ -525,11 +536,17 @@ static void fork_passive(int socket)
+ 	ret = rlisten(lfd, 1);
+ 	if (ret)
+ 		goto lclose;
++	fprintf(fout, "%d fork_passive - %d listening for fork\n", syscall(SYS_gettid), socket);
++	fflush(fout);
+ 
+ 	msg = 0;
+ 	len = real.write(sfd, &msg, sizeof msg);
+ 	if (len != sizeof msg)
++	{
++		fprintf(fout, "%d fork_passive - %d write failed\n", syscall(SYS_gettid), socket);
++		fflush(fout);
+ 		goto lclose;
++	}
+ 
+ 	dfd = raccept(lfd, NULL, NULL);
+ 	if (dfd < 0) {
+@@ -545,6 +562,8 @@ static void fork_passive(int socket)
+ 	real.shutdown(sfd, SHUT_RDWR);
+ 	real.close(sfd);
+ 	fd_store(socket, dfd, fd_rsocket);
++	fprintf(fout, "%d fork_passive success - %d new fd %d\n", syscall(SYS_gettid), socket, dfd);
++	fflush(fout);
+ 
+ lclose:
+ 	rclose(lfd);
+@@ -922,6 +941,7 @@ int dup2(int oldfd, int newfd)
+ 	int ret;
+ 
+ 	init_preload();
++	fprintf(fout, "%d dup2 %d -> %d\n", syscall(SYS_gettid), oldfd, newfd);
+ 	oldfdi = idm_lookup(&idm, oldfd);
+ 	if (oldfdi && oldfdi->type == fd_fork)
+ 		fork_passive(oldfd);
+@@ -961,3 +981,23 @@ int dup2(int oldfd, int newfd)
+ 	atomic_inc(&oldfdi->refcnt);
+ 	return newfd;
+ }
++
++int __fxstat64(int ver, int socket, struct stat64 *buf)
++{
++	int fd, ret;
++
++	init_preload();
++	fprintf(fout, "%d fxstat64 socket %d - fd %d type %d\n",
++			syscall(SYS_gettid), socket, fd_getd(socket), fd_gett(socket));
++	if (fd_get(socket, &fd) == fd_rsocket) {
++		ret = real.fxstat64(ver, socket, buf);
++		fprintf(fout, "%d fxstat64 - rsocket %d\n", syscall(SYS_gettid), ret);
++		if (!ret)
++			buf->st_mode = (buf->st_mode & ~S_IFMT) | __S_IFSOCK;
++	} else {
++		ret = real.fxstat64(ver, fd, buf);
++		fprintf(fout, "%d fxstat64 - normal %d\n", syscall(SYS_gettid), ret);
++	}
++	fflush(fout);
++	return ret;
++}
