@@ -1,0 +1,32 @@
+Bottom: 7cfa8b8bbb7449eac973ab817f043b3f1a3850b7
+Top:    3ea2748a5c41b11a2e7033c56bddd938d2770b6c
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-07 21:33:24 -0700
+
+Refresh of oobinline
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index b9105a1..996cb2f 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -1820,6 +1820,10 @@ int rsetsockopt(int socket, int level, int optname,
+ 			opt_on = *(int *) optval;
+ 			ret = 0;
+ 			break;
++		case SO_OOBINLINE:
++			opt_on = *(int *) optval;
++			ret = 0;
++			break;
+ 		default:
+ 			break;
+ 		}
+@@ -1898,6 +1902,7 @@ int rgetsockopt(int socket, int level, int optname,
+ 		switch (optname) {
+ 		case SO_REUSEADDR:
+ 		case SO_KEEPALIVE:
++		case SO_OOBINLINE:
+ 			*((int *) optval) = !!(rs->so_opts & (1 << optname));
+ 			*optlen = sizeof(int);
+ 			break;
