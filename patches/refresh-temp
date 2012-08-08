@@ -1,0 +1,20 @@
+Bottom: 0382bfbc76f972809dc6224e88bb2a5833ff6631
+Top:    b8e33c8cc997f75f8237040667ce4e1659e75b0d
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-08 16:40:18 -0700
+
+Refresh of dbg-out
+
+---
+
+diff --git a/src/preload.c b/src/preload.c
+index abe9471..5ab023a 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -388,6 +388,7 @@ int socket(int domain, int type, int protocol)
+ 	static __thread int recursive;
+ 	int index, ret;
+ 
++	fprintf(fout, "%d socket\n", (int)syscall(SYS_gettid));
+ 	if (recursive)
+ 		goto real;
