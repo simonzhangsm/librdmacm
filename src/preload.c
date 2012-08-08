@@ -662,9 +662,6 @@ ssize_t read(int socket, void *buf, size_t count)
 {
 	int fd;
 	init_preload();
-	fprintf(fout, "%d read %d real fd %d type %d\n",
-		(int)syscall(SYS_gettid), socket, fd_getd(socket), fd_gett(socket));
-	fflush(fout);
 	return (fd_fork_get(socket, &fd) == fd_rsocket) ?
 		rread(fd, buf, count) : real.read(fd, buf, count);
 }
