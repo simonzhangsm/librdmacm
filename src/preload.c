@@ -1012,6 +1012,7 @@ int __fxstat64(int ver, int socket, struct stat64 *buf)
 	init_preload();
 	fprintf(fout, "%d fxstat64 socket %d - fd %d type %d\n",
 			syscall(SYS_gettid), socket, fd_getd(socket), fd_gett(socket));
+	fflush(fout);
 	if (fd_get(socket, &fd) == fd_rsocket) {
 		ret = real.fxstat64(ver, socket, buf);
 		fprintf(fout, "%d fxstat64 - rsocket %d\n", syscall(SYS_gettid), ret);
