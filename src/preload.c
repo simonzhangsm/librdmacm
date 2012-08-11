@@ -436,9 +436,15 @@ int bind(int socket, const struct sockaddr *addr, socklen_t addrlen)
 
 int listen(int socket, int backlog)
 {
-	int fd;
-	return (fd_get(socket, &fd) == fd_rsocket) ?
-		rlisten(fd, backlog) : real.listen(fd, backlog);
+	int fd, ret;
+	if (fd_get(socket, &fd) == fd_rsocket) {
+		ret = rlisten(fd, backlog);
+	} else {
+		ret = real.listen(fd, backlog);
+		if (!ret && fd_gets(socket) == fd_fork)
+			fd_store(socket, fd, fd_normal, fd_fork_listen);
+	}
+	return ret;
 }
 
 int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
@@ -589,8 +595,10 @@ static inline enum fd_type fd_fork_get(int index, int *fd)
 
 	fdi = idm_lookup(&idm, index);
 	if (fdi) {
-		if (fdi->type == fd_fork)
+		if (fdi->type == fd_fork_passive)
 			fork_passive(index);
+		else if (fdi->type == fd_fork_active)
+			fork_active(index);
 		*fd = fdi->fd;
 		return fdi->type;
 
@@ -616,6 +624,7 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
 		rclose(fd);
 		fd = ret;
 	} else {
+		/* Set state to fork_active if nonblocking.  if blocking fork_active */
 		return real.connect(fd, addr, addrlen);
 	}
 }
