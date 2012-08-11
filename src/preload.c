@@ -486,8 +486,7 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
  * We can't fork RDMA connections and pass them from the parent to the child
  * process.  Instead, we need to establish the RDMA connection after calling
  * fork.  To do this, we delay establishing the RDMA connection until we try
- * to send/receive on the server side.  On the client side, we don't expect
- * to fork, so we switch from a TCP connection to an rsocket when connecting.
+ * to send/receive on the server side.
  */
 static int fork_active(int socket, const struct sockaddr *addr, socklen_t addrlen)
 {
@@ -498,9 +497,12 @@ static int fork_active(int socket, const struct sockaddr *addr, socklen_t addrle
 	fd = fd_getd(socket);
 	flags = real.fcntl(fd, F_GETFL);
 	real.fcntl(fd, F_SETFL, 0);
-	ret = real.connect(fd, addr, addrlen);
-	if (ret)
-		return ret;
+
+	if (!(flags & O_NONBLOCK)) {
+		ret = real.connect(fd, addr, addrlen);
+		if (ret)
+			return ret;
+	}
 
 	ret = real.recv(fd, &msg, sizeof msg, MSG_PEEK);
 	if ((ret != sizeof msg) || msg) {
@@ -598,7 +600,7 @@ static inline enum fd_type fd_fork_get(int index, int *fd)
 		if (fdi->type == fd_fork_passive)
 			fork_passive(index);
 		else if (fdi->type == fd_fork_active)
-			fork_active(index);
+			fork_active(index); /* NEED addr, addrlen */
 		*fd = fdi->fd;
 		return fdi->type;
 
@@ -611,6 +613,7 @@ static inline enum fd_type fd_fork_get(int index, int *fd)
 int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
 {
 	int fd, ret;
+	long flags;
 
 	if (fd_get(socket, &fd) == fd_rsocket) {
 		ret = rconnect(fd, addr, addrlen);
@@ -623,10 +626,15 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
 
 		rclose(fd);
 		fd = ret;
-	} else {
-		/* Set state to fork_active if nonblocking.  if blocking fork_active */
-		return real.connect(fd, addr, addrlen);
+	} else if (fd_gets(socket) == fd_fork) {
+		flags = real.fcntl(fd, F_GETFL);
+		if (!(flags & O_NONBLOCK))
+			return fork_active(socket, addr, addrlen);
+
+		fd_store(socket, fd, fd_normal, fd_fork_active);
 	}
+
+	return real.connect(fd, addr, addrlen);
 }
 
 ssize_t recv(int socket, void *buf, size_t len, int flags)
