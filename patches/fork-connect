@@ -1,0 +1,30 @@
+Bottom: 3ea2748a5c41b11a2e7033c56bddd938d2770b6c
+Top:    3ea2748a5c41b11a2e7033c56bddd938d2770b6c
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-10 21:44:39 -0700
+
+rspreload: Do not block connect when supporting fork
+
+Many FTP servers require fork support.  However, FTP clients,
+such as ncftp, will perform the following call sequence:
+
+send PASV request to server over connection 1
+         server will listen for connection 2
+issue nonblocking connect to server
+send ACCEPT request to server over connection 1
+         server will accept connection 2
+
+The current fork support converts all nonblocking connect
+calls to blocking.  The result is that the FTP client ends up
+blocked waiting for the server to accept the connection,
+which it will never do.
+
+Fix this by deferring the fork connection handling until the
+first socket call after connect.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
