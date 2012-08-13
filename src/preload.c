@@ -514,7 +514,7 @@ static void fork_active(int socket)
 	if ((ret != sizeof msg) || msg)
 		goto err2;
 
-	ret = rconnect(ret, &addr, len);
+	ret = rconnect(ret, (struct sockaddr *) &addr, len);
 	if (ret)
 		goto err2;
 
