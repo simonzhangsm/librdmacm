@@ -184,7 +184,7 @@ static inline int fd_getd(int index)
 	return fdi ? fdi->fd : index;
 }
 
-static inline enum fd_state fd_gets(int index)
+static inline enum fd_fork_state fd_gets(int index)
 {
 	struct fd_info *fdi;
 
@@ -514,7 +514,7 @@ static void fork_active(int socket)
 	if ((ret != sizeof msg) || msg)
 		goto err2;
 
-	ret = rconnect(ret, &sin6, len);
+	ret = rconnect(ret, &addr, len);
 	if (ret)
 		goto err2;
 
@@ -574,7 +574,7 @@ static void fork_passive(int socket)
 		goto lclose;
 
 	msg = 0;
-	len = real.send(sfd, &msg, sizeof msg, MSG_NODELAY);
+	len = real.write(sfd, &msg, sizeof msgs);
 	if (len != sizeof msg)
 		goto lclose;
 
