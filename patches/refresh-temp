@@ -1,0 +1,21 @@
+Bottom: 3513087cec3ea33b2826cc40e6f7fcdcafbab00c
+Top:    869244971263f9cd4426b0428f1505bf77030a32
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-13 14:48:42 -0700
+
+Refresh of fork-connect
+
+---
+
+diff --git a/src/preload.c b/src/preload.c
+index 76c473b..9182b6a 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -514,7 +514,7 @@ static void fork_active(int socket)
+ 	if ((ret != sizeof msg) || msg)
+ 		goto err2;
+ 
+-	ret = rconnect(ret, &addr, len);
++	ret = rconnect(ret, (struct sockaddr *) &addr, len);
+ 	if (ret)
+ 		goto err2;
