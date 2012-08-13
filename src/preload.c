@@ -574,7 +574,7 @@ static void fork_passive(int socket)
 		goto lclose;
 
 	msg = 0;
-	len = real.write(sfd, &msg, sizeof msgs);
+	len = real.write(sfd, &msg, sizeof msg);
 	if (len != sizeof msg)
 		goto lclose;
 
@@ -622,7 +622,6 @@ static inline enum fd_type fd_fork_get(int index, int *fd)
 int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
 {
 	int fd, ret;
-	long flags;
 
 	if (fd_get(socket, &fd) == fd_rsocket) {
 		ret = rconnect(fd, addr, addrlen);
