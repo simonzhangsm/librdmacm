@@ -609,7 +609,7 @@ static inline enum fd_type fd_fork_get(int index, int *fd)
 		if (fdi->type == fd_fork_passive)
 			fork_passive(index);
 		else if (fdi->type == fd_fork_active)
-			fork_active(index, NULL, 0);
+			fork_active(index);
 		*fd = fdi->fd;
 		return fdi->type;
 
@@ -636,10 +636,6 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
 		rclose(fd);
 		fd = ret;
 	} else if (fd_gets(socket) == fd_fork) {
-//		flags = real.fcntl(fd, F_GETFL);
-//		if (!(flags & O_NONBLOCK))
-//			return fork_active(socket, addr, addrlen);
-//
 		fd_store(socket, fd, fd_normal, fd_fork_active);
 	}
 
