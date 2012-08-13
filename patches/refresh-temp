@@ -1,0 +1,30 @@
+Bottom: 8e79723d04b7d3effe0d91fe456426c68892b6bb
+Top:    da811bd45f316fb30abd2a28fca7900d8b0f8de6
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-13 11:09:26 -0700
+
+Refresh of fork-connect
+
+---
+
+diff --git a/src/preload.c b/src/preload.c
+index 9bc6c13..b4c319f 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -498,7 +498,7 @@ static int fork_active(int socket, const struct sockaddr *addr, socklen_t addrle
+ 	flags = real.fcntl(fd, F_GETFL);
+ 	real.fcntl(fd, F_SETFL, 0);
+ 
+-	if (!(flags & O_NONBLOCK)) {
++	if (!(flags & O_NONBLOCK) && addr && addrlen) {
+ 		ret = real.connect(fd, addr, addrlen);
+ 		if (ret)
+ 			return ret;
+@@ -600,7 +600,7 @@ static inline enum fd_type fd_fork_get(int index, int *fd)
+ 		if (fdi->type == fd_fork_passive)
+ 			fork_passive(index);
+ 		else if (fdi->type == fd_fork_active)
+-			fork_active(index); /* NEED addr, addrlen */
++			fork_active(index, NULL, 0);
+ 		*fd = fdi->fd;
+ 		return fdi->type;
