@@ -1,5 +1,5 @@
 Bottom: 3ea2748a5c41b11a2e7033c56bddd938d2770b6c
-Top:    b325ccfd975dd153285cfe5ba9f66efd16427780
+Top:    3513087cec3ea33b2826cc40e6f7fcdcafbab00c
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-10 21:44:39 -0700
 
@@ -28,7 +28,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index b18d310..2b115d3 100644
+index b18d310..76c473b 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -99,12 +99,20 @@ static int fork_support;
@@ -132,32 +132,32 @@ index b18d310..2b115d3 100644
 -	type = fd_get(socket, &fd);
 -	if (type == fd_rsocket || type == fd_fork) {
 +	if (fd_get(socket, &fd) == fd_rsocket) {
-+		index = fd_open();
-+		if (index < 0)
-+			return index;
-+
-+		ret = raccept(fd, addr, addrlen);
-+		if (ret < 0) {
-+			fd_close(index, &fd);
-+			return ret;
-+		}
-+
-+		fd_store(index, ret, fd_rsocket, fd_ready);
-+		return index;
-+	} else if (fd_gets(socket) == fd_fork_listen) {
  		index = fd_open();
  		if (index < 0)
  			return index;
  
 -		ret = (type == fd_rsocket) ? raccept(fd, addr, addrlen) :
 -					     real.accept(fd, addr, addrlen);
-+		ret = real.accept(fd, addr, addrlen);
++		ret = raccept(fd, addr, addrlen);
  		if (ret < 0) {
  			fd_close(index, &fd);
  			return ret;
  		}
  
 -		fd_store(index, ret, type);
++		fd_store(index, ret, fd_rsocket, fd_ready);
++		return index;
++	} else if (fd_gets(socket) == fd_fork_listen) {
++		index = fd_open();
++		if (index < 0)
++			return index;
++
++		ret = real.accept(fd, addr, addrlen);
++		if (ret < 0) {
++			fd_close(index, &fd);
++			return ret;
++		}
++
 +		fd_store(index, ret, fd_normal, fd_fork_passive);
  		return index;
  	} else {
@@ -211,13 +211,13 @@ index b18d310..2b115d3 100644
 +	real.fcntl(sfd, F_SETFL, flags);
 +	if ((ret != sizeof msg) || msg)
 +		goto err2;
- 
--	real.close(fd);
--	return rconnect(ret, addr, addrlen);
++
 +	ret = rconnect(ret, &addr, len);
 +	if (ret)
 +		goto err2;
-+
+ 
+-	real.close(fd);
+-	return rconnect(ret, addr, addrlen);
 +	set_rsocket_options(dfd);
 +	copysockopts(dfd, sfd, &rs, &real);
 +	real.shutdown(sfd, SHUT_RDWR);
@@ -249,15 +249,6 @@ index b18d310..2b115d3 100644
 +		ret = lfd;
  		goto sclose;
  	}
- 
-@@ -527,7 +574,7 @@ static void fork_passive(int socket)
- 		goto lclose;
- 
- 	msg = 0;
--	len = real.write(sfd, &msg, sizeof msg);
-+	len = real.write(sfd, &msg, sizeof msgs);
- 	if (len != sizeof msg)
- 		goto lclose;
  
 @@ -537,14 +584,11 @@ static void fork_passive(int socket)
  		goto lclose;
@@ -296,11 +287,9 @@ index b18d310..2b115d3 100644
  		*fd = fdi->fd;
  		return fdi->type;
  
-@@ -576,11 +622,9 @@ static inline enum fd_type fd_fork_get(int index, int *fd)
- int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
+@@ -577,10 +623,7 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
  {
  	int fd, ret;
-+	long flags;
  
 -	switch (fd_get(socket, &fd)) {
 -	case fd_fork:
@@ -310,7 +299,7 @@ index b18d310..2b115d3 100644
  		ret = rconnect(fd, addr, addrlen);
  		if (!ret || errno == EINPROGRESS)
  			return ret;
-@@ -591,9 +635,8 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
+@@ -591,9 +634,8 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
  
  		rclose(fd);
  		fd = ret;
