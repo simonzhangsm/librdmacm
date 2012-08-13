@@ -19,8 +19,9 @@ calls to blocking.  The result is that the FTP client ends up
 blocked waiting for the server to accept the connection,
 which it will never do.
 
-Fix this by deferring the fork connection handling until the
-first socket call after connect.
+To handle this case, we have the active side follow the same
+rule as the server side and defer establishing the rsocket
+connection until the user calls the first data transfer routine.
 
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
