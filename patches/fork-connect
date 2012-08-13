@@ -1,5 +1,5 @@
 Bottom: 3ea2748a5c41b11a2e7033c56bddd938d2770b6c
-Top:    3513087cec3ea33b2826cc40e6f7fcdcafbab00c
+Top:    869244971263f9cd4426b0428f1505bf77030a32
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-10 21:44:39 -0700
 
@@ -28,7 +28,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index b18d310..76c473b 100644
+index b18d310..9182b6a 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -99,12 +99,20 @@ static int fork_support;
@@ -212,7 +212,7 @@ index b18d310..76c473b 100644
 +	if ((ret != sizeof msg) || msg)
 +		goto err2;
 +
-+	ret = rconnect(ret, &addr, len);
++	ret = rconnect(ret, (struct sockaddr *) &addr, len);
 +	if (ret)
 +		goto err2;
  
