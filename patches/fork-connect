@@ -1,5 +1,5 @@
 Bottom: 3ea2748a5c41b11a2e7033c56bddd938d2770b6c
-Top:    0841906224bb250847983ffd2a5d0bee11b39b28
+Top:    b325ccfd975dd153285cfe5ba9f66efd16427780
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-10 21:44:39 -0700
 
@@ -28,7 +28,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index b18d310..33f3baf 100644
+index b18d310..2b115d3 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -99,12 +99,20 @@ static int fork_support;
@@ -74,7 +74,7 @@ index b18d310..33f3baf 100644
  	return fdi ? fdi->fd : index;
  }
  
-+static inline enum fd_state fd_gets(int index)
++static inline enum fd_fork_state fd_gets(int index)
 +{
 +	struct fd_info *fdi;
 +
@@ -214,7 +214,7 @@ index b18d310..33f3baf 100644
  
 -	real.close(fd);
 -	return rconnect(ret, addr, addrlen);
-+	ret = rconnect(ret, &sin6, len);
++	ret = rconnect(ret, &addr, len);
 +	if (ret)
 +		goto err2;
 +
@@ -255,7 +255,7 @@ index b18d310..33f3baf 100644
  
  	msg = 0;
 -	len = real.write(sfd, &msg, sizeof msg);
-+	len = real.send(sfd, &msg, sizeof msg, MSG_NODELAY);
++	len = real.write(sfd, &msg, sizeof msgs);
  	if (len != sizeof msg)
  		goto lclose;
  
