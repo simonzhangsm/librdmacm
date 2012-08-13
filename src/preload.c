@@ -498,7 +498,7 @@ static int fork_active(int socket, const struct sockaddr *addr, socklen_t addrle
 	flags = real.fcntl(fd, F_GETFL);
 	real.fcntl(fd, F_SETFL, 0);
 
-	if (!(flags & O_NONBLOCK)) {
+	if (!(flags & O_NONBLOCK) && addr && addrlen) {
 		ret = real.connect(fd, addr, addrlen);
 		if (ret)
 			return ret;
@@ -600,7 +600,7 @@ static inline enum fd_type fd_fork_get(int index, int *fd)
 		if (fdi->type == fd_fork_passive)
 			fork_passive(index);
 		else if (fdi->type == fd_fork_active)
-			fork_active(index); /* NEED addr, addrlen */
+			fork_active(index, NULL, 0);
 		*fd = fdi->fd;
 		return fdi->type;
 
