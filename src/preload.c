@@ -531,6 +531,12 @@ err1:
 	fd_store(socket, sfd, fd_normal, fd_ready);
 }
 
+/*
+ * The server will start listening for the new connection, then send a
+ * message to the active side when the listen is ready.  This does leave
+ * fork unsupported in the following case: the server is nonblocking and
+ * calls select/poll waiting to receive data from the client.
+ */
 static void fork_passive(int socket)
 {
 	struct sockaddr_in6 sin6;
