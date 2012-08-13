@@ -1,5 +1,5 @@
 Bottom: 3ea2748a5c41b11a2e7033c56bddd938d2770b6c
-Top:    3ea2748a5c41b11a2e7033c56bddd938d2770b6c
+Top:    216c0397df2215433e2acfe73e52db57cbf694c4
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-13 16:00:16 -0700
 
@@ -12,4 +12,36 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 ---
 
-
+diff --git a/src/preload.c b/src/preload.c
+index b18d310..bb8e3fb 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -492,7 +492,7 @@ static void fork_passive(int socket)
+ 	socklen_t len;
+ 	uint32_t msg;
+ 
+-	fd_get(socket, &sfd);
++	sfd = fd_getd(socket);
+ 
+ 	len = sizeof sin6;
+ 	ret = real.getsockname(sfd, (struct sockaddr *) &sin6, &len);
+@@ -510,7 +510,7 @@ static void fork_passive(int socket)
+ 
+ 	lfd = rsocket(sin6.sin6_family, SOCK_STREAM, 0);
+ 	if (lfd < 0) {
+-		ret  = lfd;
++		ret = lfd;
+ 		goto sclose;
+ 	}
+ 
+@@ -537,10 +537,7 @@ static void fork_passive(int socket)
+ 		goto lclose;
+ 	}
+ 
+-	param = 1;
+-	rsetsockopt(dfd, IPPROTO_TCP, TCP_NODELAY, &param, sizeof param);
+ 	set_rsocket_options(dfd);
+-
+ 	copysockopts(dfd, sfd, &rs, &real);
+ 	real.shutdown(sfd, SHUT_RDWR);
+ 	real.close(sfd);
