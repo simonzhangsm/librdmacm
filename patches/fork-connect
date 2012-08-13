@@ -1,5 +1,5 @@
 Bottom: 3ea2748a5c41b11a2e7033c56bddd938d2770b6c
-Top:    869244971263f9cd4426b0428f1505bf77030a32
+Top:    652ae6e1dadacc92be353adaafd434f1ff7ddbfa
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-10 21:44:39 -0700
 
@@ -29,7 +29,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index b18d310..9182b6a 100644
+index b18d310..8b86415 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -99,12 +99,20 @@ static int fork_support;
@@ -133,37 +133,37 @@ index b18d310..9182b6a 100644
 -	type = fd_get(socket, &fd);
 -	if (type == fd_rsocket || type == fd_fork) {
 +	if (fd_get(socket, &fd) == fd_rsocket) {
++		index = fd_open();
++		if (index < 0)
++			return index;
++
++		ret = raccept(fd, addr, addrlen);
++		if (ret < 0) {
++			fd_close(index, &fd);
++			return ret;
++		}
++
++		fd_store(index, ret, fd_rsocket, fd_ready);
++		return index;
++	} else if (fd_gets(socket) == fd_fork_listen) {
  		index = fd_open();
  		if (index < 0)
  			return index;
  
 -		ret = (type == fd_rsocket) ? raccept(fd, addr, addrlen) :
 -					     real.accept(fd, addr, addrlen);
-+		ret = raccept(fd, addr, addrlen);
++		ret = real.accept(fd, addr, addrlen);
  		if (ret < 0) {
  			fd_close(index, &fd);
  			return ret;
  		}
  
 -		fd_store(index, ret, type);
-+		fd_store(index, ret, fd_rsocket, fd_ready);
-+		return index;
-+	} else if (fd_gets(socket) == fd_fork_listen) {
-+		index = fd_open();
-+		if (index < 0)
-+			return index;
-+
-+		ret = real.accept(fd, addr, addrlen);
-+		if (ret < 0) {
-+			fd_close(index, &fd);
-+			return ret;
-+		}
-+
 +		fd_store(index, ret, fd_normal, fd_fork_passive);
  		return index;
  	} else {
  		return real.accept(fd, addr, addrlen);
-@@ -453,35 +486,49 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
+@@ -453,37 +486,57 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
   * We can't fork RDMA connections and pass them from the parent to the child
   * process.  Instead, we need to establish the RDMA connection after calling
   * fork.  To do this, we delay establishing the RDMA connection until we try
@@ -216,24 +216,32 @@ index b18d310..9182b6a 100644
 +	ret = rconnect(ret, (struct sockaddr *) &addr, len);
 +	if (ret)
 +		goto err2;
- 
--	real.close(fd);
--	return rconnect(ret, addr, addrlen);
++
 +	set_rsocket_options(dfd);
 +	copysockopts(dfd, sfd, &rs, &real);
 +	real.shutdown(sfd, SHUT_RDWR);
 +	real.close(sfd);
 +	fd_store(socket, dfd, fd_rsocket, fd_ready);
 +	return;
-+
+ 
+-	real.close(fd);
+-	return rconnect(ret, addr, addrlen);
 +err2:
 +	rclose(dfd);
 +err1:
 +	fd_store(socket, sfd, fd_normal, fd_ready);
  }
  
++/*
++ * The server will start listening for the new connection, then send a
++ * message to the active side when the listen is ready.  This does leave
++ * fork unsupported in the following case: the server is nonblocking and
++ * calls select/poll waiting to receive data from the client.
++ */
  static void fork_passive(int socket)
-@@ -492,7 +539,7 @@ static void fork_passive(int socket)
+ {
+ 	struct sockaddr_in6 sin6;
+@@ -492,7 +545,7 @@ static void fork_passive(int socket)
  	socklen_t len;
  	uint32_t msg;
  
@@ -242,7 +250,7 @@ index b18d310..9182b6a 100644
  
  	len = sizeof sin6;
  	ret = real.getsockname(sfd, (struct sockaddr *) &sin6, &len);
-@@ -510,7 +557,7 @@ static void fork_passive(int socket)
+@@ -510,7 +563,7 @@ static void fork_passive(int socket)
  
  	lfd = rsocket(sin6.sin6_family, SOCK_STREAM, 0);
  	if (lfd < 0) {
@@ -251,7 +259,7 @@ index b18d310..9182b6a 100644
  		goto sclose;
  	}
  
-@@ -537,14 +584,11 @@ static void fork_passive(int socket)
+@@ -537,14 +590,11 @@ static void fork_passive(int socket)
  		goto lclose;
  	}
  
@@ -267,7 +275,7 @@ index b18d310..9182b6a 100644
  
  lclose:
  	rclose(lfd);
-@@ -553,7 +597,7 @@ sclose:
+@@ -553,7 +603,7 @@ sclose:
  	sem_close(sem);
  out:
  	if (ret)
@@ -276,7 +284,7 @@ index b18d310..9182b6a 100644
  }
  
  static inline enum fd_type fd_fork_get(int index, int *fd)
-@@ -562,8 +606,10 @@ static inline enum fd_type fd_fork_get(int index, int *fd)
+@@ -562,8 +612,10 @@ static inline enum fd_type fd_fork_get(int index, int *fd)
  
  	fdi = idm_lookup(&idm, index);
  	if (fdi) {
@@ -288,7 +296,7 @@ index b18d310..9182b6a 100644
  		*fd = fdi->fd;
  		return fdi->type;
  
-@@ -577,10 +623,7 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
+@@ -577,10 +629,7 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
  {
  	int fd, ret;
  
@@ -300,7 +308,7 @@ index b18d310..9182b6a 100644
  		ret = rconnect(fd, addr, addrlen);
  		if (!ret || errno == EINPROGRESS)
  			return ret;
-@@ -591,9 +634,8 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
+@@ -591,9 +640,8 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
  
  		rclose(fd);
  		fd = ret;
