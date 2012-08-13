@@ -1,5 +1,5 @@
 Bottom: 3ea2748a5c41b11a2e7033c56bddd938d2770b6c
-Top:    8e79723d04b7d3effe0d91fe456426c68892b6bb
+Top:    da811bd45f316fb30abd2a28fca7900d8b0f8de6
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-10 21:44:39 -0700
 
@@ -28,7 +28,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index b18d310..9bc6c13 100644
+index b18d310..b4c319f 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -99,12 +99,20 @@ static int fork_support;
@@ -180,7 +180,7 @@ index b18d310..9bc6c13 100644
 -	if (ret)
 -		return ret;
 +
-+	if (!(flags & O_NONBLOCK)) {
++	if (!(flags & O_NONBLOCK) && addr && addrlen) {
 +		ret = real.connect(fd, addr, addrlen);
 +		if (ret)
 +			return ret;
@@ -219,7 +219,7 @@ index b18d310..9bc6c13 100644
 +		if (fdi->type == fd_fork_passive)
  			fork_passive(index);
 +		else if (fdi->type == fd_fork_active)
-+			fork_active(index); /* NEED addr, addrlen */
++			fork_active(index, NULL, 0);
  		*fd = fdi->fd;
  		return fdi->type;
  
