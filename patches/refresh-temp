@@ -1,0 +1,26 @@
+Bottom: 869244971263f9cd4426b0428f1505bf77030a32
+Top:    652ae6e1dadacc92be353adaafd434f1ff7ddbfa
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-13 15:59:00 -0700
+
+Refresh of fork-connect
+
+---
+
+diff --git a/src/preload.c b/src/preload.c
+index 9182b6a..8b86415 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -531,6 +531,12 @@ err1:
+ 	fd_store(socket, sfd, fd_normal, fd_ready);
+ }
+ 
++/*
++ * The server will start listening for the new connection, then send a
++ * message to the active side when the listen is ready.  This does leave
++ * fork unsupported in the following case: the server is nonblocking and
++ * calls select/poll waiting to receive data from the client.
++ */
+ static void fork_passive(int socket)
+ {
+ 	struct sockaddr_in6 sin6;
