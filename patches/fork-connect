@@ -1,5 +1,5 @@
 Bottom: 3ea2748a5c41b11a2e7033c56bddd938d2770b6c
-Top:    e5851de376df609d0644456f8a89570a86a723f0
+Top:    0841906224bb250847983ffd2a5d0bee11b39b28
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-10 21:44:39 -0700
 
@@ -28,7 +28,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index b18d310..2830f14 100644
+index b18d310..33f3baf 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -99,12 +99,20 @@ static int fork_support;
@@ -292,7 +292,7 @@ index b18d310..2830f14 100644
 +		if (fdi->type == fd_fork_passive)
  			fork_passive(index);
 +		else if (fdi->type == fd_fork_active)
-+			fork_active(index, NULL, 0);
++			fork_active(index);
  		*fd = fdi->fd;
  		return fdi->type;
  
@@ -310,7 +310,7 @@ index b18d310..2830f14 100644
  		ret = rconnect(fd, addr, addrlen);
  		if (!ret || errno == EINPROGRESS)
  			return ret;
-@@ -591,9 +635,12 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
+@@ -591,9 +635,8 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
  
  		rclose(fd);
  		fd = ret;
@@ -318,10 +318,6 @@ index b18d310..2830f14 100644
 -	default:
 -		break;
 +	} else if (fd_gets(socket) == fd_fork) {
-+//		flags = real.fcntl(fd, F_GETFL);
-+//		if (!(flags & O_NONBLOCK))
-+//			return fork_active(socket, addr, addrlen);
-+//
 +		fd_store(socket, fd, fd_normal, fd_fork_active);
  	}
  
