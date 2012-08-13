@@ -488,35 +488,47 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
  * fork.  To do this, we delay establishing the RDMA connection until we try
  * to send/receive on the server side.
  */
-static int fork_active(int socket, const struct sockaddr *addr, socklen_t addrlen)
+static void fork_active(int socket)
 {
-	int fd, ret;
+	struct sockaddr_storage addr;
+	int sfd, dfd, ret;
+	socklen_t len;
 	uint32_t msg;
 	long flags;
 
-	fd = fd_getd(socket);
-	flags = real.fcntl(fd, F_GETFL);
-	real.fcntl(fd, F_SETFL, 0);
+	sfd = fd_getd(socket);
 
-	if (!(flags & O_NONBLOCK) && addr && addrlen) {
-		ret = real.connect(fd, addr, addrlen);
-		if (ret)
-			return ret;
-	}
+	len = sizeof addr;
+	ret = real.getpeername(sfd, (struct sockaddr *) &addr, &len);
+	if (ret)
+		goto err1;
 
-	ret = real.recv(fd, &msg, sizeof msg, MSG_PEEK);
-	if ((ret != sizeof msg) || msg) {
-		fd_store(socket, fd, fd_normal, fd_ready);
-		return 0;
-	}
+	dfd = rsocket(addr.ss_family, SOCK_STREAM, 0);
+	if (dfd < 0)
+		goto err1;
 
-	real.fcntl(fd, F_SETFL, flags);
-	ret = transpose_socket(socket, fd_rsocket);
-	if (ret < 0)
-		return ret;
+	flags = real.fcntl(sfd, F_GETFL);
+	real.fcntl(sfd, F_SETFL, 0);
+	ret = real.recv(sfd, &msg, sizeof msg, MSG_PEEK);
+	real.fcntl(sfd, F_SETFL, flags);
+	if ((ret != sizeof msg) || msg)
+		goto err2;
 
-	real.close(fd);
-	return rconnect(ret, addr, addrlen);
+	ret = rconnect(ret, &sin6, len);
+	if (ret)
+		goto err2;
+
+	set_rsocket_options(dfd);
+	copysockopts(dfd, sfd, &rs, &real);
+	real.shutdown(sfd, SHUT_RDWR);
+	real.close(sfd);
+	fd_store(socket, dfd, fd_rsocket, fd_ready);
+	return;
+
+err2:
+	rclose(dfd);
+err1:
+	fd_store(socket, sfd, fd_normal, fd_ready);
 }
 
 static void fork_passive(int socket)
@@ -527,7 +539,7 @@ static void fork_passive(int socket)
 	socklen_t len;
 	uint32_t msg;
 
-	fd_get(socket, &sfd);
+	sfd = fd_getd(socket);
 
 	len = sizeof sin6;
 	ret = real.getsockname(sfd, (struct sockaddr *) &sin6, &len);
@@ -545,7 +557,7 @@ static void fork_passive(int socket)
 
 	lfd = rsocket(sin6.sin6_family, SOCK_STREAM, 0);
 	if (lfd < 0) {
-		ret  = lfd;
+		ret = lfd;
 		goto sclose;
 	}
 
@@ -562,7 +574,7 @@ static void fork_passive(int socket)
 		goto lclose;
 
 	msg = 0;
-	len = real.write(sfd, &msg, sizeof msg);
+	len = real.send(sfd, &msg, sizeof msg, MSG_NODELAY);
 	if (len != sizeof msg)
 		goto lclose;
 
@@ -572,10 +584,7 @@ static void fork_passive(int socket)
 		goto lclose;
 	}
 
-	param = 1;
-	rsetsockopt(dfd, IPPROTO_TCP, TCP_NODELAY, &param, sizeof param);
 	set_rsocket_options(dfd);
-
 	copysockopts(dfd, sfd, &rs, &real);
 	real.shutdown(sfd, SHUT_RDWR);
 	real.close(sfd);
@@ -627,10 +636,10 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
 		rclose(fd);
 		fd = ret;
 	} else if (fd_gets(socket) == fd_fork) {
-		flags = real.fcntl(fd, F_GETFL);
-		if (!(flags & O_NONBLOCK))
-			return fork_active(socket, addr, addrlen);
-
+//		flags = real.fcntl(fd, F_GETFL);
+//		if (!(flags & O_NONBLOCK))
+//			return fork_active(socket, addr, addrlen);
+//
 		fd_store(socket, fd, fd_normal, fd_fork_active);
 	}
 
