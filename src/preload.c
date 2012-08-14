@@ -86,11 +86,9 @@ struct socket_calls {
 			  void *optval, socklen_t *optlen);
 	int (*fcntl)(int socket, int cmd, ... /* arg */);
 	int (*dup2)(int oldfd, int newfd);
-<<<<<<< current
 	ssize_t (*sendfile)(int out_fd, int in_fd, off_t *offset, size_t count);
-=======
 	int (*fxstat64)(int ver, int fd, struct stat64 *buf);
->>>>>>> patched
+	int (*fxstat)(int ver, int fd, struct stat *buf);
 };
 
 static struct socket_calls real;
@@ -283,11 +281,9 @@ static void init_preload(void)
 	real.getsockopt = dlsym(RTLD_NEXT, "getsockopt");
 	real.fcntl = dlsym(RTLD_NEXT, "fcntl");
 	real.dup2 = dlsym(RTLD_NEXT, "dup2");
-<<<<<<< current
 	real.sendfile = dlsym(RTLD_NEXT, "sendfile");
-=======
 	real.fxstat64 = dlsym(RTLD_NEXT, "__fxstat64");
->>>>>>> patched
+	real.fxstat = dlsym(RTLD_NEXT, "__fxstat");
 
 	rs.socket = dlsym(RTLD_DEFAULT, "rsocket");
 	rs.bind = dlsym(RTLD_DEFAULT, "rbind");
