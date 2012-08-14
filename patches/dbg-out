@@ -1,5 +1,5 @@
 Bottom: 758d450afd5a63013c7540fa171eea46bb810c1a
-Top:    8075f6a47dbad3c54feda08b60166abfced62daf
+Top:    1553275a3c6855e88d8b2c6f8cfb26579eb9307a
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-07 21:30:48 -0700
 
@@ -8,7 +8,7 @@ support for debug prints
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index ec62e69..b2cbb78 100644
+index ec62e69..ac36642 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -50,6 +50,8 @@
@@ -37,24 +37,20 @@ index ec62e69..b2cbb78 100644
  	getenv_options();
  	init = 1;
  out:
-@@ -406,6 +411,7 @@ int socket(int domain, int type, int protocol)
- 	static __thread int recursive;
- 	int index, ret;
- 
-+	fprintf(fout, "%d socket\n", (int)syscall(SYS_gettid));
- 	if (recursive)
+@@ -410,10 +415,12 @@ int socket(int domain, int type, int protocol)
  		goto real;
  
-@@ -414,6 +420,8 @@ int socket(int domain, int type, int protocol)
+ 	init_preload();
++	fprintf(fout, "%d socket\n", (int)syscall(SYS_gettid));
+ 	index = fd_open();
  	if (index < 0)
  		return index;
  
-+	fprintf(fout, "%d socket %d\n", (int)syscall(SYS_gettid), index);
-+	fflush(fout);
++	fprintf(fout, "%d socket %d\n", (int)syscall(SYS_gettid), index); fflush(fout);
  	recursive = 1;
  	ret = rsocket(domain, type, protocol);
  	recursive = 0;
-@@ -428,6 +436,9 @@ int socket(int domain, int type, int protocol)
+@@ -428,6 +435,9 @@ int socket(int domain, int type, int protocol)
  			fd_store(index, ret, fd_rsocket, fd_ready);
  			set_rsocket_options(ret);
  		}
@@ -64,16 +60,15 @@ index ec62e69..b2cbb78 100644
  		return index;
  	}
  	fd_close(index, &ret);
-@@ -438,6 +449,8 @@ real:
+@@ -438,6 +448,7 @@ real:
  int bind(int socket, const struct sockaddr *addr, socklen_t addrlen)
  {
  	int fd;
-+	fprintf(fout, "%d bind %d\n", (int)syscall(SYS_gettid), socket);
-+	fflush(fout);
++	fprintf(fout, "%d bind %d\n", (int)syscall(SYS_gettid), socket); fflush(fout);
  	return (fd_get(socket, &fd) == fd_rsocket) ?
  		rbind(fd, addr, addrlen) : real.bind(fd, addr, addrlen);
  }
-@@ -554,7 +567,6 @@ static void fork_passive(int socket)
+@@ -554,7 +565,6 @@ static void fork_passive(int socket)
  	uint32_t msg;
  
  	sfd = fd_getd(socket);
@@ -81,7 +76,7 @@ index ec62e69..b2cbb78 100644
  	len = sizeof sin6;
  	ret = real.getsockname(sfd, (struct sockaddr *) &sin6, &len);
  	if (ret)
-@@ -586,11 +598,17 @@ static void fork_passive(int socket)
+@@ -586,11 +596,17 @@ static void fork_passive(int socket)
  	ret = rlisten(lfd, 1);
  	if (ret)
  		goto lclose;
@@ -99,7 +94,7 @@ index ec62e69..b2cbb78 100644
  
  	dfd = raccept(lfd, NULL, NULL);
  	if (dfd < 0) {
-@@ -874,18 +892,29 @@ int close(int socket)
+@@ -874,18 +890,29 @@ int close(int socket)
  	int ret;
  
  	init_preload();
@@ -129,7 +124,7 @@ index ec62e69..b2cbb78 100644
  
  	idm_clear(&idm, socket);
  	real.close(socket);
-@@ -978,6 +1007,8 @@ int dup2(int oldfd, int newfd)
+@@ -978,6 +1005,8 @@ int dup2(int oldfd, int newfd)
  	int ret;
  
  	init_preload();
@@ -138,7 +133,7 @@ index ec62e69..b2cbb78 100644
  	oldfdi = idm_lookup(&idm, oldfd);
  	if (oldfdi && oldfdi->type == fd_fork)
  		fork_passive(oldfd);
-@@ -1015,6 +1046,9 @@ int dup2(int oldfd, int newfd)
+@@ -1015,6 +1044,9 @@ int dup2(int oldfd, int newfd)
  	atomic_init(&newfdi->refcnt);
  	atomic_set(&newfdi->refcnt, 1);
  	atomic_inc(&oldfdi->refcnt);
@@ -148,16 +143,19 @@ index ec62e69..b2cbb78 100644
  	return newfd;
  }
  
-@@ -1042,6 +1076,8 @@ int __fxstat64(int ver, int socket, struct stat64 *buf)
+@@ -1040,8 +1072,10 @@ ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count)
+ 
+ int __fxstat64(int ver, int socket, struct stat64 *buf)
  {
- //	int fd, ret;
+-//	int fd, ret;
++	int fd, ret;
  
 +	init_preload();
 +	fprintf(fout, "%s\n", __func__); fflush(fout);
  //	if (fd_get(socket, &fd) == fd_rsocket) {
  //		ret = real.fxstat64(ver, socket, buf);
  //		if (!ret)
-@@ -1055,5 +1091,7 @@ int __fxstat64(int ver, int socket, struct stat64 *buf)
+@@ -1055,5 +1089,7 @@ int __fxstat64(int ver, int socket, struct stat64 *buf)
  
  int __fxstat(int ver, int socket, struct stat *buf)
  {
