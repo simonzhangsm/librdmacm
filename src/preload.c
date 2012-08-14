@@ -39,6 +39,7 @@
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
+#include <sys/sendfile.h>
 #include <stdarg.h>
 #include <dlfcn.h>
 #include <netdb.h>
@@ -49,7 +50,6 @@
 #include <netinet/tcp.h>
 #include <unistd.h>
 #include <semaphore.h>
-#include <sendfile.h>
 
 #include <rdma/rdma_cma.h>
 #include <rdma/rdma_verbs.h>
@@ -1027,9 +1027,9 @@ ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count)
 	if (file_addr == (void *) -1)
 		return -1;
 
-	len = rsend(fd, file_addr, count);
-	if ((len > 0) && offset)
-		lseek(in_fd, len, SEEK_CUR);
+	ret = rwrite(fd, file_addr, count);
+	if ((ret > 0) && offset)
+		lseek(in_fd, ret, SEEK_CUR);
 	munmap(file_addr, count);
 	return ret;
 }
