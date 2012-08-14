@@ -1,0 +1,43 @@
+Bottom: 3bb516909d69e30fc529f1702bc96db012fce103
+Top:    ebbfcee2d01231735d5a1be17b9fd52b51608bca
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-14 16:21:52 -0700
+
+Refresh of fstat
+
+---
+
+diff --git a/src/preload.c b/src/preload.c
+index f0c4174..1dc7082 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -1044,14 +1044,20 @@ ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count)
+ 
+ int __fxstat64(int ver, int socket, struct stat64 *buf)
+ {
+-	int fd, ret;
++//	int fd, ret;
++
++//	if (fd_get(socket, &fd) == fd_rsocket) {
++//		ret = real.fxstat64(ver, socket, buf);
++//		if (!ret)
++//			buf->st_mode = (buf->st_mode & ~S_IFMT) | __S_IFSOCK;
++//	} else {
++//		ret = real.fxstat64(ver, fd, buf);
++//	}
++//	return ret;
++	return real.fxstat64(ver, socket, buf);
++}
+ 
+-	if (fd_get(socket, &fd) == fd_rsocket) {
+-		ret = real.fxstat64(ver, socket, buf);
+-		if (!ret)
+-			buf->st_mode = (buf->st_mode & ~S_IFMT) | __S_IFSOCK;
+-	} else {
+-		ret = real.fxstat64(ver, fd, buf);
+-	}
+-	return ret;
++int __fxstat(int ver, int socket, struct stat *buf)
++{
++	return real.fxstat(ver, socket, buf);
+ }
