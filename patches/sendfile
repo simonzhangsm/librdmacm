@@ -1,5 +1,5 @@
 Bottom: 652ae6e1dadacc92be353adaafd434f1ff7ddbfa
-Top:    9baead7ab1e6af902e2683f1af27b76fb91f0ae2
+Top:    03b5e28f4ac8f642409cf46b6a2bfc0da609ec5d
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-13 17:00:42 -0700
 
@@ -13,25 +13,18 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index 8b86415..9b71c77 100644
+index 8b86415..c6cf176 100644
 --- a/src/preload.c
 +++ b/src/preload.c
-@@ -38,6 +38,7 @@
+@@ -38,6 +38,8 @@
  #include <sys/types.h>
  #include <sys/socket.h>
  #include <sys/stat.h>
 +#include <sys/mman.h>
++#include <sys/sendfile.h>
  #include <stdarg.h>
  #include <dlfcn.h>
  #include <netdb.h>
-@@ -48,6 +49,7 @@
- #include <netinet/tcp.h>
- #include <unistd.h>
- #include <semaphore.h>
-+#include <sendfile.h>
- 
- #include <rdma/rdma_cma.h>
- #include <rdma/rdma_verbs.h>
 @@ -84,6 +86,7 @@ struct socket_calls {
  			  void *optval, socklen_t *optlen);
  	int (*fcntl)(int socket, int cmd, ... /* arg */);
@@ -66,9 +59,9 @@ index 8b86415..9b71c77 100644
 +	if (file_addr == (void *) -1)
 +		return -1;
 +
-+	len = rsend(fd, file_addr, count);
-+	if ((len > 0) && offset)
-+		lseek(in_fd, len, SEEK_CUR);
++	ret = rwrite(fd, file_addr, count);
++	if ((ret > 0) && offset)
++		lseek(in_fd, ret, SEEK_CUR);
 +	munmap(file_addr, count);
 +	return ret;
 +}
