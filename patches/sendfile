@@ -1,0 +1,15 @@
+Bottom: 652ae6e1dadacc92be353adaafd434f1ff7ddbfa
+Top:    652ae6e1dadacc92be353adaafd434f1ff7ddbfa
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-13 17:00:42 -0700
+
+rspreload: Support sendfile
+
+Handle users calling sendfile with an rsocket.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
