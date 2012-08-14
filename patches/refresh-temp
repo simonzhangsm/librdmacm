@@ -1,0 +1,52 @@
+Bottom: 8075f6a47dbad3c54feda08b60166abfced62daf
+Top:    1553275a3c6855e88d8b2c6f8cfb26579eb9307a
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-14 16:44:49 -0700
+
+Refresh of dbg-out
+
+---
+
+diff --git a/src/preload.c b/src/preload.c
+index b2cbb78..ac36642 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -411,17 +411,16 @@ int socket(int domain, int type, int protocol)
+ 	static __thread int recursive;
+ 	int index, ret;
+ 
+-	fprintf(fout, "%d socket\n", (int)syscall(SYS_gettid));
+ 	if (recursive)
+ 		goto real;
+ 
+ 	init_preload();
++	fprintf(fout, "%d socket\n", (int)syscall(SYS_gettid));
+ 	index = fd_open();
+ 	if (index < 0)
+ 		return index;
+ 
+-	fprintf(fout, "%d socket %d\n", (int)syscall(SYS_gettid), index);
+-	fflush(fout);
++	fprintf(fout, "%d socket %d\n", (int)syscall(SYS_gettid), index); fflush(fout);
+ 	recursive = 1;
+ 	ret = rsocket(domain, type, protocol);
+ 	recursive = 0;
+@@ -449,8 +448,7 @@ real:
+ int bind(int socket, const struct sockaddr *addr, socklen_t addrlen)
+ {
+ 	int fd;
+-	fprintf(fout, "%d bind %d\n", (int)syscall(SYS_gettid), socket);
+-	fflush(fout);
++	fprintf(fout, "%d bind %d\n", (int)syscall(SYS_gettid), socket); fflush(fout);
+ 	return (fd_get(socket, &fd) == fd_rsocket) ?
+ 		rbind(fd, addr, addrlen) : real.bind(fd, addr, addrlen);
+ }
+@@ -1074,7 +1072,7 @@ ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count)
+ 
+ int __fxstat64(int ver, int socket, struct stat64 *buf)
+ {
+-//	int fd, ret;
++	int fd, ret;
+ 
+ 	init_preload();
+ 	fprintf(fout, "%s\n", __func__); fflush(fout);
