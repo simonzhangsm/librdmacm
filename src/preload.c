@@ -1076,6 +1076,7 @@ int __fxstat64(int ver, int socket, struct stat64 *buf)
 {
 //	int fd, ret;
 
+	init_preload();
 	fprintf(fout, "%s\n", __func__); fflush(fout);
 //	if (fd_get(socket, &fd) == fd_rsocket) {
 //		ret = real.fxstat64(ver, socket, buf);
@@ -1090,6 +1091,7 @@ int __fxstat64(int ver, int socket, struct stat64 *buf)
 
 int __fxstat(int ver, int socket, struct stat *buf)
 {
+	init_preload();
 	fprintf(fout, "%s\n", __func__); fflush(fout);
 	return real.fxstat(ver, socket, buf);
 }
