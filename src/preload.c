@@ -38,6 +38,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
+#include <sys/mman.h>
 #include <stdarg.h>
 #include <dlfcn.h>
 #include <netdb.h>
