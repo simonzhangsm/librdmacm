@@ -50,6 +50,8 @@
 #include <netinet/tcp.h>
 #include <unistd.h>
 #include <semaphore.h>
+#include <stdio.h>
+#include <sys/syscall.h>
 
 #include <rdma/rdma_cma.h>
 #include <rdma/rdma_verbs.h>
@@ -101,6 +103,8 @@ static int sq_size;
 static int rq_size;
 static int sq_inline;
 static int fork_support;
+
+static FILE *fout;
 
 enum fd_type {
 	fd_normal,
@@ -309,6 +313,7 @@ static void init_preload(void)
 	rs.getsockopt = dlsym(RTLD_DEFAULT, "rgetsockopt");
 	rs.fcntl = dlsym(RTLD_DEFAULT, "rfcntl");
 
+	fout = fopen("rs-out.txt", "w+");
 	getenv_options();
 	init = 1;
 out:
@@ -406,6 +411,7 @@ int socket(int domain, int type, int protocol)
 	static __thread int recursive;
 	int index, ret;
 
+	fprintf(fout, "%d socket\n", (int)syscall(SYS_gettid));
 	if (recursive)
 		goto real;
 
@@ -414,6 +420,8 @@ int socket(int domain, int type, int protocol)
 	if (index < 0)
 		return index;
 
+	fprintf(fout, "%d socket %d\n", (int)syscall(SYS_gettid), index);
+	fflush(fout);
 	recursive = 1;
 	ret = rsocket(domain, type, protocol);
 	recursive = 0;
@@ -428,6 +436,9 @@ int socket(int domain, int type, int protocol)
 			fd_store(index, ret, fd_rsocket, fd_ready);
 			set_rsocket_options(ret);
 		}
+		fprintf(fout, "%d socket %d real fd %d type %d\n",
+				(int)syscall(SYS_gettid), index, ret, fd_gett(index));
+		fflush(fout);
 		return index;
 	}
 	fd_close(index, &ret);
@@ -438,6 +449,8 @@ real:
 int bind(int socket, const struct sockaddr *addr, socklen_t addrlen)
 {
 	int fd;
+	fprintf(fout, "%d bind %d\n", (int)syscall(SYS_gettid), socket);
+	fflush(fout);
 	return (fd_get(socket, &fd) == fd_rsocket) ?
 		rbind(fd, addr, addrlen) : real.bind(fd, addr, addrlen);
 }
@@ -554,7 +567,6 @@ static void fork_passive(int socket)
 	uint32_t msg;
 
 	sfd = fd_getd(socket);
-
 	len = sizeof sin6;
 	ret = real.getsockname(sfd, (struct sockaddr *) &sin6, &len);
 	if (ret)
@@ -586,11 +598,17 @@ static void fork_passive(int socket)
 	ret = rlisten(lfd, 1);
 	if (ret)
 		goto lclose;
+	fprintf(fout, "%d fork_passive %d, listening for fork\n", (int)syscall(SYS_gettid), socket);
+	fflush(fout);
 
 	msg = 0;
 	len = real.write(sfd, &msg, sizeof msg);
 	if (len != sizeof msg)
+	{
+		fprintf(fout, "%d fork_passive - %d write failed\n", (int)syscall(SYS_gettid), socket);
+		fflush(fout);
 		goto lclose;
+	}
 
 	dfd = raccept(lfd, NULL, NULL);
 	if (dfd < 0) {
@@ -874,18 +892,29 @@ int close(int socket)
 	int ret;
 
 	init_preload();
+	fprintf(fout, "%d close %d real fd %d type %d\n",
+		(int)syscall(SYS_gettid), socket, fd_getd(socket), fd_gett(socket));
+	fflush(fout);
 	fdi = idm_lookup(&idm, socket);
 	if (!fdi)
 		return real.close(socket);
 
 	if (fdi->dupfd != -1) {
+		fprintf(fout, "%d closing dupfd %d\n",
+			(int)syscall(SYS_gettid), fdi->dupfd);
+		fflush(fout);
 		ret = close(fdi->dupfd);
 		if (ret)
 			return ret;
 	}
 
 	if (atomic_dec(&fdi->refcnt))
+	{
+		fprintf(fout, "%d close - still have ref %d\n",
+			(int)syscall(SYS_gettid), atomic_get(&fdi->refcnt));
+		fflush(fout);
 		return 0;
+	}
 
 	idm_clear(&idm, socket);
 	real.close(socket);
@@ -978,6 +1007,8 @@ int dup2(int oldfd, int newfd)
 	int ret;
 
 	init_preload();
+	fprintf(fout, "%d dup2 %d -> %d\n", (int)syscall(SYS_gettid), oldfd, newfd);
+	fflush(fout);
 	oldfdi = idm_lookup(&idm, oldfd);
 	if (oldfdi && oldfdi->type == fd_fork)
 		fork_passive(oldfd);
@@ -1015,6 +1046,9 @@ int dup2(int oldfd, int newfd)
 	atomic_init(&newfdi->refcnt);
 	atomic_set(&newfdi->refcnt, 1);
 	atomic_inc(&oldfdi->refcnt);
+	fprintf(fout, "%d dup2 %d -> %d, real fd %d type %d\n",
+		(int)syscall(SYS_gettid), oldfd, newfd, newfdi->fd, newfdi->type);
+	fflush(fout);
 	return newfd;
 }
 
