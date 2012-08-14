@@ -1,5 +1,5 @@
 Bottom: 03b5e28f4ac8f642409cf46b6a2bfc0da609ec5d
-Top:    758d450afd5a63013c7540fa171eea46bb810c1a
+Top:    7272e42eaa5f911fa4e114b67fb12099a278a57d
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-07 09:37:24 -0700
 
@@ -13,48 +13,40 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index c6cf176..ec62e69 100644
+index c6cf176..cc2162a 100644
 --- a/src/preload.c
 +++ b/src/preload.c
-@@ -87,6 +87,8 @@ struct socket_calls {
+@@ -87,6 +87,7 @@ struct socket_calls {
  	int (*fcntl)(int socket, int cmd, ... /* arg */);
  	int (*dup2)(int oldfd, int newfd);
  	ssize_t (*sendfile)(int out_fd, int in_fd, off_t *offset, size_t count);
-+	int (*fxstat64)(int ver, int fd, struct stat64 *buf);
 +	int (*fxstat)(int ver, int fd, struct stat *buf);
  };
  
  static struct socket_calls real;
-@@ -280,6 +282,8 @@ static void init_preload(void)
+@@ -280,6 +281,7 @@ static void init_preload(void)
  	real.fcntl = dlsym(RTLD_NEXT, "fcntl");
  	real.dup2 = dlsym(RTLD_NEXT, "dup2");
  	real.sendfile = dlsym(RTLD_NEXT, "sendfile");
-+	real.fxstat64 = dlsym(RTLD_NEXT, "__fxstat64");
 +	real.fxstat = dlsym(RTLD_NEXT, "__fxstat");
  
  	rs.socket = dlsym(RTLD_DEFAULT, "rsocket");
  	rs.bind = dlsym(RTLD_DEFAULT, "rbind");
-@@ -1033,3 +1037,23 @@ ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count)
+@@ -1033,3 +1035,17 @@ ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count)
  	munmap(file_addr, count);
  	return ret;
  }
 +
-+int __fxstat64(int ver, int socket, struct stat64 *buf)
-+{
-+//	int fd, ret;
-+
-+//	if (fd_get(socket, &fd) == fd_rsocket) {
-+//		ret = real.fxstat64(ver, socket, buf);
-+//		if (!ret)
-+//			buf->st_mode = (buf->st_mode & ~S_IFMT) | __S_IFSOCK;
-+//	} else {
-+//		ret = real.fxstat64(ver, fd, buf);
-+//	}
-+//	return ret;
-+	return real.fxstat64(ver, socket, buf);
-+}
-+
 +int __fxstat(int ver, int socket, struct stat *buf)
 +{
-+	return real.fxstat(ver, socket, buf);
++	int fd, ret;
++
++	if (fd_get(socket, &fd) == fd_rsocket) {
++		ret = real.fxstat(ver, socket, buf);
++		if (!ret)
++			buf->st_mode = (buf->st_mode & ~S_IFMT) | __S_IFSOCK;
++	} else {
++		ret = real.fxstat(ver, fd, buf);
++	}
++	return ret;
 +}
