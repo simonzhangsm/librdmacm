@@ -1,5 +1,5 @@
 Bottom: 758d450afd5a63013c7540fa171eea46bb810c1a
-Top:    67eec87fa9af69af71c0117c513e627fc1ccd969
+Top:    2d92ae89cbff3b1eccae9de8b9718649004e2453
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-07 21:30:48 -0700
 
@@ -8,7 +8,7 @@ support for debug prints
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index ec62e69..8770161 100644
+index ec62e69..efdb414 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -50,6 +50,8 @@
@@ -146,4 +146,20 @@ index ec62e69..8770161 100644
 +		(int)syscall(SYS_gettid), oldfd, newfd, newfdi->fd, newfdi->type);
 +	fflush(fout);
  	return newfd;
+ }
+ 
+@@ -1042,6 +1076,7 @@ int __fxstat64(int ver, int socket, struct stat64 *buf)
+ {
+ //	int fd, ret;
+ 
++	fprintf(fout, "%s\n", __func__); fflush(fout);
+ //	if (fd_get(socket, &fd) == fd_rsocket) {
+ //		ret = real.fxstat64(ver, socket, buf);
+ //		if (!ret)
+@@ -1055,5 +1090,6 @@ int __fxstat64(int ver, int socket, struct stat64 *buf)
+ 
+ int __fxstat(int ver, int socket, struct stat *buf)
+ {
++	fprintf(fout, "%s\n", __func__); fflush(fout);
+ 	return real.fxstat(ver, socket, buf);
  }
