@@ -48,6 +48,7 @@
 #include <netinet/tcp.h>
 #include <unistd.h>
 #include <semaphore.h>
+#include <sendfile.h>
 
 #include <rdma/rdma_cma.h>
 #include <rdma/rdma_verbs.h>
