@@ -1,5 +1,5 @@
 Bottom: 03b5e28f4ac8f642409cf46b6a2bfc0da609ec5d
-Top:    7272e42eaa5f911fa4e114b67fb12099a278a57d
+Top:    3f4ba48a611f719563dc773a1c33fbd391708df0
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-07 09:37:24 -0700
 
@@ -13,7 +13,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index c6cf176..cc2162a 100644
+index c6cf176..8f19af5 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -87,6 +87,7 @@ struct socket_calls {
@@ -32,7 +32,7 @@ index c6cf176..cc2162a 100644
  
  	rs.socket = dlsym(RTLD_DEFAULT, "rsocket");
  	rs.bind = dlsym(RTLD_DEFAULT, "rbind");
-@@ -1033,3 +1035,17 @@ ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count)
+@@ -1033,3 +1035,18 @@ ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count)
  	munmap(file_addr, count);
  	return ret;
  }
@@ -41,6 +41,7 @@ index c6cf176..cc2162a 100644
 +{
 +	int fd, ret;
 +
++	init_preload();
 +	if (fd_get(socket, &fd) == fd_rsocket) {
 +		ret = real.fxstat(ver, socket, buf);
 +		if (!ret)
