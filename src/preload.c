@@ -1044,14 +1044,20 @@ ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count)
 
 int __fxstat64(int ver, int socket, struct stat64 *buf)
 {
-	int fd, ret;
+//	int fd, ret;
 
-	if (fd_get(socket, &fd) == fd_rsocket) {
-		ret = real.fxstat64(ver, socket, buf);
-		if (!ret)
-			buf->st_mode = (buf->st_mode & ~S_IFMT) | __S_IFSOCK;
-	} else {
-		ret = real.fxstat64(ver, fd, buf);
-	}
-	return ret;
+//	if (fd_get(socket, &fd) == fd_rsocket) {
+//		ret = real.fxstat64(ver, socket, buf);
+//		if (!ret)
+//			buf->st_mode = (buf->st_mode & ~S_IFMT) | __S_IFSOCK;
+//	} else {
+//		ret = real.fxstat64(ver, fd, buf);
+//	}
+//	return ret;
+	return real.fxstat64(ver, socket, buf);
+}
+
+int __fxstat(int ver, int socket, struct stat *buf)
+{
+	return real.fxstat(ver, socket, buf);
 }
