@@ -1040,6 +1040,7 @@ int __fxstat(int ver, int socket, struct stat *buf)
 {
 	int fd, ret;
 
+	init_preload();
 	if (fd_get(socket, &fd) == fd_rsocket) {
 		ret = real.fxstat(ver, socket, buf);
 		if (!ret)
