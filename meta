@@ -1,6 +1,6 @@
 Version: 1
-Previous: cdaf2d76a50c27ae85593291deee41c2722b4f2d
-Head: e59f2da75c818b44fb907d948a93db244780c380
+Previous: 62d3ba97618203ad82b2a5515d08195e09a6445d
+Head: 7e015ddb5914093ecb1e7f87938f7c55f5cefde1
 Applied:
   real-close: 3409f8d6af187d25c63a5d1f8ee8bff5f14555e2
   dup2: ca5813e7cf95dee5933fc417e4a34d26f2b01824
@@ -9,8 +9,7 @@ Applied:
   fork-connect: a50a83fb4e574a2cc435bba1abf6f9df3d0cc7a6
   sendfile: 9073427ddddfa2f7c93d0ac4a6da9844cb7d2960
   fstat: a957d5786c30dfb1da9cf9345e4a639f6006fbda
-  waitall-buggy: e25feca85b5309386f87c67d9cc5a74610205d39
-  refresh-temp: e59f2da75c818b44fb907d948a93db244780c380
+  waitall-buggy: 7e015ddb5914093ecb1e7f87938f7c55f5cefde1
 Unapplied:
   dbg-out: 4b4c0572eab77856d8fbb919b1feb8f3502a101a
   dbg: 0c269855776d3001e37da8c8afe283c20e1d6cd6
