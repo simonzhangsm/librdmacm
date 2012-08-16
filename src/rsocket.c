@@ -1143,7 +1143,7 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
 		if (flags & MSG_PEEK) {
 			// fixme or will peek same data in waitall loop
 			left -= rs_peek(rs, &buf, left);
-			continue;
+			break;
 		}
 
 		for (; left && rs_have_rdata(rs); left -= rsize) {
@@ -1164,12 +1164,13 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
 				buf += end_size;
 				rsize -= end_size;
 				left -= end_size;
+				rs->rbuf_bytes_avail += end_size;
 			}
 			memcpy(buf, &rs->rbuf[rs->rbuf_offset], rsize);
 			rs->rbuf_offset += rsize;
 			buf += rsize;
+			rs->rbuf_bytes_avail += rsize;
 		}
-		rs->rbuf_bytes_avail += len - left; // <- fixme in waitall loop
 
 	} while ((flags & MSG_WAITALL) && (rs->state & rs_connect_rd) && left);
 
