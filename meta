@@ -1,6 +1,6 @@
 Version: 1
-Previous: 212a44d17fb98fbf723069d4e1a7eaef7693f0bf
-Head: 00027ae94707991c0bcfeea2b3f56d8c32f53587
+Previous: 82a4b7258b81212efc1b65af5b5a5db7f48547fe
+Head: d39c872f800e92b9e921a6332b9dcf1470b19f75
 Applied:
   real-close: 3409f8d6af187d25c63a5d1f8ee8bff5f14555e2
   dup2: ca5813e7cf95dee5933fc417e4a34d26f2b01824
@@ -10,6 +10,7 @@ Applied:
   sendfile: 9073427ddddfa2f7c93d0ac4a6da9844cb7d2960
   fstat: a957d5786c30dfb1da9cf9345e4a639f6006fbda
   waitall-buggy: 00027ae94707991c0bcfeea2b3f56d8c32f53587
+  refresh-temp: d39c872f800e92b9e921a6332b9dcf1470b19f75
 Unapplied:
   dbg-out: 4b4c0572eab77856d8fbb919b1feb8f3502a101a
   dbg: 0c269855776d3001e37da8c8afe283c20e1d6cd6
