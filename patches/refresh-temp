@@ -1,0 +1,22 @@
+Bottom: 82b0aedfaff9c5dc6df2e8b45d95f760cc338281
+Top:    9ceee3ed5d3b8307cdf04d2f0cca8313992ef22e
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-16 14:25:17 -0700
+
+Refresh of waitall-buggy
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 8c9e847..e48c305 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -1141,8 +1141,7 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
+ 
+ 		ret = 0;
+ 		if (flags & MSG_PEEK) {
+-			// fixme or will peek same data in waitall loop
+-			left -= rs_peek(rs, &buf, left);
++			left = len - rs_peek(rs, &buf, left);
+ 			break;
+ 		}
