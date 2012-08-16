@@ -1077,7 +1077,7 @@ static int rs_conn_all_sends_done(struct rsocket *rs)
 	       !(rs->state & rs_connected);
 }
 
-static ssize_t rs_peek(struct rsocket *rs, void **buf, size_t len)
+static ssize_t rs_peek(struct rsocket *rs, void *buf, size_t len)
 {
 	size_t left = len;
 	uint32_t end_size, rsize;
@@ -1097,15 +1097,15 @@ static ssize_t rs_peek(struct rsocket *rs, void **buf, size_t len)
 
 		end_size = rs->rbuf_size - rbuf_offset;
 		if (rsize > end_size) {
-			memcpy(*buf, &rs->rbuf[rbuf_offset], end_size);
+			memcpy(buf, &rs->rbuf[rbuf_offset], end_size);
 			rbuf_offset = 0;
-			*buf += end_size;
+			buf += end_size;
 			rsize -= end_size;
 			left -= end_size;
 		}
-		memcpy(*buf, &rs->rbuf[rbuf_offset], rsize);
+		memcpy(buf, &rs->rbuf[rbuf_offset], rsize);
 		rbuf_offset += rsize;
-		*buf += rsize;
+		buf += rsize;
 	}
 
 	return len - left;
