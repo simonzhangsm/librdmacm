@@ -1,5 +1,5 @@
 Version: 1
-Previous: 53a23b42fc6f76408ab0539d9b6dd1f8e5a7170e
+Previous: 43becf5160f3d6562bc5b68ef5c8f8166bd707c5
 Head: a957d5786c30dfb1da9cf9345e4a639f6006fbda
 Applied:
   real-close: 3409f8d6af187d25c63a5d1f8ee8bff5f14555e2
@@ -10,7 +10,6 @@ Applied:
   sendfile: 9073427ddddfa2f7c93d0ac4a6da9844cb7d2960
   fstat: a957d5786c30dfb1da9cf9345e4a639f6006fbda
 Unapplied:
-  chroot: 217b50f5bf2a51dc9392a3bcab93325c4dd1c0e1
   dbg-out: 4b4c0572eab77856d8fbb919b1feb8f3502a101a
   dbg: 0c269855776d3001e37da8c8afe283c20e1d6cd6
   waitall-buggy: c49c6b56c55385774065f5aa2704078e6ae0ceb8
