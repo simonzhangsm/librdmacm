@@ -1,5 +1,5 @@
 Bottom: 3f4ba48a611f719563dc773a1c33fbd391708df0
-Top:    f0b4d530a7758f20a79b3abc8f27419ecb1fc961
+Top:    82b0aedfaff9c5dc6df2e8b45d95f760cc338281
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-06-28 11:34:38 -0700
 
@@ -11,10 +11,10 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index 996cb2f..13fd0da 100644
+index 996cb2f..8c9e847 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
-@@ -1131,43 +1131,48 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
+@@ -1131,43 +1131,49 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
  		}
  	}
  	fastlock_acquire(&rs->rlock);
@@ -50,7 +50,7 @@ index 996cb2f..13fd0da 100644
 +		if (flags & MSG_PEEK) {
 +			// fixme or will peek same data in waitall loop
 +			left -= rs_peek(rs, &buf, left);
-+			continue;
++			break;
  		}
  
 -		end_size = rs->rbuf_size - rs->rbuf_offset;
@@ -78,10 +78,12 @@ index 996cb2f..13fd0da 100644
 +				buf += end_size;
 +				rsize -= end_size;
 +				left -= end_size;
++				rs->rbuf_bytes_avail += end_size;
 +			}
 +			memcpy(buf, &rs->rbuf[rs->rbuf_offset], rsize);
 +			rs->rbuf_offset += rsize;
 +			buf += rsize;
++			rs->rbuf_bytes_avail += rsize;
  		}
 -		memcpy(buf, &rs->rbuf[rs->rbuf_offset], rsize);
 -		rs->rbuf_offset += rsize;
@@ -89,7 +91,6 @@ index 996cb2f..13fd0da 100644
 -	}
 -	rs->rbuf_bytes_avail += len - left;
 -out:
-+		rs->rbuf_bytes_avail += len - left; // <- fixme in waitall loop
 +
 +	} while ((flags & MSG_WAITALL) && (rs->state & rs_connect_rd) && left);
 +
