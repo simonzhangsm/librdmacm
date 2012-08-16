@@ -1141,7 +1141,7 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
 
 		ret = 0;
 		if (flags & MSG_PEEK) {
-			left = len - rs_peek(rs, &buf, left);
+			left = len - rs_peek(rs, buf, left);
 			break;
 		}
 
