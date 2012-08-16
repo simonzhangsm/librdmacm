@@ -1,5 +1,5 @@
-Bottom: 1242d5df80aef5749c32bdb6490d768bfdd28ffe
-Top:    cc155d40ac28117d20959cbd97dbc2bbb3c4ffe6
+Bottom: 3f4ba48a611f719563dc773a1c33fbd391708df0
+Top:    22a257de4ff3a8bf47adda8be0b930b2fbcc4fea
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-06-28 11:34:38 -0700
 
@@ -11,11 +11,11 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index bdb756f..6605df9 100644
+index 996cb2f..07c1355 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
-@@ -1079,7 +1079,7 @@ static int rs_all_sends_done(struct rsocket *rs)
- 	return (rs->sqe_avail + rs->ctrl_avail) == rs->sq_size;
+@@ -1077,7 +1077,7 @@ static int rs_conn_all_sends_done(struct rsocket *rs)
+ 	       !(rs->state & rs_connected);
  }
  
 -static ssize_t rs_peek(struct rsocket *rs, void *buf, size_t len)
@@ -23,7 +23,7 @@ index bdb756f..6605df9 100644
  {
  	size_t left = len;
  	uint32_t end_size, rsize;
-@@ -1099,15 +1099,15 @@ static ssize_t rs_peek(struct rsocket *rs, void *buf, size_t len)
+@@ -1097,15 +1097,15 @@ static ssize_t rs_peek(struct rsocket *rs, void *buf, size_t len)
  
  		end_size = rs->rbuf_size - rbuf_offset;
  		if (rsize > end_size) {
@@ -43,7 +43,7 @@ index bdb756f..6605df9 100644
  	}
  
  	return len - left;
-@@ -1133,43 +1133,48 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
+@@ -1131,43 +1131,48 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
  		}
  	}
  	fastlock_acquire(&rs->rlock);
