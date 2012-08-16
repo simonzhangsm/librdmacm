@@ -1,0 +1,31 @@
+Bottom: 0c97026b5f690fd1e2693e9f9c63549fc3e00f00
+Top:    15d584ee23e38f450359c3caea511818f5bf14c0
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-16 15:44:18 -0700
+
+Refresh of waitall-ex
+
+---
+
+diff --git a/examples/rstream.c b/examples/rstream.c
+index befb7c6..1d221d0 100644
+--- a/examples/rstream.c
++++ b/examples/rstream.c
+@@ -607,7 +607,7 @@ static int set_test_opt(char *optarg)
+ 			use_async = 1;
+ 			break;
+ 		case 'b':
+-			flags &= ~MSG_DONTWAIT;
++			flags = (flags & ~MSG_DONTWAIT) | MSG_WAITALL;
+ 			break;
+ 		case 'f':
+ 			use_fork = 1;
+@@ -628,7 +628,7 @@ static int set_test_opt(char *optarg)
+ 		} else if (!strncasecmp("async", optarg, 5)) {
+ 			use_async = 1;
+ 		} else if (!strncasecmp("block", optarg, 5)) {
+-			flags &= ~MSG_DONTWAIT;
++			flags = (flags & ~MSG_DONTWAIT) | MSG_WAITALL;
+ 		} else if (!strncasecmp("nonblock", optarg, 8)) {
+ 			flags |= MSG_DONTWAIT;
+ 		} else if (!strncasecmp("verify", optarg, 6)) {
