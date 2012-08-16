@@ -1171,7 +1171,7 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
 			rs->rbuf_bytes_avail += rsize;
 		}
 
-	} while ((flags & MSG_WAITALL) && (rs->state & rs_connect_rd) && left);
+	} while (left && (flags & MSG_WAITALL) && (rs->state & rs_connect_rd));
 
 	fastlock_release(&rs->rlock);
 	return ret ? ret : len - left;
