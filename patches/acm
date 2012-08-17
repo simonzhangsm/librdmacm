@@ -1,0 +1,19 @@
+Bottom: 15d584ee23e38f450359c3caea511818f5bf14c0
+Top:    15d584ee23e38f450359c3caea511818f5bf14c0
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-17 16:41:04 -0700
+
+librdmacm: Re-enable ibacm support
+
+Commit 272c3cc024d0e5854cbafa6c2f1e8560398a68d7, "Delay ACM
+connection until resolving an address", removed the call to
+ucma_ib_init without adding it back in the correct location.
+As a result, the librdmacm no longer uses ibacm.  Fix this
+by adding the initialization call when resolving an address.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
