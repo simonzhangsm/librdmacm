@@ -1,0 +1,13 @@
+Bottom: 15d584ee23e38f450359c3caea511818f5bf14c0
+Top:    15d584ee23e38f450359c3caea511818f5bf14c0
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-17 14:02:45 -0700
+
+librdmacm: Enable AF_IB support
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
