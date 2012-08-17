@@ -1,0 +1,20 @@
+Bottom: 15d584ee23e38f450359c3caea511818f5bf14c0
+Top:    f1083d042db3658ee98dca601a0a2fd94d4cb12a
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-17 16:42:19 -0700
+
+Refresh of acm
+
+---
+
+diff --git a/src/acm.c b/src/acm.c
+index 5bdeb88..458e23d 100755
+--- a/src/acm.c
++++ b/src/acm.c
+@@ -326,6 +326,7 @@ void ucma_ib_resolve(struct rdma_addrinfo **rai, struct rdma_addrinfo *hints)
+ 	struct acm_ep_addr_data *data;
+ 	int ret;
+ 
++	ucma_ib_init();
+ 	if (sock < 0)
+ 		return;
