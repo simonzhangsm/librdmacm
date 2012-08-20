@@ -1,0 +1,13 @@
+Bottom: f1083d042db3658ee98dca601a0a2fd94d4cb12a
+Top:    f1083d042db3658ee98dca601a0a2fd94d4cb12a
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-20 09:06:49 -0700
+
+rspreload: Fix checks in fork_active
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
