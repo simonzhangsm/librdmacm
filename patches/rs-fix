@@ -3,7 +3,13 @@ Top:    30191aa638f3f574e67a71c82fa7771bcc620c52
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-20 09:06:49 -0700
 
-rspreload: Fix checks in fork_active
+rspreload: Fix checks in fork_active/passive
+
+Fix passing in wrong variable to rconnect(), check state instead
+of type, and move call to getpeername until after we are sure than
+the normal socket connection has completed.
+
+Problems pointed out by Sridhar Samudrala <sri@us.ibm.com>
 
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
