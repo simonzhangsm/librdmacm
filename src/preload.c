@@ -504,6 +504,13 @@ static void fork_active(int socket)
 
 	sfd = fd_getd(socket);
 
+	flags = real.fcntl(sfd, F_GETFL);
+	real.fcntl(sfd, F_SETFL, 0);
+	ret = real.recv(sfd, &msg, sizeof msg, MSG_PEEK);
+	real.fcntl(sfd, F_SETFL, flags);
+	if ((ret != sizeof msg) || msg)
+		goto err1;
+
 	len = sizeof addr;
 	ret = real.getpeername(sfd, (struct sockaddr *) &addr, &len);
 	if (ret)
@@ -512,13 +519,6 @@ static void fork_active(int socket)
 	dfd = rsocket(addr.ss_family, SOCK_STREAM, 0);
 	if (dfd < 0)
 		goto err1;
-
-	flags = real.fcntl(sfd, F_GETFL);
-	real.fcntl(sfd, F_SETFL, 0);
-	ret = real.recv(sfd, &msg, sizeof msg, MSG_PEEK);
-	real.fcntl(sfd, F_SETFL, flags);
-	if ((ret != sizeof msg) || msg)
-		goto err2;
 
 	ret = rconnect(dfd, (struct sockaddr *) &addr, len);
 	if (ret)
