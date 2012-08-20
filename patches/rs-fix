@@ -1,5 +1,5 @@
 Bottom: f1083d042db3658ee98dca601a0a2fd94d4cb12a
-Top:    3fd71bbdde8064c89162f5d4672b6b5bead9703a
+Top:    30191aa638f3f574e67a71c82fa7771bcc620c52
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-20 09:06:49 -0700
 
@@ -11,13 +11,34 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index 8f19af5..474287e 100644
+index 8f19af5..0645f6d 100644
 --- a/src/preload.c
 +++ b/src/preload.c
-@@ -520,7 +520,7 @@ static void fork_active(int socket)
- 	if ((ret != sizeof msg) || msg)
- 		goto err2;
+@@ -504,6 +504,13 @@ static void fork_active(int socket)
  
+ 	sfd = fd_getd(socket);
+ 
++	flags = real.fcntl(sfd, F_GETFL);
++	real.fcntl(sfd, F_SETFL, 0);
++	ret = real.recv(sfd, &msg, sizeof msg, MSG_PEEK);
++	real.fcntl(sfd, F_SETFL, flags);
++	if ((ret != sizeof msg) || msg)
++		goto err1;
++
+ 	len = sizeof addr;
+ 	ret = real.getpeername(sfd, (struct sockaddr *) &addr, &len);
+ 	if (ret)
+@@ -513,14 +520,7 @@ static void fork_active(int socket)
+ 	if (dfd < 0)
+ 		goto err1;
+ 
+-	flags = real.fcntl(sfd, F_GETFL);
+-	real.fcntl(sfd, F_SETFL, 0);
+-	ret = real.recv(sfd, &msg, sizeof msg, MSG_PEEK);
+-	real.fcntl(sfd, F_SETFL, flags);
+-	if ((ret != sizeof msg) || msg)
+-		goto err2;
+-
 -	ret = rconnect(ret, (struct sockaddr *) &addr, len);
 +	ret = rconnect(dfd, (struct sockaddr *) &addr, len);
  	if (ret)
