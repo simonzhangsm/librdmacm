@@ -239,7 +239,7 @@ void getenv_options(void)
 	if (var)
 		sq_inline = atoi(var);
 
-	var = getenv("RDMAV_FORK_SAFE");
+	var = getenv("RS_FORK_SUPPORT");
 	if (var)
 		fork_support = atoi(var);
 }
@@ -413,11 +413,13 @@ int socket(int domain, int type, int protocol)
 		return index;
 
 	recursive = 1;
+goto realsock;
 	ret = rsocket(domain, type, protocol);
 	recursive = 0;
 	if (ret >= 0) {
 		if (fork_support) {
 			rclose(ret);
+realsock:
 			ret = real.socket(domain, type, protocol);
 			if (ret < 0)
 				return ret;
