@@ -34,6 +34,7 @@
 #if HAVE_CONFIG_H
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
+#include <stdio.h>
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -239,7 +240,7 @@ void getenv_options(void)
 	if (var)
 		sq_inline = atoi(var);
 
-	var = getenv("RDMAV_FORK_SAFE");
+	var = getenv("RS_FORK_SUPPORT");
 	if (var)
 		fork_support = atoi(var);
 }
@@ -412,12 +413,19 @@ int socket(int domain, int type, int protocol)
 	if (index < 0)
 		return index;
 
+	if ((domain == PF_INET || domain == PF_INET6) &&
+	    (type == SOCK_STREAM) && (!protocol || protocol == IPPROTO_TCP) && fork_support) {
+		printf("skipping rsocket call\n");
+		goto realsock;
+	}
+
 	recursive = 1;
 	ret = rsocket(domain, type, protocol);
 	recursive = 0;
 	if (ret >= 0) {
 		if (fork_support) {
 			rclose(ret);
+realsock:
 			ret = real.socket(domain, type, protocol);
 			if (ret < 0)
 				return ret;
@@ -560,6 +568,7 @@ static void fork_passive(int socket)
 	sin6.sin6_flowinfo = sin6.sin6_scope_id = 0;
 	memset(&sin6.sin6_addr, 0, sizeof sin6.sin6_addr);
 
+	sem_unlink("/rsocket_fork");
 	sem = sem_open("/rsocket_fork", O_CREAT | O_RDWR,
 		       S_IRWXU | S_IRWXG, 1);
 	if (sem == SEM_FAILED) {
