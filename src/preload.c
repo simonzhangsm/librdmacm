@@ -34,6 +34,7 @@
 #if HAVE_CONFIG_H
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
+#include <stdio.h>
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -239,7 +240,7 @@ void getenv_options(void)
 	if (var)
 		sq_inline = atoi(var);
 
-	var = getenv("RDMAV_FORK_SAFE");
+	var = getenv("RS_FORK_SUPPORT");
 	if (var)
 		fork_support = atoi(var);
 }
@@ -413,11 +414,14 @@ int socket(int domain, int type, int protocol)
 		return index;
 
 	recursive = 1;
+printf("skipping rsocket call\n");
+goto realsock;
 	ret = rsocket(domain, type, protocol);
 	recursive = 0;
 	if (ret >= 0) {
 		if (fork_support) {
 			rclose(ret);
+realsock:
 			ret = real.socket(domain, type, protocol);
 			if (ret < 0)
 				return ret;
@@ -502,6 +506,7 @@ static void fork_active(int socket)
 	uint32_t msg;
 	long flags;
 
+	printf("fork_active\n");
 	sfd = fd_getd(socket);
 
 	flags = real.fcntl(sfd, F_GETFL);
@@ -516,10 +521,12 @@ static void fork_active(int socket)
 	if (ret)
 		goto err1;
 
+	printf("fork_active - create rsocket\n");
 	dfd = rsocket(addr.ss_family, SOCK_STREAM, 0);
 	if (dfd < 0)
 		goto err1;
 
+	printf("fork_active - rconnect\n");
 	ret = rconnect(dfd, (struct sockaddr *) &addr, len);
 	if (ret)
 		goto err2;
@@ -551,6 +558,7 @@ static void fork_passive(int socket)
 	socklen_t len;
 	uint32_t msg;
 
+	printf("fork_passive\n");
 	sfd = fd_getd(socket);
 
 	len = sizeof sin6;
@@ -566,6 +574,7 @@ static void fork_passive(int socket)
 		ret = -1;
 		goto out;
 	}
+	printf("fork_passive - create rsocket\n");
 
 	lfd = rsocket(sin6.sin6_family, SOCK_STREAM, 0);
 	if (lfd < 0) {
@@ -589,6 +598,7 @@ static void fork_passive(int socket)
 	len = real.write(sfd, &msg, sizeof msg);
 	if (len != sizeof msg)
 		goto lclose;
+	printf("fork_passive - raccept\n");
 
 	dfd = raccept(lfd, NULL, NULL);
 	if (dfd < 0) {
