@@ -34,6 +34,7 @@
 #if HAVE_CONFIG_H
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
+#include <stdio.h>
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -239,7 +240,7 @@ void getenv_options(void)
 	if (var)
 		sq_inline = atoi(var);
 
-	var = getenv("RDMAV_FORK_SAFE");
+	var = getenv("RS_FORK_SUPPORT");
 	if (var)
 		fork_support = atoi(var);
 }
@@ -412,12 +413,19 @@ int socket(int domain, int type, int protocol)
 	if (index < 0)
 		return index;
 
+	if ((domain == PF_INET || domain == PF_INET6) &&
+	    (type == SOCK_STREAM) && (!protocol || protocol == IPPROTO_TCP) && fork_support) {
+		printf("skipping rsocket call\n");
+		goto realsock;
+	}
+
 	recursive = 1;
 	ret = rsocket(domain, type, protocol);
 	recursive = 0;
 	if (ret >= 0) {
 		if (fork_support) {
 			rclose(ret);
+realsock:
 			ret = real.socket(domain, type, protocol);
 			if (ret < 0)
 				return ret;
@@ -502,24 +510,30 @@ static void fork_active(int socket)
 	uint32_t msg;
 	long flags;
 
+	printf("fork_active\n");
 	sfd = fd_getd(socket);
 
 	flags = real.fcntl(sfd, F_GETFL);
 	real.fcntl(sfd, F_SETFL, 0);
+	printf("fork_active - recv\n");
 	ret = real.recv(sfd, &msg, sizeof msg, MSG_PEEK);
+	printf("fork_active - recv %d\n", ret);
 	real.fcntl(sfd, F_SETFL, flags);
 	if ((ret != sizeof msg) || msg)
 		goto err1;
 
 	len = sizeof addr;
 	ret = real.getpeername(sfd, (struct sockaddr *) &addr, &len);
+	printf("fork_active - getpeername %d\n", ret);
 	if (ret)
 		goto err1;
 
+	printf("fork_active - create rsocket\n");
 	dfd = rsocket(addr.ss_family, SOCK_STREAM, 0);
 	if (dfd < 0)
 		goto err1;
 
+	printf("fork_active - rconnect\n");
 	ret = rconnect(dfd, (struct sockaddr *) &addr, len);
 	if (ret)
 		goto err2;
@@ -551,6 +565,7 @@ static void fork_passive(int socket)
 	socklen_t len;
 	uint32_t msg;
 
+	printf("fork_passive\n");
 	sfd = fd_getd(socket);
 
 	len = sizeof sin6;
@@ -566,6 +581,7 @@ static void fork_passive(int socket)
 		ret = -1;
 		goto out;
 	}
+	printf("fork_passive - create rsocket\n");
 
 	lfd = rsocket(sin6.sin6_family, SOCK_STREAM, 0);
 	if (lfd < 0) {
@@ -578,19 +594,24 @@ static void fork_passive(int socket)
 
 	sem_wait(sem);
 	ret = rbind(lfd, (struct sockaddr *) &sin6, sizeof sin6);
+	printf("fork_passive bind %d\n", ret);
 	if (ret)
 		goto lclose;
 
 	ret = rlisten(lfd, 1);
+	printf("fork_passive listen %d\n", ret);
 	if (ret)
 		goto lclose;
 
 	msg = 0;
 	len = real.write(sfd, &msg, sizeof msg);
+	printf("fork_passive write %d\n", len);
 	if (len != sizeof msg)
 		goto lclose;
+	printf("fork_passive - raccept\n");
 
 	dfd = raccept(lfd, NULL, NULL);
+	printf("fork_passive accept %d\n", dfd);
 	if (dfd < 0) {
 		ret  = dfd;
 		goto lclose;
