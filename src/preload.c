@@ -413,11 +413,13 @@ int socket(int domain, int type, int protocol)
 		return index;
 
 	recursive = 1;
+goto realsock;
 	ret = rsocket(domain, type, protocol);
 	recursive = 0;
 	if (ret >= 0) {
 		if (fork_support) {
 			rclose(ret);
+realsock:
 			ret = real.socket(domain, type, protocol);
 			if (ret < 0)
 				return ret;
