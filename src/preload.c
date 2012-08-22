@@ -239,7 +239,7 @@ void getenv_options(void)
 	if (var)
 		sq_inline = atoi(var);
 
-	var = getenv("RDMAV_FORK_SAFE");
+	var = getenv("RS_FORK_SUPPORT");
 	if (var)
 		fork_support = atoi(var);
 }
