@@ -413,9 +413,13 @@ int socket(int domain, int type, int protocol)
 	if (index < 0)
 		return index;
 
+	if ((domain == PF_INET || domain == PF_INET6) &&
+	    (type == SOCK_STREAM) && (!protocol || protocol == IPPROTO_TCP) && fork_support) {
+		printf("skipping rsocket call\n");
+		goto realsock;
+	}
+
 	recursive = 1;
-printf("skipping rsocket call\n");
-goto realsock;
 	ret = rsocket(domain, type, protocol);
 	recursive = 0;
 	if (ret >= 0) {
