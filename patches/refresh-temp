@@ -1,0 +1,22 @@
+Bottom: 06853a301391158299c28be6011861e4de091813
+Top:    d21d7a185654b30280c213c38688f30ca0fabe87
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-22 14:33:18 -0700
+
+Refresh of dbg-fork
+
+---
+
+diff --git a/src/preload.c b/src/preload.c
+index c96d1d7..8889410 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -239,7 +239,7 @@ void getenv_options(void)
+ 	if (var)
+ 		sq_inline = atoi(var);
+ 
+-	var = getenv("RDMAV_FORK_SAFE");
++	var = getenv("RS_FORK_SUPPORT");
+ 	if (var)
+ 		fork_support = atoi(var);
+ }
