@@ -1,5 +1,5 @@
 Bottom: 30191aa638f3f574e67a71c82fa7771bcc620c52
-Top:    897cee0b17f17050fe3667cbaf7c6d9d3f66ab9d
+Top:    24c419a565e8be47500329bc1ba94c160d8d19e1
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-21 13:49:59 -0700
 
@@ -9,7 +9,7 @@ debug fork issue
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index 0645f6d..d1d8b06 100644
+index 0645f6d..d0fead2 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -34,6 +34,7 @@
@@ -80,7 +80,7 @@ index 0645f6d..d1d8b06 100644
  	ret = rconnect(dfd, (struct sockaddr *) &addr, len);
  	if (ret)
  		goto err2;
-@@ -551,6 +565,7 @@ static void fork_passive(int socket)
+@@ -551,21 +565,25 @@ static void fork_passive(int socket)
  	socklen_t len;
  	uint32_t msg;
  
@@ -88,7 +88,17 @@ index 0645f6d..d1d8b06 100644
  	sfd = fd_getd(socket);
  
  	len = sizeof sin6;
-@@ -566,6 +581,7 @@ static void fork_passive(int socket)
+ 	ret = real.getsockname(sfd, (struct sockaddr *) &sin6, &len);
++	printf("fork_passive - getsockname %d\n", ret);
+ 	if (ret)
+ 		goto out;
+ 	sin6.sin6_flowinfo = sin6.sin6_scope_id = 0;
+ 	memset(&sin6.sin6_addr, 0, sizeof sin6.sin6_addr);
+ 
++	sem_unlink("/rsocket_fork");
+ 	sem = sem_open("/rsocket_fork", O_CREAT | O_RDWR,
+ 		       S_IRWXU | S_IRWXG, 1);
+ 	if (sem == SEM_FAILED) {
  		ret = -1;
  		goto out;
  	}
@@ -96,7 +106,7 @@ index 0645f6d..d1d8b06 100644
  
  	lfd = rsocket(sin6.sin6_family, SOCK_STREAM, 0);
  	if (lfd < 0) {
-@@ -578,19 +594,24 @@ static void fork_passive(int socket)
+@@ -578,19 +596,24 @@ static void fork_passive(int socket)
  
  	sem_wait(sem);
  	ret = rbind(lfd, (struct sockaddr *) &sin6, sizeof sin6);
