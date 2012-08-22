@@ -511,13 +511,16 @@ static void fork_active(int socket)
 
 	flags = real.fcntl(sfd, F_GETFL);
 	real.fcntl(sfd, F_SETFL, 0);
+	printf("fork_active - recv\n");
 	ret = real.recv(sfd, &msg, sizeof msg, MSG_PEEK);
+	printf("fork_active - recv %d\n", ret);
 	real.fcntl(sfd, F_SETFL, flags);
 	if ((ret != sizeof msg) || msg)
 		goto err1;
 
 	len = sizeof addr;
 	ret = real.getpeername(sfd, (struct sockaddr *) &addr, &len);
+	printf("fork_active - getpeername %d\n", ret);
 	if (ret)
 		goto err1;
 
@@ -587,20 +590,24 @@ static void fork_passive(int socket)
 
 	sem_wait(sem);
 	ret = rbind(lfd, (struct sockaddr *) &sin6, sizeof sin6);
+	printf("fork_passive bind %d\n", ret);
 	if (ret)
 		goto lclose;
 
 	ret = rlisten(lfd, 1);
+	printf("fork_passive listen %d\n", ret);
 	if (ret)
 		goto lclose;
 
 	msg = 0;
 	len = real.write(sfd, &msg, sizeof msg);
+	printf("fork_passive write %d\n", len);
 	if (len != sizeof msg)
 		goto lclose;
 	printf("fork_passive - raccept\n");
 
 	dfd = raccept(lfd, NULL, NULL);
+	printf("fork_passive accept %d\n", dfd);
 	if (dfd < 0) {
 		ret  = dfd;
 		goto lclose;
