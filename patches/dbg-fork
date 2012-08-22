@@ -1,5 +1,5 @@
 Bottom: 30191aa638f3f574e67a71c82fa7771bcc620c52
-Top:    d21d7a185654b30280c213c38688f30ca0fabe87
+Top:    296e6cd8f1f1213e16e0d247ff92a700dc79ef41
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-21 13:49:59 -0700
 
@@ -9,10 +9,18 @@ debug fork issue
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index 0645f6d..8889410 100644
+index 0645f6d..b5a67cb 100644
 --- a/src/preload.c
 +++ b/src/preload.c
-@@ -239,7 +239,7 @@ void getenv_options(void)
+@@ -34,6 +34,7 @@
+ #if HAVE_CONFIG_H
+ #  include <config.h>
+ #endif /* HAVE_CONFIG_H */
++#include <stdio.h>
+ 
+ #include <sys/types.h>
+ #include <sys/socket.h>
+@@ -239,7 +240,7 @@ void getenv_options(void)
  	if (var)
  		sq_inline = atoi(var);
  
@@ -21,10 +29,11 @@ index 0645f6d..8889410 100644
  	if (var)
  		fork_support = atoi(var);
  }
-@@ -413,11 +413,13 @@ int socket(int domain, int type, int protocol)
+@@ -413,11 +414,14 @@ int socket(int domain, int type, int protocol)
  		return index;
  
  	recursive = 1;
++printf("skipping rsocket call\n");
 +goto realsock;
  	ret = rsocket(domain, type, protocol);
  	recursive = 0;
@@ -35,6 +44,51 @@ index 0645f6d..8889410 100644
  			ret = real.socket(domain, type, protocol);
  			if (ret < 0)
  				return ret;
+@@ -502,6 +506,7 @@ static void fork_active(int socket)
+ 	uint32_t msg;
+ 	long flags;
+ 
++	printf("fork_active\n");
+ 	sfd = fd_getd(socket);
+ 
+ 	flags = real.fcntl(sfd, F_GETFL);
+@@ -516,10 +521,12 @@ static void fork_active(int socket)
+ 	if (ret)
+ 		goto err1;
+ 
++	printf("fork_active - create rsocket\n");
+ 	dfd = rsocket(addr.ss_family, SOCK_STREAM, 0);
+ 	if (dfd < 0)
+ 		goto err1;
+ 
++	printf("fork_active - rconnect\n");
+ 	ret = rconnect(dfd, (struct sockaddr *) &addr, len);
+ 	if (ret)
+ 		goto err2;
+@@ -551,6 +558,7 @@ static void fork_passive(int socket)
+ 	socklen_t len;
+ 	uint32_t msg;
+ 
++	printf("fork_passive\n");
+ 	sfd = fd_getd(socket);
+ 
+ 	len = sizeof sin6;
+@@ -566,6 +574,7 @@ static void fork_passive(int socket)
+ 		ret = -1;
+ 		goto out;
+ 	}
++	printf("fork_passive - create rsocket\n");
+ 
+ 	lfd = rsocket(sin6.sin6_family, SOCK_STREAM, 0);
+ 	if (lfd < 0) {
+@@ -589,6 +598,7 @@ static void fork_passive(int socket)
+ 	len = real.write(sfd, &msg, sizeof msg);
+ 	if (len != sizeof msg)
+ 		goto lclose;
++	printf("fork_passive - raccept\n");
+ 
+ 	dfd = raccept(lfd, NULL, NULL);
+ 	if (dfd < 0) {
 diff --git a/src/rsocket.c b/src/rsocket.c
 index 4c4821b..52476a2 100644
 --- a/src/rsocket.c
