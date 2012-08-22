@@ -570,11 +570,13 @@ static void fork_passive(int socket)
 
 	len = sizeof sin6;
 	ret = real.getsockname(sfd, (struct sockaddr *) &sin6, &len);
+	printf("fork_passive - getsockname %d\n", ret);
 	if (ret)
 		goto out;
 	sin6.sin6_flowinfo = sin6.sin6_scope_id = 0;
 	memset(&sin6.sin6_addr, 0, sizeof sin6.sin6_addr);
 
+	sem_unlink("/rsocket_fork");
 	sem = sem_open("/rsocket_fork", O_CREAT | O_RDWR,
 		       S_IRWXU | S_IRWXG, 1);
 	if (sem == SEM_FAILED) {
