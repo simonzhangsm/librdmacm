@@ -1,5 +1,5 @@
 Bottom: 30191aa638f3f574e67a71c82fa7771bcc620c52
-Top:    3ff660268308f81ffa10068086e46e1eb0d84b77
+Top:    897cee0b17f17050fe3667cbaf7c6d9d3f66ab9d
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-21 13:49:59 -0700
 
@@ -9,7 +9,7 @@ debug fork issue
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index 0645f6d..fba0281 100644
+index 0645f6d..d1d8b06 100644
 --- a/src/preload.c
 +++ b/src/preload.c
 @@ -34,6 +34,7 @@
@@ -29,12 +29,17 @@ index 0645f6d..fba0281 100644
  	if (var)
  		fork_support = atoi(var);
  }
-@@ -413,11 +414,14 @@ int socket(int domain, int type, int protocol)
+@@ -412,12 +413,19 @@ int socket(int domain, int type, int protocol)
+ 	if (index < 0)
  		return index;
  
++	if ((domain == PF_INET || domain == PF_INET6) &&
++	    (type == SOCK_STREAM) && (!protocol || protocol == IPPROTO_TCP) && fork_support) {
++		printf("skipping rsocket call\n");
++		goto realsock;
++	}
++
  	recursive = 1;
-+printf("skipping rsocket call\n");
-+goto realsock;
  	ret = rsocket(domain, type, protocol);
  	recursive = 0;
  	if (ret >= 0) {
@@ -44,7 +49,7 @@ index 0645f6d..fba0281 100644
  			ret = real.socket(domain, type, protocol);
  			if (ret < 0)
  				return ret;
-@@ -502,24 +506,30 @@ static void fork_active(int socket)
+@@ -502,24 +510,30 @@ static void fork_active(int socket)
  	uint32_t msg;
  	long flags;
  
@@ -75,7 +80,7 @@ index 0645f6d..fba0281 100644
  	ret = rconnect(dfd, (struct sockaddr *) &addr, len);
  	if (ret)
  		goto err2;
-@@ -551,6 +561,7 @@ static void fork_passive(int socket)
+@@ -551,6 +565,7 @@ static void fork_passive(int socket)
  	socklen_t len;
  	uint32_t msg;
  
@@ -83,7 +88,7 @@ index 0645f6d..fba0281 100644
  	sfd = fd_getd(socket);
  
  	len = sizeof sin6;
-@@ -566,6 +577,7 @@ static void fork_passive(int socket)
+@@ -566,6 +581,7 @@ static void fork_passive(int socket)
  		ret = -1;
  		goto out;
  	}
@@ -91,7 +96,7 @@ index 0645f6d..fba0281 100644
  
  	lfd = rsocket(sin6.sin6_family, SOCK_STREAM, 0);
  	if (lfd < 0) {
-@@ -578,19 +590,24 @@ static void fork_passive(int socket)
+@@ -578,19 +594,24 @@ static void fork_passive(int socket)
  
  	sem_wait(sem);
  	ret = rbind(lfd, (struct sockaddr *) &sin6, sizeof sin6);
