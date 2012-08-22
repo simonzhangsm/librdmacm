@@ -1,5 +1,5 @@
 Bottom: 30191aa638f3f574e67a71c82fa7771bcc620c52
-Top:    06853a301391158299c28be6011861e4de091813
+Top:    d21d7a185654b30280c213c38688f30ca0fabe87
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-21 13:49:59 -0700
 
@@ -9,9 +9,18 @@ debug fork issue
 ---
 
 diff --git a/src/preload.c b/src/preload.c
-index 0645f6d..c96d1d7 100644
+index 0645f6d..8889410 100644
 --- a/src/preload.c
 +++ b/src/preload.c
+@@ -239,7 +239,7 @@ void getenv_options(void)
+ 	if (var)
+ 		sq_inline = atoi(var);
+ 
+-	var = getenv("RDMAV_FORK_SAFE");
++	var = getenv("RS_FORK_SUPPORT");
+ 	if (var)
+ 		fork_support = atoi(var);
+ }
 @@ -413,11 +413,13 @@ int socket(int domain, int type, int protocol)
  		return index;
  
