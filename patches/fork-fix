@@ -1,0 +1,32 @@
+Bottom: 30191aa638f3f574e67a71c82fa7771bcc620c52
+Top:    30191aa638f3f574e67a71c82fa7771bcc620c52
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-23 11:20:08 -0700
+
+rspreload: Avoid rsocket calls until after fork
+
+When an rsocket call is made before an application calls fork(),
+the forked applications can hang.  This can be seen by running
+netserver and two netperf clients simultaneously.  The second
+netperf client will eventually stop performing data transfers.
+
+LD_PRELOAD=librspreload.so netserver -D
+
+LD_PRELOAD=librspreload.so netperf -v2 -c -C -H 192.168.0.101 -l30
+LD_PRELOAD=librspreload.so netperf -v2 -c -C -H 192.168.0.101 -l30
+
+It's not clear what the specific problem is.  The best guess is
+that libibverbs or the provider library (e.g. libmlx4) perform
+some initialization, such as mmap'ing device memory, which does not
+work when fork is called.
+
+As a work-around, avoid calling rsocket routines until immediately
+before they are needed.  This allows the process to fork before
+the libraries are initialized.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
