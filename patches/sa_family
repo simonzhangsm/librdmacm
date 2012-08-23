@@ -1,0 +1,16 @@
+Bottom: 1f3e91359a2a6d34a157b3b986b2afac307079ae
+Top:    1f3e91359a2a6d34a157b3b986b2afac307079ae
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-23 15:48:06 -0700
+
+librdmacm: Set address family for source address returned by ACM
+
+Set the sa_family type when saving the source address returnd
+by ACM.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
