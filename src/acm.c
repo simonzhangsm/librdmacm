@@ -384,11 +384,11 @@ void ucma_ib_resolve(struct rdma_addrinfo **rai, struct rdma_addrinfo *hints)
 
 		if (ucma_ib_addr((*rai)->ai_src_addr, (*rai)->ai_src_len)) {
 			memcpy(&data->info.path.sgid,
-			       ((struct sockaddr_ib *) (*rai)->ai_src_addr)->sib_addr, 16);
+			       &((struct sockaddr_ib *) (*rai)->ai_src_addr)->sib_addr, 16);
 		}
 		if (ucma_ib_addr((*rai)->ai_dst_addr, (*rai)->ai_dst_len)) {
 			memcpy(&data->info.path.dgid,
-			       ((struct sockaddr_ib *) (*rai)->ai_dst_addr)->sib_addr, 16);
+			       &((struct sockaddr_ib *) (*rai)->ai_dst_addr)->sib_addr, 16);
 		}
 		data->type = ACM_EP_INFO_PATH;
 		data++;
