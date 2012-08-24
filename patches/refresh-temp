@@ -1,0 +1,27 @@
+Bottom: 162a1f68ee732043b0c08739b5bab499d00d568d
+Top:    f785cd6baadc37d4b07525ba84ef1cb4eb08b31a
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-24 16:34:58 -0700
+
+Refresh of af_ib
+
+---
+
+diff --git a/src/acm.c b/src/acm.c
+index d538d92..7e7e8a7 100755
+--- a/src/acm.c
++++ b/src/acm.c
+@@ -384,11 +384,11 @@ void ucma_ib_resolve(struct rdma_addrinfo **rai, struct rdma_addrinfo *hints)
+ 
+ 		if (ucma_ib_addr((*rai)->ai_src_addr, (*rai)->ai_src_len)) {
+ 			memcpy(&data->info.path.sgid,
+-			       ((struct sockaddr_ib *) (*rai)->ai_src_addr)->sib_addr, 16);
++			       &((struct sockaddr_ib *) (*rai)->ai_src_addr)->sib_addr, 16);
+ 		}
+ 		if (ucma_ib_addr((*rai)->ai_dst_addr, (*rai)->ai_dst_len)) {
+ 			memcpy(&data->info.path.dgid,
+-			       ((struct sockaddr_ib *) (*rai)->ai_dst_addr)->sib_addr, 16);
++			       &((struct sockaddr_ib *) (*rai)->ai_dst_addr)->sib_addr, 16);
+ 		}
+ 		data->type = ACM_EP_INFO_PATH;
+ 		data++;
