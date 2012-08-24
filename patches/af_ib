@@ -1,5 +1,5 @@
 Bottom: a714bc4ff96a4b6832ac8f7cb9d7f0d37f8320e7
-Top:    f785cd6baadc37d4b07525ba84ef1cb4eb08b31a
+Top:    887d55d9c4229530cb6672292eccba87095a9e52
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-17 14:02:45 -0700
 
@@ -45,7 +45,7 @@ index 1487f8f..f3c8921 100755
  static inline struct sockaddr *rdma_get_local_addr(struct rdma_cm_id *id)
  {
 diff --git a/src/acm.c b/src/acm.c
-index d96dbcd..7e7e8a7 100755
+index d96dbcd..92411fa 100755
 --- a/src/acm.c
 +++ b/src/acm.c
 @@ -324,6 +324,17 @@ static void ucma_copy_rai_addr(struct acm_ep_addr_data *data, struct sockaddr *a
@@ -119,6 +119,15 @@ index d96dbcd..7e7e8a7 100755
  	}
  
  	pthread_mutex_lock(&acm_lock);
+@@ -389,7 +410,7 @@ void ucma_ib_resolve(struct rdma_addrinfo **rai, struct rdma_addrinfo *hints)
+ 	ucma_ib_save_resp(*rai, &msg);
+ 
+ 	if (af_ib_support && !((*rai)->ai_flags & RAI_ROUTEONLY) &&
+-	    (*rai)->ai_route_len)
++	    (*rai)->ai_route_len && ((*rai)->ai_family != AF_IB))
+ 		ucma_resolve_af_ib(rai);
+ }
+ 
 diff --git a/src/cma.c b/src/cma.c
 index 5280620..2994655 100755
 --- a/src/cma.c
