@@ -410,7 +410,7 @@ void ucma_ib_resolve(struct rdma_addrinfo **rai, struct rdma_addrinfo *hints)
 	ucma_ib_save_resp(*rai, &msg);
 
 	if (af_ib_support && !((*rai)->ai_flags & RAI_ROUTEONLY) &&
-	    (*rai)->ai_route_len)
+	    (*rai)->ai_route_len && ((*rai)->ai_family != AF_IB))
 		ucma_resolve_af_ib(rai);
 }
 
