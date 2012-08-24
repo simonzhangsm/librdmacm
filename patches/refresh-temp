@@ -1,0 +1,21 @@
+Bottom: f785cd6baadc37d4b07525ba84ef1cb4eb08b31a
+Top:    887d55d9c4229530cb6672292eccba87095a9e52
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-24 16:42:38 -0700
+
+Refresh of af_ib
+
+---
+
+diff --git a/src/acm.c b/src/acm.c
+index 7e7e8a7..92411fa 100755
+--- a/src/acm.c
++++ b/src/acm.c
+@@ -410,7 +410,7 @@ void ucma_ib_resolve(struct rdma_addrinfo **rai, struct rdma_addrinfo *hints)
+ 	ucma_ib_save_resp(*rai, &msg);
+ 
+ 	if (af_ib_support && !((*rai)->ai_flags & RAI_ROUTEONLY) &&
+-	    (*rai)->ai_route_len)
++	    (*rai)->ai_route_len && ((*rai)->ai_family != AF_IB))
+ 		ucma_resolve_af_ib(rai);
+ }
