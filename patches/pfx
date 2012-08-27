@@ -1,0 +1,14 @@
+Bottom: 57d7314fff3682c73b462fc63ad5d1b91784f59a
+Top:    57d7314fff3682c73b462fc63ad5d1b91784f59a
+Author: Yann Droneaud <ydroneaud@opteya.com>
+Date:   2012-08-27 16:35:32 -0700
+
+librdmacm: Use common prefix for error messages
+
+Signed-off-by: Yann Droneaud <ydroneaud@opteya.com>
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
