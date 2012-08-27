@@ -1,0 +1,16 @@
+Bottom: 8ecca87db88331d6078a80c3fd9825bc2059cd28
+Top:    8ecca87db88331d6078a80c3fd9825bc2059cd28
+Author: Yann Droneaud <ydroneaud@opteya.com>
+Date:   2012-08-27 16:37:29 -0700
+
+librdmacm: Report error level in error messages
+
+Report error messages as either 'Warning' or 'Fatal'.
+
+Signed-off-by: Yann Droneaud <ydroneaud@opteya.com>
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
