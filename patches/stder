@@ -1,6 +1,6 @@
 Bottom: f28ec49823485e069c95d7c5851dbd01583cf091
 Top:    f28ec49823485e069c95d7c5851dbd01583cf091
-Author: Sean Hefty <sean.hefty@intel.com>
+Author: Yann Droneaud <ydroneaud@opteya.com>
 Date:   2012-08-27 16:33:50 -0700
 
 librdmacm: Report error messages on stderr
