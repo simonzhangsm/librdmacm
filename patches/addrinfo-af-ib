@@ -1,0 +1,20 @@
+Bottom: 2e0a7d3ef44614a3f6760f3dad7fff7ae67386fc
+Top:    2e0a7d3ef44614a3f6760f3dad7fff7ae67386fc
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-28 12:33:04 -0700
+
+librdmacm: Support using GIDs with rdma_getaddrinfo
+
+Allow the user to specify a GID as the node parameter into
+rdma_getaddrinfo.
+
+Since we can't easily determine if a node is a GID, versus
+an IPv6 address...
+FIX ME
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
