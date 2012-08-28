@@ -137,6 +137,7 @@ typedef struct { volatile int val; } atomic_t;
 #define atomic_get(v) ((v)->val)
 #define atomic_set(v, s) ((v)->val = s)
 
+uint16_t ucma_get_port(struct sockaddr *addr);
 int ucma_max_qpsize(struct rdma_cm_id *id);
 int ucma_complete(struct rdma_cm_id *id);
 static inline int ERR(int err)
