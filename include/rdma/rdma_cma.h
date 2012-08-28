@@ -176,6 +176,7 @@ struct rdma_cm_event {
 #define RAI_PASSIVE		0x00000001
 #define RAI_NUMERICHOST		0x00000002
 #define RAI_NOROUTE		0x00000004
+#define RAI_FAMILY		0x00000008
 
 struct rdma_addrinfo {
 	int			ai_flags;
