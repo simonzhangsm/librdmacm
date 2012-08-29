@@ -1,0 +1,31 @@
+Bottom: a286739cf5a9cb2c62140f9cb9ea5cea10a48b56
+Top:    4ce62c6180a5ad6e3d7080ab386b955959166fc1
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-29 15:42:01 -0700
+
+Refresh of addrinfo-af-ib
+
+---
+
+diff --git a/src/addrinfo.c b/src/addrinfo.c
+index 5099058..c729720 100755
+--- a/src/addrinfo.c
++++ b/src/addrinfo.c
+@@ -172,7 +172,7 @@ static int ucma_convert_to_rai(struct rdma_addrinfo *rai,
+ 
+ 		if ((ai->ai_flags & RAI_FAMILY) && (rai->ai_family == AF_IB) &&
+ 		    (ai->ai_flags & RAI_NUMERICHOST)) {
+-			ret = ucma_convert_in6(&((struct sockaddr_ib *) rai->ai_src_addr),
++			ret = ucma_convert_in6((struct sockaddr_ib **) &rai->ai_src_addr,
+ 					       &rai->ai_src_len,
+ 					       (struct sockaddr_in6 *) ai->ai_addr,
+ 					       ai->ai_addrlen);
+@@ -186,7 +186,7 @@ static int ucma_convert_to_rai(struct rdma_addrinfo *rai,
+ 
+ 		if ((ai->ai_flags & RAI_FAMILY) && (rai->ai_family == AF_IB) &&
+ 		    (ai->ai_flags & RAI_NUMERICHOST)) {
+-			ret = ucma_convert_in6(&((struct sockaddr_ib *) rai->ai_dst_addr),
++			ret = ucma_convert_in6((struct sockaddr_ib **) &rai->ai_dst_addr,
+ 					       &rai->ai_dst_len,
+ 					       (struct sockaddr_in6 *) ai->ai_addr,
+ 					       ai->ai_addrlen);
