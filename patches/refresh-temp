@@ -1,0 +1,61 @@
+Bottom: 29c9da5494261c5f46bb469941ba77d30e344aab
+Top:    37d2010ca6d23762f290e35d6a3474ff9d72123b
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-29 15:44:51 -0700
+
+Refresh of addrtype
+
+---
+
+diff --git a/examples/cmatose.c b/examples/cmatose.c
+index 1ff87d6..8d11f33 100644
+--- a/examples/cmatose.c
++++ b/examples/cmatose.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2005-2006,2011 Intel Corporation.  All rights reserved.
++ * Copyright (c) 2005-2006,2011-2012 Intel Corporation.  All rights reserved.
+  *
+  * This software is available to you under a choice of one of two
+  * licenses.  You may choose to be licensed under the terms of the GNU
+@@ -681,8 +681,8 @@ int main(int argc, char **argv)
+ 			printf("usage: %s\n", argv[0]);
+ 			printf("\t[-s server_address]\n");
+ 			printf("\t[-b bind_address]\n");
+-			printf("\t[-f address_format]\n")
+-			printf("\t    name, ip, ipv6, or gid\n")
++			printf("\t[-f address_format]\n");
++			printf("\t    name, ip, ipv6, or gid\n");
+ 			printf("\t[-c connections]\n");
+ 			printf("\t[-C message_count]\n");
+ 			printf("\t[-S message_size]\n");
+diff --git a/examples/common.c b/examples/common.c
+index eeee046..89e76f9 100644
+--- a/examples/common.c
++++ b/examples/common.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2005-2006 Intel Corporation.  All rights reserved.
++ * Copyright (c) 2005-2006,2012 Intel Corporation.  All rights reserved.
+  *
+  * This software is available to you under a choice of one of two
+  * licenses.  You may choose to be licensed under the terms of the GNU
+diff --git a/examples/common.h b/examples/common.h
+index 8d9fea0..25d881f 100644
+--- a/examples/common.h
++++ b/examples/common.h
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2005-2011 Intel Corporation.  All rights reserved.
++ * Copyright (c) 2005-2012 Intel Corporation.  All rights reserved.
+  *
+  * This software is available to you under a choice of one of two
+  * licenses.  You may choose to be licensed under the terms of the GNU
+@@ -37,6 +37,7 @@
+ #include <byteswap.h>
+ 
+ #include <rdma/rdma_cma.h>
++#include <infiniband/ib.h>
+ 
+ #if __BYTE_ORDER == __BIG_ENDIAN
+ static inline uint64_t cpu_to_be64(uint64_t x) { return x; }
