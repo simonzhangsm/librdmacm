@@ -1,5 +1,5 @@
 Bottom: 4e01eb8a1c0681cd7bcca9c1bf3502036b929d4b
-Top:    8b6bb37c12c4672472e625ad648944ae8c0ebf16
+Top:    0fe9873298edf4cada887e75c401246a8cdab420
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-28 12:33:04 -0700
 
@@ -46,7 +46,7 @@ index 86e00ca..cd819c6 100755
  Address family for the source and destination address.  Supported families
  are: AF_INET, AF_INET6, and AF_IB.
 diff --git a/src/addrinfo.c b/src/addrinfo.c
-index 2da35f0..f606470 100755
+index 2da35f0..44496cc 100755
 --- a/src/addrinfo.c
 +++ b/src/addrinfo.c
 @@ -56,9 +56,12 @@
@@ -131,8 +131,8 @@ index 2da35f0..f606470 100755
 +		if (ai->ai_canonname)
 +			rai->ai_src_canonname = strdup(ai->ai_canonname);
 +
-+		if ((ai->ai_flags & RAI_FAMILY) && (rai->ai_family == AF_IB) &&
-+		    (ai->ai_flags & RAI_NUMERICHOST)) {
++		if ((hints->ai_flags & RAI_FAMILY) && (hints->ai_family == AF_IB) &&
++		    (hints->ai_flags & RAI_NUMERICHOST)) {
 +			ret = ucma_convert_in6((struct sockaddr_ib **) &rai->ai_src_addr,
 +					       &rai->ai_src_len,
 +					       (struct sockaddr_in6 *) ai->ai_addr,
@@ -148,8 +148,8 @@ index 2da35f0..f606470 100755
 +		if (ai->ai_canonname)
 +			rai->ai_dst_canonname = strdup(ai->ai_canonname);
 +
-+		if ((ai->ai_flags & RAI_FAMILY) && (rai->ai_family == AF_IB) &&
-+		    (ai->ai_flags & RAI_NUMERICHOST)) {
++		if ((hints->ai_flags & RAI_FAMILY) && (hints->ai_family == AF_IB) &&
++		    (hints->ai_flags & RAI_NUMERICHOST)) {
 +			ret = ucma_convert_in6((struct sockaddr_ib **) &rai->ai_dst_addr,
 +					       &rai->ai_dst_len,
 +					       (struct sockaddr_in6 *) ai->ai_addr,
