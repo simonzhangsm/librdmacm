@@ -1,0 +1,15 @@
+Bottom: 2e0a7d3ef44614a3f6760f3dad7fff7ae67386fc
+Top:    2e0a7d3ef44614a3f6760f3dad7fff7ae67386fc
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-28 17:37:30 -0700
+
+librdmacm: Rename ucma_copy_rai_addr
+
+Simple function rename to better indicate what is being copied.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
