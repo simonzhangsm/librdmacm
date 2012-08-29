@@ -122,6 +122,7 @@ static int ucma_convert_in6(struct sockaddr_ib **dst, socklen_t *dst_len,
 		return ERR(ENOMEM);
 
 	(*dst)->sib_family = AF_IB;
+	(*dst)->sib_pkey = 0xFFFF;
 	(*dst)->sib_flowinfo = src->sin6_flowinfo;
 	ib_addr_set(&(*dst)->sib_addr, src->sin6_addr.s6_addr32[0],
 		    src->sin6_addr.s6_addr32[1], src->sin6_addr.s6_addr32[2],
