@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2011 Intel Corporation.  All rights reserved.
+ * Copyright (c) 2005-2012 Intel Corporation.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
  * licenses.  You may choose to be licensed under the terms of the GNU
@@ -37,6 +37,7 @@
 #include <byteswap.h>
 
 #include <rdma/rdma_cma.h>
+#include <infiniband/ib.h>
 
 #if __BYTE_ORDER == __BIG_ENDIAN
 static inline uint64_t cpu_to_be64(uint64_t x) { return x; }
