@@ -1,5 +1,5 @@
 Bottom: 4e01eb8a1c0681cd7bcca9c1bf3502036b929d4b
-Top:    53f00af95df12c3aa07ab0835c666a9645b86b7f
+Top:    8b6bb37c12c4672472e625ad648944ae8c0ebf16
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-28 12:33:04 -0700
 
@@ -46,7 +46,7 @@ index 86e00ca..cd819c6 100755
  Address family for the source and destination address.  Supported families
  are: AF_INET, AF_INET6, and AF_IB.
 diff --git a/src/addrinfo.c b/src/addrinfo.c
-index 2da35f0..01c04d1 100755
+index 2da35f0..f606470 100755
 --- a/src/addrinfo.c
 +++ b/src/addrinfo.c
 @@ -56,9 +56,12 @@
@@ -65,7 +65,7 @@ index 2da35f0..01c04d1 100755
  
  	switch (rai->ai_qp_type) {
  	case IBV_QPT_RC:
-@@ -99,11 +102,44 @@ static void ucma_convert_to_ai(struct addrinfo *ai, struct rdma_addrinfo *rai)
+@@ -99,11 +102,45 @@ static void ucma_convert_to_ai(struct addrinfo *ai, struct rdma_addrinfo *rai)
  	ai->ai_next = NULL;
  }
  
@@ -89,6 +89,7 @@ index 2da35f0..01c04d1 100755
 +		return ERR(ENOMEM);
 +
 +	(*dst)->sib_family = AF_IB;
++	(*dst)->sib_pkey = 0xFFFF;
 +	(*dst)->sib_flowinfo = src->sin6_flowinfo;
 +	ib_addr_set(&(*dst)->sib_addr, src->sin6_addr.s6_addr32[0],
 +		    src->sin6_addr.s6_addr32[1], src->sin6_addr.s6_addr32[2],
@@ -112,7 +113,7 @@ index 2da35f0..01c04d1 100755
  
  	rai->ai_family = ai->ai_family;
  
-@@ -133,24 +169,36 @@ static int ucma_convert_to_rai(struct rdma_addrinfo *rai,
+@@ -133,24 +170,36 @@ static int ucma_convert_to_rai(struct rdma_addrinfo *rai,
  		}
  	}
  
@@ -164,7 +165,7 @@ index 2da35f0..01c04d1 100755
  }
  
  static int ucma_convert_gai(char *node, char *service,
-@@ -178,18 +226,6 @@ static int ucma_convert_gai(char *node, char *service,
+@@ -178,18 +227,6 @@ static int ucma_convert_gai(char *node, char *service,
  	return ret;
  }
  
@@ -183,7 +184,7 @@ index 2da35f0..01c04d1 100755
  int rdma_getaddrinfo(char *node, char *service,
  		     struct rdma_addrinfo *hints,
  		     struct rdma_addrinfo **res)
-@@ -216,16 +252,16 @@ int rdma_getaddrinfo(char *node, char *service,
+@@ -216,16 +253,16 @@ int rdma_getaddrinfo(char *node, char *service,
  		rai->ai_qp_type = hints->ai_qp_type;
  		rai->ai_port_space = hints->ai_port_space;
  		if (hints->ai_dst_len) {
