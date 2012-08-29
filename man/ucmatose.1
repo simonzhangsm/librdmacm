@@ -4,10 +4,10 @@ ucmatose \- RDMA CM connection and simple ping-pong test.
 .SH SYNOPSIS
 .sp
 .nf
-\fIucmatose\fR [-s server_address] [-b bind_address] [-c connections]
-		[-C message_count] [-S message_size]
-\fIucmatose\fR -s server_address [-b bind_address] [-c connections]
-		[-C message_count] [-S message_size] [-t tos]
+\fIucmatose\fR [-s server_address] [-b bind_address] [-f address_format]
+		[-c connections] [-C message_count] [-S message_size]
+\fIucmatose\fR -s server_address [-b bind_address] [-f address_format]
+		[-c connections] [-C message_count] [-S message_size] [-t tos]
 .fi
 .SH "DESCRIPTION"
 Establishes a set of reliable RDMA connections between two nodes using the
@@ -21,6 +21,13 @@ This option must be specified by the client.
 .TP
 \-b bind_address
 The local network address to bind to.
+.TP
+\-f address_format
+Specifies the format of the server and bind address.  Be default, the
+format is determined by getaddrinfo() as either being a hostname, an IPv4
+address, or an IPv6 address.  This option may be used to indicate that
+a specific address format has been provided.  Supported address_format
+values are: name, ip, ipv6, and gid.
 .TP
 \-c connections
 The number of connections to establish between the client and server.
