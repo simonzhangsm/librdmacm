@@ -100,7 +100,7 @@ static void ucma_convert_to_ai(struct addrinfo *ai, struct rdma_addrinfo *rai)
 }
 
 static int ucma_copy_addr(struct sockaddr **dst, socklen_t *dst_len,
-			     struct sockaddr *src, socklen_t src_len)
+			  struct sockaddr *src, socklen_t src_len)
 {
 	*dst = malloc(src_len);
 	if (!(*dst))
@@ -111,9 +111,33 @@ static int ucma_copy_addr(struct sockaddr **dst, socklen_t *dst_len,
 	return 0;
 }
 
+static int ucma_convert_in6(struct sockaddr_ib **dst, socklen_t *dst_len,
+			    struct sockaddr_in6 *src, socklen_t src_len)
+{
+	*dst = calloc(1, sizeof(struct sockaddr_ib));
+	if (!(*dst))
+		return ERR(ENOMEM);
+
+	(*dst)->sib_family = AF_IB;
+	(*dst)->sib_flowinfo = src->sin6_flowinfo;
+	ib_addr_set(&(*dst)->sib_addr, src->sin6_addr.s6_addr32[0],
+		    src->sin6_addr.s6_addr32[1], src->sin6_addr.s6_addr32[2],
+		    src->sin6_addr.s6_addr32[3]);
+	if (src->sin6_port) {
+		(*dst)->sib_sid = htonll((uint64_t) ntohs(src->sin6_port));
+		(*dst)->sib_sid_mask = htonll((uint64_t) 0x0000FFFF);
+	}
+	(*dst)->sib_scope_id = src->sin6_scope_id;
+
+	*dst_len = sizeof(struct sockaddr_ib);
+	return 0;
+}
+
 static int ucma_convert_to_rai(struct rdma_addrinfo *rai,
 			       struct rdma_addrinfo *hints, struct addrinfo *ai)
 {
+	int ret;
+
 	rai->ai_family = ai->ai_family;
 
 	if (hints && hints->ai_qp_type) {
@@ -145,14 +169,33 @@ static int ucma_convert_to_rai(struct rdma_addrinfo *rai,
 	if (ai->ai_flags & RAI_PASSIVE) {
 		if (ai->ai_canonname)
 			rai->ai_src_canonname = strdup(ai->ai_canonname);
-		return ucma_copy_addr(&rai->ai_src_addr, &rai->ai_src_len,
-				      ai->ai_addr, ai->ai_addrlen);
+
+		if ((ai->ai_flags & RAI_FAMILY) && (rai->ai_family == AF_IB) &&
+		    (ai->ai_flags & RAI_NUMERICHOST)) {
+			ret = ucma_convert_in6(&((struct sockaddr_ib *) rai->ai_src_addr),
+					       &rai->ai_src_len,
+					       (struct sockaddr_in6 *) ai->ai_addr,
+					       ai->ai_addrlen);
+		} else {
+			ret = ucma_copy_addr(&rai->ai_src_addr, &rai->ai_src_len,
+					     ai->ai_addr, ai->ai_addrlen);
+		}
 	} else {
 		if (ai->ai_canonname)
 			rai->ai_dst_canonname = strdup(ai->ai_canonname);
-		return ucma_copy_addr(&rai->ai_dst_addr, &rai->ai_dst_len,
-				      ai->ai_addr, ai->ai_addrlen);
+
+		if ((ai->ai_flags & RAI_FAMILY) && (rai->ai_family == AF_IB) &&
+		    (ai->ai_flags & RAI_NUMERICHOST)) {
+			ret = ucma_convert_in6(&((struct sockaddr_ib *) rai->ai_dst_addr),
+					       &rai->ai_dst_len,
+					       (struct sockaddr_in6 *) ai->ai_addr,
+					       ai->ai_addrlen);
+		} else {
+			ret = ucma_copy_addr(&rai->ai_dst_addr, &rai->ai_dst_len,
+					     ai->ai_addr, ai->ai_addrlen);
+		}
 	}
+	return ret;
 }
 
 static int ucma_convert_gai(char *node, char *service,
