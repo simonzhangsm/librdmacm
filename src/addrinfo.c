@@ -56,9 +56,12 @@
 static void ucma_convert_to_ai(struct addrinfo *ai, struct rdma_addrinfo *rai)
 {
 	memset(ai, 0, sizeof *ai);
-	ai->ai_flags  = (rai->ai_flags & RAI_PASSIVE) ? AI_PASSIVE : 0;
-	ai->ai_flags |= (rai->ai_flags & RAI_NUMERICHOST) ? AI_NUMERICHOST : 0;
-	ai->ai_family = rai->ai_family;
+	if (rai->ai_flags & RAI_PASSIVE)
+		ai->ai_flags = AI_PASSIVE;
+	if (rai->ai_flags & RAI_NUMERICHOST)
+		ai->ai_flags |= AI_NUMERICHOST;
+	if (rai->ai_family != AF_IB)
+		ai->ai_family = rai->ai_family;
 
 	switch (rai->ai_qp_type) {
 	case IBV_QPT_RC:
