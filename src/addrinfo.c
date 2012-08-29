@@ -174,8 +174,8 @@ static int ucma_convert_to_rai(struct rdma_addrinfo *rai,
 		if (ai->ai_canonname)
 			rai->ai_src_canonname = strdup(ai->ai_canonname);
 
-		if ((ai->ai_flags & RAI_FAMILY) && (rai->ai_family == AF_IB) &&
-		    (ai->ai_flags & RAI_NUMERICHOST)) {
+		if ((hints->ai_flags & RAI_FAMILY) && (hints->ai_family == AF_IB) &&
+		    (hints->ai_flags & RAI_NUMERICHOST)) {
 			ret = ucma_convert_in6((struct sockaddr_ib **) &rai->ai_src_addr,
 					       &rai->ai_src_len,
 					       (struct sockaddr_in6 *) ai->ai_addr,
@@ -188,8 +188,8 @@ static int ucma_convert_to_rai(struct rdma_addrinfo *rai,
 		if (ai->ai_canonname)
 			rai->ai_dst_canonname = strdup(ai->ai_canonname);
 
-		if ((ai->ai_flags & RAI_FAMILY) && (rai->ai_family == AF_IB) &&
-		    (ai->ai_flags & RAI_NUMERICHOST)) {
+		if ((hints->ai_flags & RAI_FAMILY) && (hints->ai_family == AF_IB) &&
+		    (hints->ai_flags & RAI_NUMERICHOST)) {
 			ret = ucma_convert_in6((struct sockaddr_ib **) &rai->ai_dst_addr,
 					       &rai->ai_dst_len,
 					       (struct sockaddr_in6 *) ai->ai_addr,
