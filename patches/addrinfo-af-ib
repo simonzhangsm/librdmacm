@@ -1,5 +1,5 @@
 Bottom: 4e01eb8a1c0681cd7bcca9c1bf3502036b929d4b
-Top:    a286739cf5a9cb2c62140f9cb9ea5cea10a48b56
+Top:    4ce62c6180a5ad6e3d7080ab386b955959166fc1
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-28 12:33:04 -0700
 
@@ -46,7 +46,7 @@ index 86e00ca..cd819c6 100755
  Address family for the source and destination address.  Supported families
  are: AF_INET, AF_INET6, and AF_IB.
 diff --git a/src/addrinfo.c b/src/addrinfo.c
-index 2da35f0..5099058 100755
+index 2da35f0..c729720 100755
 --- a/src/addrinfo.c
 +++ b/src/addrinfo.c
 @@ -99,11 +99,44 @@ static void ucma_convert_to_ai(struct addrinfo *ai, struct rdma_addrinfo *rai)
@@ -116,7 +116,7 @@ index 2da35f0..5099058 100755
 +
 +		if ((ai->ai_flags & RAI_FAMILY) && (rai->ai_family == AF_IB) &&
 +		    (ai->ai_flags & RAI_NUMERICHOST)) {
-+			ret = ucma_convert_in6(&((struct sockaddr_ib *) rai->ai_src_addr),
++			ret = ucma_convert_in6((struct sockaddr_ib **) &rai->ai_src_addr,
 +					       &rai->ai_src_len,
 +					       (struct sockaddr_in6 *) ai->ai_addr,
 +					       ai->ai_addrlen);
@@ -133,7 +133,7 @@ index 2da35f0..5099058 100755
 +
 +		if ((ai->ai_flags & RAI_FAMILY) && (rai->ai_family == AF_IB) &&
 +		    (ai->ai_flags & RAI_NUMERICHOST)) {
-+			ret = ucma_convert_in6(&((struct sockaddr_ib *) rai->ai_dst_addr),
++			ret = ucma_convert_in6((struct sockaddr_ib **) &rai->ai_dst_addr,
 +					       &rai->ai_dst_len,
 +					       (struct sockaddr_in6 *) ai->ai_addr,
 +					       ai->ai_addrlen);
