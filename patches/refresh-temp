@@ -1,0 +1,120 @@
+Bottom: c80d4e98ce099519a7bc416aaf687d3ebc1baa41
+Top:    a286739cf5a9cb2c62140f9cb9ea5cea10a48b56
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-29 14:46:24 -0700
+
+Refresh of addrinfo-af-ib
+
+---
+
+diff --git a/include/rdma/rdma_cma.h b/include/rdma/rdma_cma.h
+index f3c8921..07fc747 100755
+--- a/include/rdma/rdma_cma.h
++++ b/include/rdma/rdma_cma.h
+@@ -176,6 +176,7 @@ struct rdma_cm_event {
+ #define RAI_PASSIVE		0x00000001
+ #define RAI_NUMERICHOST		0x00000002
+ #define RAI_NOROUTE		0x00000004
++#define RAI_FAMILY		0x00000008
+ 
+ struct rdma_addrinfo {
+ 	int			ai_flags;
+diff --git a/man/rdma_getaddrinfo.3 b/man/rdma_getaddrinfo.3
+index 86e00ca..cd819c6 100755
+--- a/man/rdma_getaddrinfo.3
++++ b/man/rdma_getaddrinfo.3
+@@ -48,6 +48,9 @@ If specified, then the node parameter, if provided, must be a numerical
+ network address.  This flag suppresses any lengthy address resolution. 
+ .IP "RAI_NOROUTE" 12
+ If set, this flag suppresses any lengthy route resolution.
++.IP "RAI_FAMILY" 12
++If set, the ai_family setting should be used as an input hint for interpretting
++the node parameter.
+ .IP "ai_family" 12
+ Address family for the source and destination address.  Supported families
+ are: AF_INET, AF_INET6, and AF_IB.
+diff --git a/src/addrinfo.c b/src/addrinfo.c
+index cb67e17..5099058 100755
+--- a/src/addrinfo.c
++++ b/src/addrinfo.c
+@@ -100,7 +100,7 @@ static void ucma_convert_to_ai(struct addrinfo *ai, struct rdma_addrinfo *rai)
+ }
+ 
+ static int ucma_copy_addr(struct sockaddr **dst, socklen_t *dst_len,
+-			     struct sockaddr *src, socklen_t src_len)
++			  struct sockaddr *src, socklen_t src_len)
+ {
+ 	*dst = malloc(src_len);
+ 	if (!(*dst))
+@@ -111,9 +111,33 @@ static int ucma_copy_addr(struct sockaddr **dst, socklen_t *dst_len,
+ 	return 0;
+ }
+ 
++static int ucma_convert_in6(struct sockaddr_ib **dst, socklen_t *dst_len,
++			    struct sockaddr_in6 *src, socklen_t src_len)
++{
++	*dst = calloc(1, sizeof(struct sockaddr_ib));
++	if (!(*dst))
++		return ERR(ENOMEM);
++
++	(*dst)->sib_family = AF_IB;
++	(*dst)->sib_flowinfo = src->sin6_flowinfo;
++	ib_addr_set(&(*dst)->sib_addr, src->sin6_addr.s6_addr32[0],
++		    src->sin6_addr.s6_addr32[1], src->sin6_addr.s6_addr32[2],
++		    src->sin6_addr.s6_addr32[3]);
++	if (src->sin6_port) {
++		(*dst)->sib_sid = htonll((uint64_t) ntohs(src->sin6_port));
++		(*dst)->sib_sid_mask = htonll((uint64_t) 0x0000FFFF);
++	}
++	(*dst)->sib_scope_id = src->sin6_scope_id;
++
++	*dst_len = sizeof(struct sockaddr_ib);
++	return 0;
++}
++
+ static int ucma_convert_to_rai(struct rdma_addrinfo *rai,
+ 			       struct rdma_addrinfo *hints, struct addrinfo *ai)
+ {
++	int ret;
++
+ 	rai->ai_family = ai->ai_family;
+ 
+ 	if (hints && hints->ai_qp_type) {
+@@ -145,14 +169,33 @@ static int ucma_convert_to_rai(struct rdma_addrinfo *rai,
+ 	if (ai->ai_flags & RAI_PASSIVE) {
+ 		if (ai->ai_canonname)
+ 			rai->ai_src_canonname = strdup(ai->ai_canonname);
+-		return ucma_copy_addr(&rai->ai_src_addr, &rai->ai_src_len,
+-				      ai->ai_addr, ai->ai_addrlen);
++
++		if ((ai->ai_flags & RAI_FAMILY) && (rai->ai_family == AF_IB) &&
++		    (ai->ai_flags & RAI_NUMERICHOST)) {
++			ret = ucma_convert_in6(&((struct sockaddr_ib *) rai->ai_src_addr),
++					       &rai->ai_src_len,
++					       (struct sockaddr_in6 *) ai->ai_addr,
++					       ai->ai_addrlen);
++		} else {
++			ret = ucma_copy_addr(&rai->ai_src_addr, &rai->ai_src_len,
++					     ai->ai_addr, ai->ai_addrlen);
++		}
+ 	} else {
+ 		if (ai->ai_canonname)
+ 			rai->ai_dst_canonname = strdup(ai->ai_canonname);
+-		return ucma_copy_addr(&rai->ai_dst_addr, &rai->ai_dst_len,
+-				      ai->ai_addr, ai->ai_addrlen);
++
++		if ((ai->ai_flags & RAI_FAMILY) && (rai->ai_family == AF_IB) &&
++		    (ai->ai_flags & RAI_NUMERICHOST)) {
++			ret = ucma_convert_in6(&((struct sockaddr_ib *) rai->ai_dst_addr),
++					       &rai->ai_dst_len,
++					       (struct sockaddr_in6 *) ai->ai_addr,
++					       ai->ai_addrlen);
++		} else {
++			ret = ucma_copy_addr(&rai->ai_dst_addr, &rai->ai_dst_len,
++					     ai->ai_addr, ai->ai_addrlen);
++		}
+ 	}
++	return ret;
+ }
+ 
+ static int ucma_convert_gai(char *node, char *service,
