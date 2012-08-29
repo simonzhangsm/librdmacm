@@ -1,0 +1,22 @@
+Bottom: 37d2010ca6d23762f290e35d6a3474ff9d72123b
+Top:    32b2fc95f4b63e10ed407576f1c52d33d49f3f5b
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-29 15:59:29 -0700
+
+Refresh of addrtype
+
+---
+
+diff --git a/examples/cmatose.c b/examples/cmatose.c
+index 8d11f33..ec3a4ce 100644
+--- a/examples/cmatose.c
++++ b/examples/cmatose.c
+@@ -640,7 +640,7 @@ int main(int argc, char **argv)
+ {
+ 	int op, ret;
+ 
+-	while ((op = getopt(argc, argv, "s:b:c:C:S:t:p:m")) != -1) {
++	while ((op = getopt(argc, argv, "s:b:f:c:C:S:t:p:m")) != -1) {
+ 		switch (op) {
+ 		case 's':
+ 			dst_addr = optarg;
