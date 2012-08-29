@@ -1,0 +1,111 @@
+Bottom: 2e0a7d3ef44614a3f6760f3dad7fff7ae67386fc
+Top:    c1b21c4763251b677707aec109830eb4fc78c975
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-28 17:36:46 -0700
+
+Refresh of addrinfo-af-ib
+
+---
+
+diff --git a/src/addrinfo.c b/src/addrinfo.c
+index 2da35f0..cb67e17 100755
+--- a/src/addrinfo.c
++++ b/src/addrinfo.c
+@@ -99,12 +99,21 @@ static void ucma_convert_to_ai(struct addrinfo *ai, struct rdma_addrinfo *rai)
+ 	ai->ai_next = NULL;
+ }
+ 
++static int ucma_copy_addr(struct sockaddr **dst, socklen_t *dst_len,
++			     struct sockaddr *src, socklen_t src_len)
++{
++	*dst = malloc(src_len);
++	if (!(*dst))
++		return ERR(ENOMEM);
++
++	memcpy(*dst, src, src_len);
++	*dst_len = src_len;
++	return 0;
++}
++
+ static int ucma_convert_to_rai(struct rdma_addrinfo *rai,
+ 			       struct rdma_addrinfo *hints, struct addrinfo *ai)
+ {
+-	struct sockaddr *addr;
+-	char *canonname;
+-
+ 	rai->ai_family = ai->ai_family;
+ 
+ 	if (hints && hints->ai_qp_type) {
+@@ -133,24 +142,17 @@ static int ucma_convert_to_rai(struct rdma_addrinfo *rai,
+ 		}
+ 	}
+ 
+-	addr = malloc(ai->ai_addrlen);
+-	if (!addr)
+-		return ERR(ENOMEM);
+-
+-	canonname = ai->ai_canonname ? strdup(ai->ai_canonname) : NULL;
+-
+-	memcpy(addr, ai->ai_addr, ai->ai_addrlen);
+ 	if (ai->ai_flags & RAI_PASSIVE) {
+-		rai->ai_src_addr = addr;
+-		rai->ai_src_len = ai->ai_addrlen;
+-		rai->ai_src_canonname = canonname;
++		if (ai->ai_canonname)
++			rai->ai_src_canonname = strdup(ai->ai_canonname);
++		return ucma_copy_addr(&rai->ai_src_addr, &rai->ai_src_len,
++				      ai->ai_addr, ai->ai_addrlen);
+ 	} else {
+-		rai->ai_dst_addr = addr;
+-		rai->ai_dst_len = ai->ai_addrlen;
+-		rai->ai_dst_canonname = canonname;
++		if (ai->ai_canonname)
++			rai->ai_dst_canonname = strdup(ai->ai_canonname);
++		return ucma_copy_addr(&rai->ai_dst_addr, &rai->ai_dst_len,
++				      ai->ai_addr, ai->ai_addrlen);
+ 	}
+-
+-	return 0;
+ }
+ 
+ static int ucma_convert_gai(char *node, char *service,
+@@ -178,18 +180,6 @@ static int ucma_convert_gai(char *node, char *service,
+ 	return ret;
+ }
+ 
+-static int ucma_copy_ai_addr(struct sockaddr **dst, socklen_t *dst_len,
+-			     struct sockaddr *src, socklen_t src_len)
+-{
+-	*dst = calloc(1, src_len);
+-	if (!(*dst))
+-		return ERR(ENOMEM);
+-
+-	memcpy(*dst, src, src_len);
+-	*dst_len = src_len;
+-	return 0;
+-}
+-
+ int rdma_getaddrinfo(char *node, char *service,
+ 		     struct rdma_addrinfo *hints,
+ 		     struct rdma_addrinfo **res)
+@@ -216,16 +206,16 @@ int rdma_getaddrinfo(char *node, char *service,
+ 		rai->ai_qp_type = hints->ai_qp_type;
+ 		rai->ai_port_space = hints->ai_port_space;
+ 		if (hints->ai_dst_len) {
+-			ret = ucma_copy_ai_addr(&rai->ai_dst_addr, &rai->ai_dst_len,
+-						hints->ai_dst_addr, hints->ai_dst_len);
++			ret = ucma_copy_addr(&rai->ai_dst_addr, &rai->ai_dst_len,
++					     hints->ai_dst_addr, hints->ai_dst_len);
+ 		}
+ 	}
+ 	if (ret)
+ 		goto err;
+ 
+ 	if (!rai->ai_src_len && hints && hints->ai_src_len) {
+-		ret = ucma_copy_ai_addr(&rai->ai_src_addr, &rai->ai_src_len,
+-					hints->ai_src_addr, hints->ai_src_len);
++		ret = ucma_copy_addr(&rai->ai_src_addr, &rai->ai_src_len,
++				     hints->ai_src_addr, hints->ai_src_len);
+ 		if (ret)
+ 			goto err;
+ 	}
