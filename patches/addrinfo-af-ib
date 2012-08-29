@@ -8,9 +8,11 @@ librdmacm: Support using GIDs with rdma_getaddrinfo
 Allow the user to specify a GID as the node parameter into
 rdma_getaddrinfo.
 
-Since we can't easily determine if a node is a GID, versus
-an IPv6 address...
-FIX ME
+To distinguish between the node being an IPv6 address or a GID,
+we add a new flag, RAI_FAMILY, which can be set as part of the
+hints to rdma_getaddrinfo.  When set, this flag indicates that the
+value of ai_family in the hints should be used when interpretting
+the node parameter.
 
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
