@@ -56,7 +56,7 @@ int get_rdma_addr(char *src, char *dst, char *port,
 
 	rai_hints = *hints;
 	if (src) {
-		rai_hints.ai_flags = RAI_PASSIVE;
+		rai_hints.ai_flags |= RAI_PASSIVE;
 		ret = rdma_getaddrinfo(src, NULL, &rai_hints, &res);
 		if (ret)
 			return ret;
