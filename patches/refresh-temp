@@ -1,0 +1,29 @@
+Bottom: 4ce62c6180a5ad6e3d7080ab386b955959166fc1
+Top:    53f00af95df12c3aa07ab0835c666a9645b86b7f
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-29 16:14:48 -0700
+
+Refresh of addrinfo-af-ib
+
+---
+
+diff --git a/src/addrinfo.c b/src/addrinfo.c
+index c729720..01c04d1 100755
+--- a/src/addrinfo.c
++++ b/src/addrinfo.c
+@@ -56,9 +56,12 @@
+ static void ucma_convert_to_ai(struct addrinfo *ai, struct rdma_addrinfo *rai)
+ {
+ 	memset(ai, 0, sizeof *ai);
+-	ai->ai_flags  = (rai->ai_flags & RAI_PASSIVE) ? AI_PASSIVE : 0;
+-	ai->ai_flags |= (rai->ai_flags & RAI_NUMERICHOST) ? AI_NUMERICHOST : 0;
+-	ai->ai_family = rai->ai_family;
++	if (rai->ai_flags & RAI_PASSIVE)
++		ai->ai_flags = AI_PASSIVE;
++	if (rai->ai_flags & RAI_NUMERICHOST)
++		ai->ai_flags |= AI_NUMERICHOST;
++	if (rai->ai_family != AF_IB)
++		ai->ai_family = rai->ai_family;
+ 
+ 	switch (rai->ai_qp_type) {
+ 	case IBV_QPT_RC:
