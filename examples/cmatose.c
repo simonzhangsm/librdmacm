@@ -641,7 +641,7 @@ int main(int argc, char **argv)
 	int op, ret;
 
 	hints.ai_port_space = RDMA_PS_TCP;
-	while ((op = getopt(argc, argv, "s:b:f:c:C:S:t:p:m")) != -1) {
+	while ((op = getopt(argc, argv, "s:b:f:P:c:C:S:t:p:m")) != -1) {
 		switch (op) {
 		case 's':
 			dst_addr = optarg;
@@ -655,9 +655,15 @@ int main(int argc, char **argv)
 			} else if (!strncasecmp("gid", optarg, 3)) {
 				hints.ai_flags = RAI_NUMERICHOST | RAI_FAMILY;
 				hints.ai_family = AF_IB;
-				hints.ai_port_space = RDMA_PS_IB;
 			} else if (strncasecmp("name", optarg, 4)) {
 				fprintf(stderr, "Warning: unknown address format\n");
+			}
+			break;
+		case 'P':
+			if (!strncasecmp("ib", optarg, 2)) {
+				hints.ai_port_space = RDMA_PS_IB;
+			} else if (strncasecmp("tcp", optarg, 3)) {
+				fprintf(stderr, "Warning: unknown port space format\n");
 			}
 			break;
 		case 'c':
@@ -685,6 +691,8 @@ int main(int argc, char **argv)
 			printf("\t[-b bind_address]\n");
 			printf("\t[-f address_format]\n");
 			printf("\t    name, ip, ipv6, or gid\n");
+			printf("\t[-P port_space]\n");
+			printf("\t    tcp or ib\n");
 			printf("\t[-c connections]\n");
 			printf("\t[-C message_count]\n");
 			printf("\t[-S message_size]\n");

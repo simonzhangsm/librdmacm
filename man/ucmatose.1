@@ -4,9 +4,11 @@ ucmatose \- RDMA CM connection and simple ping-pong test.
 .SH SYNOPSIS
 .sp
 .nf
-\fIucmatose\fR [-s server_address] [-b bind_address] [-f address_format]
+\fIucmatose\fR [-s server_address] [-b bind_address]
+		[-f address_format] [-P port_space]
 		[-c connections] [-C message_count] [-S message_size]
-\fIucmatose\fR -s server_address [-b bind_address] [-f address_format]
+\fIucmatose\fR -s server_address [-b bind_address]
+		[-f address_format] [-P port_space]
 		[-c connections] [-C message_count] [-S message_size] [-t tos]
 .fi
 .SH "DESCRIPTION"
@@ -28,6 +30,11 @@ format is determined by getaddrinfo() as either being a hostname, an IPv4
 address, or an IPv6 address.  This option may be used to indicate that
 a specific address format has been provided.  Supported address_format
 values are: name, ip, ipv6, and gid.
+.TP
+\-P port_space
+Specifies the port space for the connection.  Be default, the port space
+is the RDMA TCP port space. (Note that the RDMA port space may be separate
+from that used for IP.)  Supported port_space values are: tcp and ib.
 .TP
 \-c connections
 The number of connections to establish between the client and server.
