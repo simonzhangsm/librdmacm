@@ -171,7 +171,7 @@ static int ucma_convert_to_rai(struct rdma_addrinfo *rai,
 	}
 
 	if (ai->ai_flags & AI_PASSIVE) {
-		rai->ai_flags = RAI_PASSIVE
+		rai->ai_flags = RAI_PASSIVE;
 		if (ai->ai_canonname)
 			rai->ai_src_canonname = strdup(ai->ai_canonname);
 
