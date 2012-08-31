@@ -116,7 +116,21 @@ static int ucma_copy_addr(struct sockaddr **dst, socklen_t *dst_len,
 	return 0;
 }
 
-static int ucma_convert_in6(struct sockaddr_ib **dst, socklen_t *dst_len,
+void ucma_set_sid(enum rdma_port_space ps, struct sockaddr *addr,
+		  struct sockaddr_ib *sib)
+{
+	uint16_t port;
+
+	port = addr ? ucma_get_port(addr) : 0;
+	sib->sib_sid = htonll(((uint64_t) ps << 16) + ntohs(port));
+
+	if (ps)
+		sib->sib_sid_mask = htonll(RDMA_IB_IP_PORT_MASK);
+	if (port)
+		sib->sib_sid_mask |= htonll(RDMA_IB_IP_PORT_MASK);
+}
+
+static int ucma_convert_in6(int ps, struct sockaddr_ib **dst, socklen_t *dst_len,
 			    struct sockaddr_in6 *src, socklen_t src_len)
 {
 	*dst = calloc(1, sizeof(struct sockaddr_ib));
@@ -129,10 +143,7 @@ static int ucma_convert_in6(struct sockaddr_ib **dst, socklen_t *dst_len,
 	ib_addr_set(&(*dst)->sib_addr, src->sin6_addr.s6_addr32[0],
 		    src->sin6_addr.s6_addr32[1], src->sin6_addr.s6_addr32[2],
 		    src->sin6_addr.s6_addr32[3]);
-	if (src->sin6_port) {
-		(*dst)->sib_sid = htonll((uint64_t) ntohs(src->sin6_port));
-		(*dst)->sib_sid_mask = htonll((uint64_t) 0x0000FFFF);
-	}
+	ucma_set_sid(ps, (struct sockaddr *) src, *dst);
 	(*dst)->sib_scope_id = src->sin6_scope_id;
 
 	*dst_len = sizeof(struct sockaddr_ib);
@@ -178,7 +189,8 @@ static int ucma_convert_to_rai(struct rdma_addrinfo *rai,
 		if ((hints->ai_flags & RAI_FAMILY) && (hints->ai_family == AF_IB) &&
 		    (hints->ai_flags & RAI_NUMERICHOST)) {
 			rai->ai_family = AF_IB;
-			ret = ucma_convert_in6((struct sockaddr_ib **) &rai->ai_src_addr,
+			ret = ucma_convert_in6(rai->ai_port_space,
+					       (struct sockaddr_ib **) &rai->ai_src_addr,
 					       &rai->ai_src_len,
 					       (struct sockaddr_in6 *) ai->ai_addr,
 					       ai->ai_addrlen);
@@ -194,7 +206,8 @@ static int ucma_convert_to_rai(struct rdma_addrinfo *rai,
 		if ((hints->ai_flags & RAI_FAMILY) && (hints->ai_family == AF_IB) &&
 		    (hints->ai_flags & RAI_NUMERICHOST)) {
 			rai->ai_family = AF_IB;
-			ret = ucma_convert_in6((struct sockaddr_ib **) &rai->ai_dst_addr,
+			ret = ucma_convert_in6(rai->ai_port_space,
+					       (struct sockaddr_ib **) &rai->ai_dst_addr,
 					       &rai->ai_dst_len,
 					       (struct sockaddr_in6 *) ai->ai_addr,
 					       ai->ai_addrlen);

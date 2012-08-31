@@ -123,20 +123,6 @@ void ucma_ib_cleanup(void)
 	}
 }
 
-static void ucma_set_sid(enum rdma_port_space ps, struct sockaddr *addr,
-			 struct sockaddr_ib *sib)
-{
-	uint16_t port;
-
-	port = addr ? ucma_get_port(addr) : 0;
-	sib->sib_sid = htonll(((uint64_t) ps << 16) + ntohs(port));
-
-	if (ps)
-		sib->sib_sid_mask = htonll(RDMA_IB_IP_PORT_MASK);
-	if (port)
-		sib->sib_sid_mask |= htonll(RDMA_IB_IP_PORT_MASK);
-}
-
 static int ucma_ib_set_addr(struct rdma_addrinfo *ib_rai,
 			    struct rdma_addrinfo *rai)
 {
