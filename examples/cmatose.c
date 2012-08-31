@@ -390,7 +390,7 @@ static int alloc_nodes(void)
 		if (dst_addr) {
 			ret = rdma_create_id(test.channel,
 					     &test.nodes[i].cma_id,
-					     &test.nodes[i], RDMA_PS_TCP);
+					     &test.nodes[i], hints.ai_port_space);
 			if (ret)
 				goto err;
 		}
@@ -505,7 +505,7 @@ static int run_server(void)
 	int i, ret;
 
 	printf("cmatose: starting server\n");
-	ret = rdma_create_id(test.channel, &listen_id, &test, RDMA_PS_TCP);
+	ret = rdma_create_id(test.channel, &listen_id, &test, hints.ai_port_space);
 	if (ret) {
 		perror("cmatose: listen request failed");
 		return ret;
