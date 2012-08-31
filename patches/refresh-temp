@@ -1,0 +1,220 @@
+Bottom: 0fe9873298edf4cada887e75c401246a8cdab420
+Top:    774b4e7c039a9a06577acf93861d5a87e9ccf6d8
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-30 17:07:47 -0700
+
+Refresh of addrinfo-af-ib
+
+---
+
+diff --git a/src/acm.c b/src/acm.c
+index 95eee73..76fc466 100755
+--- a/src/acm.c
++++ b/src/acm.c
+@@ -128,16 +128,13 @@ static void ucma_set_sid(enum rdma_port_space ps, struct sockaddr *addr,
+ {
+ 	uint16_t port;
+ 
+-	if (addr->sa_family == AF_INET)
+-		port = ((struct sockaddr_in *) addr)->sin_port;
+-	else
+-		port = ((struct sockaddr_in6 *) addr)->sin6_port;
+-
++	port = addr ? ucma_get_port(addr) : 0;
+ 	sib->sib_sid = htonll(((uint64_t) ps << 16) + ntohs(port));
++
++	if (ps)
++		sib->sib_sid_mask = htonll(RDMA_IB_IP_PORT_MASK);
+ 	if (port)
+-		sib->sib_sid_mask = ~0ULL;
+-	else
+-		sib->sib_sid_mask = htonll(RDMA_IB_IP_PS_MASK);
++		sib->sib_sid_mask |= htonll(RDMA_IB_IP_PORT_MASK);
+ }
+ 
+ static int ucma_ib_set_addr(struct rdma_addrinfo *ib_rai,
+@@ -184,6 +181,9 @@ static int ucma_ib_set_connect(struct rdma_addrinfo *ib_rai,
+ {
+ 	struct ib_connect_hdr *hdr;
+ 
++	if (rai->ai_family == AF_IB)
++		return 0;
++
+ 	hdr = calloc(1, sizeof *hdr);
+ 	if (!hdr)
+ 		return ERR(ENOMEM);
+@@ -360,16 +360,16 @@ void ucma_ib_resolve(struct rdma_addrinfo **rai, struct rdma_addrinfo *hints)
+ 
+ 	if (ucma_inet_addr((*rai)->ai_dst_addr, (*rai)->ai_dst_len)) {
+ 		data->flags = ACM_EP_FLAG_DEST;
+-		if ((*rai)->ai_flags & (RAI_NUMERICHOST | RAI_NOROUTE))
++		if (hints->ai_flags & (RAI_NUMERICHOST | RAI_NOROUTE))
+ 			data->flags |= ACM_FLAGS_NODELAY;
+ 		ucma_set_ep_addr(data, (*rai)->ai_dst_addr);
+ 		data++;
+ 		msg.hdr.length += ACM_MSG_EP_LENGTH;
+ 	}
+ 
+-	if (hints && (hints->ai_route_len ||
++	if (hints->ai_route_len ||
+ 	    ucma_ib_addr((*rai)->ai_src_addr, (*rai)->ai_src_len) ||
+-	    ucma_ib_addr((*rai)->ai_dst_addr, (*rai)->ai_dst_len))) {
++	    ucma_ib_addr((*rai)->ai_dst_addr, (*rai)->ai_dst_len)) {
+ 		struct ibv_path_record *path;
+ 
+ 		if (hints->ai_route_len == sizeof(struct ibv_path_record))
+@@ -409,8 +409,7 @@ void ucma_ib_resolve(struct rdma_addrinfo **rai, struct rdma_addrinfo *hints)
+ 
+ 	ucma_ib_save_resp(*rai, &msg);
+ 
+-	if (af_ib_support && !((*rai)->ai_flags & RAI_ROUTEONLY) &&
+-	    (*rai)->ai_route_len && ((*rai)->ai_family != AF_IB))
++	if (af_ib_support && !(hints->ai_flags & RAI_ROUTEONLY) && (*rai)->ai_route_len)
+ 		ucma_resolve_af_ib(rai);
+ }
+ 
+diff --git a/src/addrinfo.c b/src/addrinfo.c
+index 44496cc..a89aa88 100755
+--- a/src/addrinfo.c
++++ b/src/addrinfo.c
+@@ -53,6 +53,8 @@
+ #define RDMA_QPT_XRC_RECV 10
+ #endif
+ 
++struct rdma_addrinfo nohints;
++
+ static void ucma_convert_to_ai(struct addrinfo *ai, struct rdma_addrinfo *rai)
+ {
+ 	memset(ai, 0, sizeof *ai);
+@@ -142,9 +144,7 @@ static int ucma_convert_to_rai(struct rdma_addrinfo *rai,
+ {
+ 	int ret;
+ 
+-	rai->ai_family = ai->ai_family;
+-
+-	if (hints && hints->ai_qp_type) {
++	if (hints->ai_qp_type) {
+ 		rai->ai_qp_type = hints->ai_qp_type;
+ 	} else {
+ 		switch (ai->ai_socktype) {
+@@ -157,7 +157,7 @@ static int ucma_convert_to_rai(struct rdma_addrinfo *rai,
+ 		}
+ 	}
+ 
+-	if (hints && hints->ai_port_space) {
++	if (hints->ai_port_space) {
+ 		rai->ai_port_space = hints->ai_port_space;
+ 	} else {
+ 		switch (ai->ai_protocol) {
+@@ -170,17 +170,20 @@ static int ucma_convert_to_rai(struct rdma_addrinfo *rai,
+ 		}
+ 	}
+ 
+-	if (ai->ai_flags & RAI_PASSIVE) {
++	if (ai->ai_flags & AI_PASSIVE) {
++		rai->ai_flags = RAI_PASSIVE
+ 		if (ai->ai_canonname)
+ 			rai->ai_src_canonname = strdup(ai->ai_canonname);
+ 
+ 		if ((hints->ai_flags & RAI_FAMILY) && (hints->ai_family == AF_IB) &&
+ 		    (hints->ai_flags & RAI_NUMERICHOST)) {
++			rai->ai_family = AF_IB;
+ 			ret = ucma_convert_in6((struct sockaddr_ib **) &rai->ai_src_addr,
+ 					       &rai->ai_src_len,
+ 					       (struct sockaddr_in6 *) ai->ai_addr,
+ 					       ai->ai_addrlen);
+ 		} else {
++			rai->ai_family = ai->ai_family;
+ 			ret = ucma_copy_addr(&rai->ai_src_addr, &rai->ai_src_len,
+ 					     ai->ai_addr, ai->ai_addrlen);
+ 		}
+@@ -190,11 +193,13 @@ static int ucma_convert_to_rai(struct rdma_addrinfo *rai,
+ 
+ 		if ((hints->ai_flags & RAI_FAMILY) && (hints->ai_family == AF_IB) &&
+ 		    (hints->ai_flags & RAI_NUMERICHOST)) {
++			rai->ai_family = AF_IB;
+ 			ret = ucma_convert_in6((struct sockaddr_ib **) &rai->ai_dst_addr,
+ 					       &rai->ai_dst_len,
+ 					       (struct sockaddr_in6 *) ai->ai_addr,
+ 					       ai->ai_addrlen);
+ 		} else {
++			rai->ai_family = ai->ai_family;
+ 			ret = ucma_copy_addr(&rai->ai_dst_addr, &rai->ai_dst_len,
+ 					     ai->ai_addr, ai->ai_addrlen);
+ 		}
+@@ -202,23 +207,20 @@ static int ucma_convert_to_rai(struct rdma_addrinfo *rai,
+ 	return ret;
+ }
+ 
+-static int ucma_convert_gai(char *node, char *service,
++static int ucma_getaddrinfo(char *node, char *service,
+ 			    struct rdma_addrinfo *hints,
+ 			    struct rdma_addrinfo *rai)
+ {
+ 	struct addrinfo ai_hints;
+-	struct addrinfo *ai, *aih;
++	struct addrinfo *ai;
+ 	int ret;
+ 
+-	if (hints) {
++	if (hints != &nohints) {
+ 		ucma_convert_to_ai(&ai_hints, hints);
+-		rai->ai_flags = hints->ai_flags;
+-		aih = &ai_hints;
++		ret = getaddrinfo(node, service, &ai_hints, &ai);
+ 	} else {
+-		aih = NULL;
++		ret = getaddrinfo(node, service, NULL, &ai);
+ 	}
+-
+-	ret = getaddrinfo(node, service, aih, &ai);
+ 	if (ret)
+ 		return ret;
+ 
+@@ -245,8 +247,11 @@ int rdma_getaddrinfo(char *node, char *service,
+ 	if (!rai)
+ 		return ERR(ENOMEM);
+ 
++	if (!hints)
++		hints = &nohints;
++
+ 	if (node || service) {
+-		ret = ucma_convert_gai(node, service, hints, rai);
++		ret = ucma_getaddrinfo(node, service, hints, rai);
+ 	} else {
+ 		rai->ai_flags = hints->ai_flags;
+ 		rai->ai_family = hints->ai_family;
+@@ -260,7 +265,7 @@ int rdma_getaddrinfo(char *node, char *service,
+ 	if (ret)
+ 		goto err;
+ 
+-	if (!rai->ai_src_len && hints && hints->ai_src_len) {
++	if (!rai->ai_src_len && hints->ai_src_len) {
+ 		ret = ucma_copy_addr(&rai->ai_src_addr, &rai->ai_src_len,
+ 				     hints->ai_src_addr, hints->ai_src_len);
+ 		if (ret)
+diff --git a/src/cma.c b/src/cma.c
+index f460967..d168df6 100755
+--- a/src/cma.c
++++ b/src/cma.c
+@@ -2240,7 +2240,7 @@ int ucma_max_qpsize(struct rdma_cm_id *id)
+ 	return id_priv->cma_dev->max_qpsize;
+ }
+ 
+-static uint16_t ucma_get_port(struct sockaddr *addr)
++uint16_t ucma_get_port(struct sockaddr *addr)
+ {
+ 	switch (addr->sa_family) {
+ 	case AF_INET:
+diff --git a/src/cma.h b/src/cma.h
+index 6c3df27..3c4388c 100644
+--- a/src/cma.h
++++ b/src/cma.h
+@@ -137,6 +137,7 @@ typedef struct { volatile int val; } atomic_t;
+ #define atomic_get(v) ((v)->val)
+ #define atomic_set(v, s) ((v)->val = s)
+ 
++uint16_t ucma_get_port(struct sockaddr *addr);
+ int ucma_max_qpsize(struct rdma_cm_id *id);
+ int ucma_complete(struct rdma_cm_id *id);
+ static inline int ERR(int err)
