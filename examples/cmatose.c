@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2006,2011 Intel Corporation.  All rights reserved.
+ * Copyright (c) 2005-2006,2011-2012 Intel Corporation.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
  * licenses.  You may choose to be licensed under the terms of the GNU
@@ -640,6 +640,7 @@ int main(int argc, char **argv)
 {
 	int op, ret;
 
+	hints.ai_port_space = RDMA_PS_TCP;
 	while ((op = getopt(argc, argv, "s:b:f:c:C:S:t:p:m")) != -1) {
 		switch (op) {
 		case 's':
@@ -654,6 +655,7 @@ int main(int argc, char **argv)
 			} else if (!strncasecmp("gid", optarg, 3)) {
 				hints.ai_flags = RAI_NUMERICHOST | RAI_FAMILY;
 				hints.ai_family = AF_IB;
+				hints.ai_port_space = RDMA_PS_IB;
 			} else if (strncasecmp("name", optarg, 4)) {
 				fprintf(stderr, "Warning: unknown address format\n");
 			}
@@ -705,7 +707,6 @@ int main(int argc, char **argv)
 	if (alloc_nodes())
 		exit(1);
 
-	hints.ai_port_space = RDMA_PS_TCP;
 	if (dst_addr) {
 		ret = run_client();
 	} else {
