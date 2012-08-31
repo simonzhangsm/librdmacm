@@ -1,5 +1,5 @@
 Bottom: 4e01eb8a1c0681cd7bcca9c1bf3502036b929d4b
-Top:    7413d85582079678a2245ca49e793f0cd8ad5bd2
+Top:    b41f5d11d3f72c1bbe451336c858f7ebfb0a4da7
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-28 12:33:04 -0700
 
@@ -19,17 +19,6 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 ---
 
-diff --git a/examples/cmatose.c b/examples/cmatose.c
-index 94fc4cd..ba4fc72 100644
---- a/examples/cmatose.c
-+++ b/examples/cmatose.c
-@@ -1,5 +1,5 @@
- /*
-- * Copyright (c) 2005-2006,2011 Intel Corporation.  All rights reserved.
-+ * Copyright (c) 2005-2006,2011-2012 Intel Corporation.  All rights reserved.
-  *
-  * This software is available to you under a choice of one of two
-  * licenses.  You may choose to be licensed under the terms of the GNU
 diff --git a/include/rdma/rdma_cma.h b/include/rdma/rdma_cma.h
 index f3c8921..07fc747 100755
 --- a/include/rdma/rdma_cma.h
