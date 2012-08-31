@@ -1,5 +1,5 @@
 Bottom: 6b67ab7929dea022d63f78b08828f18a26afca60
-Top:    efeca456a3826ce2a412d7ac84c7b409f81d57ab
+Top:    f47b9003821d5799a9a51c8ae5ab8b6acc2ee913
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-29 15:02:54 -0700
 
@@ -15,7 +15,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/cmatose.c b/examples/cmatose.c
-index 94fc4cd..c00d28f 100644
+index 94fc4cd..167f509 100644
 --- a/examples/cmatose.c
 +++ b/examples/cmatose.c
 @@ -1,5 +1,5 @@
@@ -71,11 +71,11 @@ index 94fc4cd..c00d28f 100644
  
 -	while ((op = getopt(argc, argv, "s:b:c:C:S:t:p:m")) != -1) {
 +	hints.ai_port_space = RDMA_PS_TCP;
-+	while ((op = getopt(argc, argv, "s:b:f:c:C:S:t:p:m")) != -1) {
++	while ((op = getopt(argc, argv, "s:b:f:P:c:C:S:t:p:m")) != -1) {
  		switch (op) {
  		case 's':
  			dst_addr = optarg;
-@@ -654,6 +649,17 @@ int main(int argc, char **argv)
+@@ -654,6 +649,23 @@ int main(int argc, char **argv)
  		case 'b':
  			src_addr = optarg;
  			break;
@@ -85,24 +85,32 @@ index 94fc4cd..c00d28f 100644
 +			} else if (!strncasecmp("gid", optarg, 3)) {
 +				hints.ai_flags = RAI_NUMERICHOST | RAI_FAMILY;
 +				hints.ai_family = AF_IB;
-+				hints.ai_port_space = RDMA_PS_IB;
 +			} else if (strncasecmp("name", optarg, 4)) {
 +				fprintf(stderr, "Warning: unknown address format\n");
++			}
++			break;
++		case 'P':
++			if (!strncasecmp("ib", optarg, 2)) {
++				hints.ai_port_space = RDMA_PS_IB;
++			} else if (strncasecmp("tcp", optarg, 3)) {
++				fprintf(stderr, "Warning: unknown port space format\n");
 +			}
 +			break;
  		case 'c':
  			connections = atoi(optarg);
  			break;
-@@ -677,6 +683,8 @@ int main(int argc, char **argv)
+@@ -677,6 +689,10 @@ int main(int argc, char **argv)
  			printf("usage: %s\n", argv[0]);
  			printf("\t[-s server_address]\n");
  			printf("\t[-b bind_address]\n");
 +			printf("\t[-f address_format]\n");
 +			printf("\t    name, ip, ipv6, or gid\n");
++			printf("\t[-P port_space]\n");
++			printf("\t    tcp or ib\n");
  			printf("\t[-c connections]\n");
  			printf("\t[-C message_count]\n");
  			printf("\t[-S message_size]\n");
-@@ -699,10 +707,12 @@ int main(int argc, char **argv)
+@@ -699,10 +715,12 @@ int main(int argc, char **argv)
  	if (alloc_nodes())
  		exit(1);
  
@@ -157,10 +165,10 @@ index 8d9fea0..25d881f 100644
  #if __BYTE_ORDER == __BIG_ENDIAN
  static inline uint64_t cpu_to_be64(uint64_t x) { return x; }
 diff --git a/man/ucmatose.1 b/man/ucmatose.1
-index 73477ea..baf5837 100644
+index 73477ea..95dc2d6 100644
 --- a/man/ucmatose.1
 +++ b/man/ucmatose.1
-@@ -4,10 +4,10 @@ ucmatose \- RDMA CM connection and simple ping-pong test.
+@@ -4,10 +4,12 @@ ucmatose \- RDMA CM connection and simple ping-pong test.
  .SH SYNOPSIS
  .sp
  .nf
@@ -168,14 +176,16 @@ index 73477ea..baf5837 100644
 -		[-C message_count] [-S message_size]
 -\fIucmatose\fR -s server_address [-b bind_address] [-c connections]
 -		[-C message_count] [-S message_size] [-t tos]
-+\fIucmatose\fR [-s server_address] [-b bind_address] [-f address_format]
++\fIucmatose\fR [-s server_address] [-b bind_address]
++		[-f address_format] [-P port_space]
 +		[-c connections] [-C message_count] [-S message_size]
-+\fIucmatose\fR -s server_address [-b bind_address] [-f address_format]
++\fIucmatose\fR -s server_address [-b bind_address]
++		[-f address_format] [-P port_space]
 +		[-c connections] [-C message_count] [-S message_size] [-t tos]
  .fi
  .SH "DESCRIPTION"
  Establishes a set of reliable RDMA connections between two nodes using the
-@@ -22,6 +22,13 @@ This option must be specified by the client.
+@@ -22,6 +24,18 @@ This option must be specified by the client.
  \-b bind_address
  The local network address to bind to.
  .TP
@@ -185,6 +195,11 @@ index 73477ea..baf5837 100644
 +address, or an IPv6 address.  This option may be used to indicate that
 +a specific address format has been provided.  Supported address_format
 +values are: name, ip, ipv6, and gid.
++.TP
++\-P port_space
++Specifies the port space for the connection.  Be default, the port space
++is the RDMA TCP port space. (Note that the RDMA port space may be separate
++from that used for IP.)  Supported port_space values are: tcp and ib.
 +.TP
  \-c connections
  The number of connections to establish between the client and server.
