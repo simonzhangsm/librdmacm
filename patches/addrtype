@@ -1,5 +1,5 @@
-Bottom: 7413d85582079678a2245ca49e793f0cd8ad5bd2
-Top:    26e9149c3dc895caf3714619ecb1b06cb6088f54
+Bottom: b41f5d11d3f72c1bbe451336c858f7ebfb0a4da7
+Top:    b06830efc3ecf71d460e71ce1f8d3080436b6b83
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-29 15:02:54 -0700
 
@@ -15,7 +15,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/cmatose.c b/examples/cmatose.c
-index ba4fc72..ec3a4ce 100644
+index 94fc4cd..8ebc959 100644
 --- a/examples/cmatose.c
 +++ b/examples/cmatose.c
 @@ -81,6 +81,7 @@ static uint8_t tos;
