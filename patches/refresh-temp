@@ -1,0 +1,53 @@
+Bottom: b41f5d11d3f72c1bbe451336c858f7ebfb0a4da7
+Top:    0639a2332527fbc85555a1f2047c362495e8ec1e
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-31 10:17:46 -0700
+
+Refresh of addrinfo-af-ib
+
+---
+
+diff --git a/examples/cmatose.c b/examples/cmatose.c
+index 94fc4cd..ba4fc72 100644
+--- a/examples/cmatose.c
++++ b/examples/cmatose.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2005-2006,2011 Intel Corporation.  All rights reserved.
++ * Copyright (c) 2005-2006,2011-2012 Intel Corporation.  All rights reserved.
+  *
+  * This software is available to you under a choice of one of two
+  * licenses.  You may choose to be licensed under the terms of the GNU
+diff --git a/man/ucmatose.1 b/man/ucmatose.1
+index 73477ea..baf5837 100644
+--- a/man/ucmatose.1
++++ b/man/ucmatose.1
+@@ -4,10 +4,10 @@ ucmatose \- RDMA CM connection and simple ping-pong test.
+ .SH SYNOPSIS
+ .sp
+ .nf
+-\fIucmatose\fR [-s server_address] [-b bind_address] [-c connections]
+-		[-C message_count] [-S message_size]
+-\fIucmatose\fR -s server_address [-b bind_address] [-c connections]
+-		[-C message_count] [-S message_size] [-t tos]
++\fIucmatose\fR [-s server_address] [-b bind_address] [-f address_format]
++		[-c connections] [-C message_count] [-S message_size]
++\fIucmatose\fR -s server_address [-b bind_address] [-f address_format]
++		[-c connections] [-C message_count] [-S message_size] [-t tos]
+ .fi
+ .SH "DESCRIPTION"
+ Establishes a set of reliable RDMA connections between two nodes using the
+@@ -22,6 +22,13 @@ This option must be specified by the client.
+ \-b bind_address
+ The local network address to bind to.
+ .TP
++\-f address_format
++Specifies the format of the server and bind address.  Be default, the
++format is determined by getaddrinfo() as either being a hostname, an IPv4
++address, or an IPv6 address.  This option may be used to indicate that
++a specific address format has been provided.  Supported address_format
++values are: name, ip, ipv6, and gid.
++.TP
+ \-c connections
+ The number of connections to establish between the client and server.
+ (default 1)
