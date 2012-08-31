@@ -1,5 +1,5 @@
 Bottom: 7413d85582079678a2245ca49e793f0cd8ad5bd2
-Top:    b7b3726632c95160a455e9ae58f77cfdb6461db9
+Top:    26e9149c3dc895caf3714619ecb1b06cb6088f54
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-29 15:02:54 -0700
 
@@ -148,3 +148,36 @@ index 8d9fea0..25d881f 100644
  
  #if __BYTE_ORDER == __BIG_ENDIAN
  static inline uint64_t cpu_to_be64(uint64_t x) { return x; }
+diff --git a/man/ucmatose.1 b/man/ucmatose.1
+index 73477ea..baf5837 100644
+--- a/man/ucmatose.1
++++ b/man/ucmatose.1
+@@ -4,10 +4,10 @@ ucmatose \- RDMA CM connection and simple ping-pong test.
+ .SH SYNOPSIS
+ .sp
+ .nf
+-\fIucmatose\fR [-s server_address] [-b bind_address] [-c connections]
+-		[-C message_count] [-S message_size]
+-\fIucmatose\fR -s server_address [-b bind_address] [-c connections]
+-		[-C message_count] [-S message_size] [-t tos]
++\fIucmatose\fR [-s server_address] [-b bind_address] [-f address_format]
++		[-c connections] [-C message_count] [-S message_size]
++\fIucmatose\fR -s server_address [-b bind_address] [-f address_format]
++		[-c connections] [-C message_count] [-S message_size] [-t tos]
+ .fi
+ .SH "DESCRIPTION"
+ Establishes a set of reliable RDMA connections between two nodes using the
+@@ -22,6 +22,13 @@ This option must be specified by the client.
+ \-b bind_address
+ The local network address to bind to.
+ .TP
++\-f address_format
++Specifies the format of the server and bind address.  Be default, the
++format is determined by getaddrinfo() as either being a hostname, an IPv4
++address, or an IPv6 address.  This option may be used to indicate that
++a specific address format has been provided.  Supported address_format
++values are: name, ip, ipv6, and gid.
++.TP
+ \-c connections
+ The number of connections to establish between the client and server.
+ (default 1)
