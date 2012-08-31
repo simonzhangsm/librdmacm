@@ -1,12 +1,11 @@
 Version: 1
-Previous: a43a079b524d9c8ad143a8999aff588cec92455b
-Head: 890b40060232a9d32aade8572a284782f22b9762
+Previous: 0fdc19be74831639ace687cf5fc7090aa507d3b2
+Head: cd7d0a0ee1c2855bbeddd308948c50c884eec6d8
 Applied:
   sa_family: 79ecff9afd483c22821eca679e7ed668035ab4c1
   af_ib: ed14c624d882d21df3e2d0c022cffab0b7f664b9
   ren-copy-rai: a7ae817991416863772d28d97839ee8daeefb07e
-  addrinfo-af-ib: 06b4820665299eec70aebcd7c1b6555fc43c4f4f
-  refresh-temp: 890b40060232a9d32aade8572a284782f22b9762
+  addrinfo-af-ib: cd7d0a0ee1c2855bbeddd308948c50c884eec6d8
 Unapplied:
   addrtype: 4beef92e939dd9c77d84075fd34475ac9386a2be
   dbg-fork: 5679a32af8305db3c0406f9abb961259304a384a

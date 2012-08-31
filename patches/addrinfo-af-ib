@@ -1,5 +1,5 @@
 Bottom: 4e01eb8a1c0681cd7bcca9c1bf3502036b929d4b
-Top:    cb8a166a49d92dc3423d11cc9eb021147c9b424a
+Top:    e699287bf91c1e089e5380a9afd365f03b7906bb
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-28 12:33:04 -0700
 
@@ -20,10 +20,18 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/include/rdma/rdma_cma.h b/include/rdma/rdma_cma.h
-index f3c8921..07fc747 100755
+index f3c8921..4c4a057 100755
 --- a/include/rdma/rdma_cma.h
 +++ b/include/rdma/rdma_cma.h
-@@ -176,6 +176,7 @@ struct rdma_cm_event {
+@@ -77,6 +77,7 @@ enum rdma_port_space {
+ #define RDMA_IB_IP_PORT_MASK 0x000000000000FFFFULL
+ #define RDMA_IB_IP_PS_TCP    0x0000000001060000ULL
+ #define RDMA_IB_IP_PS_UDP    0x0000000001110000ULL
++#define RDMA_IB_PS_IB        0x00000000013F0000ULL
+ 
+ /*
+  * Global qkey value for UDP QPs and multicast groups created via the 
+@@ -176,6 +177,7 @@ struct rdma_cm_event {
  #define RAI_PASSIVE		0x00000001
  #define RAI_NUMERICHOST		0x00000002
  #define RAI_NOROUTE		0x00000004
