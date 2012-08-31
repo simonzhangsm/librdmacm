@@ -1,5 +1,5 @@
 Bottom: 4e01eb8a1c0681cd7bcca9c1bf3502036b929d4b
-Top:    6b67ab7929dea022d63f78b08828f18a26afca60
+Top:    cb8a166a49d92dc3423d11cc9eb021147c9b424a
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-28 12:33:04 -0700
 
@@ -121,7 +121,7 @@ index 95eee73..3d8c912 100755
  }
  
 diff --git a/src/addrinfo.c b/src/addrinfo.c
-index 2da35f0..0582955 100755
+index 2da35f0..e7643f7 100755
 --- a/src/addrinfo.c
 +++ b/src/addrinfo.c
 @@ -53,12 +53,17 @@
@@ -145,7 +145,7 @@ index 2da35f0..0582955 100755
  
  	switch (rai->ai_qp_type) {
  	case IBV_QPT_RC:
-@@ -99,15 +104,58 @@ static void ucma_convert_to_ai(struct addrinfo *ai, struct rdma_addrinfo *rai)
+@@ -99,15 +104,60 @@ static void ucma_convert_to_ai(struct addrinfo *ai, struct rdma_addrinfo *rai)
  	ai->ai_next = NULL;
  }
  
@@ -170,7 +170,7 @@ index 2da35f0..0582955 100755
 +	sib->sib_sid = htonll(((uint64_t) ps << 16) + ntohs(port));
 +
 +	if (ps)
-+		sib->sib_sid_mask = htonll(RDMA_IB_IP_PORT_MASK);
++		sib->sib_sid_mask = htonll(RDMA_IB_IP_PS_MASK);
 +	if (port)
 +		sib->sib_sid_mask |= htonll(RDMA_IB_IP_PORT_MASK);
 +}
@@ -181,6 +181,7 @@ index 2da35f0..0582955 100755
 +	*dst = calloc(1, sizeof(struct sockaddr_ib));
 +	if (!(*dst))
 +		return ERR(ENOMEM);
++printf("converting ipv6 to ib\n");
 +
 +	(*dst)->sib_family = AF_IB;
 +	(*dst)->sib_pkey = 0xFFFF;
@@ -189,6 +190,7 @@ index 2da35f0..0582955 100755
 +		    src->sin6_addr.s6_addr32[1], src->sin6_addr.s6_addr32[2],
 +		    src->sin6_addr.s6_addr32[3]);
 +	ucma_set_sid(ps, (struct sockaddr *) src, *dst);
++printf("sid %llx %llx\n", (*dst)->sib_sid, (*dst)->sib_sid_mask);
 +	(*dst)->sib_scope_id = src->sin6_scope_id;
 +
 +	*dst_len = sizeof(struct sockaddr_ib);
@@ -209,19 +211,22 @@ index 2da35f0..0582955 100755
  		rai->ai_qp_type = hints->ai_qp_type;
  	} else {
  		switch (ai->ai_socktype) {
-@@ -120,7 +168,7 @@ static int ucma_convert_to_rai(struct rdma_addrinfo *rai,
+@@ -119,8 +169,9 @@ static int ucma_convert_to_rai(struct rdma_addrinfo *rai,
+ 			break;
  		}
  	}
++printf("qp type %d\n", rai->ai_qp_type);
  
 -	if (hints && hints->ai_port_space) {
 +	if (hints->ai_port_space) {
  		rai->ai_port_space = hints->ai_port_space;
  	} else {
  		switch (ai->ai_protocol) {
-@@ -133,43 +181,59 @@ static int ucma_convert_to_rai(struct rdma_addrinfo *rai,
+@@ -132,44 +183,63 @@ static int ucma_convert_to_rai(struct rdma_addrinfo *rai,
+ 			break;
  		}
  	}
- 
+-
 -	addr = malloc(ai->ai_addrlen);
 -	if (!addr)
 -		return ERR(ENOMEM);
@@ -233,6 +238,8 @@ index 2da35f0..0582955 100755
 -		rai->ai_src_addr = addr;
 -		rai->ai_src_len = ai->ai_addrlen;
 -		rai->ai_src_canonname = canonname;
++printf("port space %d\n", rai->ai_port_space);
++
 +	if (ai->ai_flags & AI_PASSIVE) {
 +		rai->ai_flags = RAI_PASSIVE;
 +		if (ai->ai_canonname)
@@ -246,8 +253,10 @@ index 2da35f0..0582955 100755
 +					       &rai->ai_src_len,
 +					       (struct sockaddr_in6 *) ai->ai_addr,
 +					       ai->ai_addrlen);
++printf("using af ib \n");
 +		} else {
 +			rai->ai_family = ai->ai_family;
++printf("af %d\n", rai->ai_family);
 +			ret = ucma_copy_addr(&rai->ai_src_addr, &rai->ai_src_len,
 +					     ai->ai_addr, ai->ai_addrlen);
 +		}
@@ -302,7 +311,7 @@ index 2da35f0..0582955 100755
  	if (ret)
  		return ret;
  
-@@ -178,18 +242,6 @@ static int ucma_convert_gai(char *node, char *service,
+@@ -178,18 +248,6 @@ static int ucma_convert_gai(char *node, char *service,
  	return ret;
  }
  
@@ -321,7 +330,7 @@ index 2da35f0..0582955 100755
  int rdma_getaddrinfo(char *node, char *service,
  		     struct rdma_addrinfo *hints,
  		     struct rdma_addrinfo **res)
-@@ -208,24 +260,27 @@ int rdma_getaddrinfo(char *node, char *service,
+@@ -208,24 +266,27 @@ int rdma_getaddrinfo(char *node, char *service,
  	if (!rai)
  		return ERR(ENOMEM);
  
