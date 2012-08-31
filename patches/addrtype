@@ -1,5 +1,5 @@
-Bottom: 53f00af95df12c3aa07ab0835c666a9645b86b7f
-Top:    a47b050c3abfe028687576a9d6266c568518938e
+Bottom: 7413d85582079678a2245ca49e793f0cd8ad5bd2
+Top:    b7b3726632c95160a455e9ae58f77cfdb6461db9
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-29 15:02:54 -0700
 
@@ -15,16 +15,9 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/cmatose.c b/examples/cmatose.c
-index 94fc4cd..ec3a4ce 100644
+index ba4fc72..ec3a4ce 100644
 --- a/examples/cmatose.c
 +++ b/examples/cmatose.c
-@@ -1,5 +1,5 @@
- /*
-- * Copyright (c) 2005-2006,2011 Intel Corporation.  All rights reserved.
-+ * Copyright (c) 2005-2006,2011-2012 Intel Corporation.  All rights reserved.
-  *
-  * This software is available to you under a choice of one of two
-  * licenses.  You may choose to be licensed under the terms of the GNU
 @@ -81,6 +81,7 @@ static uint8_t tos;
  static uint8_t migrate = 0;
  static char *dst_addr;
