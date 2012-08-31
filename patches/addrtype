@@ -1,5 +1,5 @@
 Bottom: e699287bf91c1e089e5380a9afd365f03b7906bb
-Top:    ca95bafdf74ce1818fb79ea0e1828bdd2b019d5d
+Top:    543a5d8863f546b742cf34435f7e1dd649ef9381
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-29 15:02:54 -0700
 
@@ -15,7 +15,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/cmatose.c b/examples/cmatose.c
-index 94fc4cd..167f509 100644
+index 94fc4cd..8ca2d88 100644
 --- a/examples/cmatose.c
 +++ b/examples/cmatose.c
 @@ -1,5 +1,5 @@
@@ -33,7 +33,16 @@ index 94fc4cd..167f509 100644
  
  static int create_message(struct cmatest_node *node)
  {
-@@ -501,7 +502,6 @@ static int migrate_channel(struct rdma_cm_id *listen_id)
+@@ -389,7 +390,7 @@ static int alloc_nodes(void)
+ 		if (dst_addr) {
+ 			ret = rdma_create_id(test.channel,
+ 					     &test.nodes[i].cma_id,
+-					     &test.nodes[i], RDMA_PS_TCP);
++					     &test.nodes[i], hints.ai_port_space);
+ 			if (ret)
+ 				goto err;
+ 		}
+@@ -501,19 +502,15 @@ static int migrate_channel(struct rdma_cm_id *listen_id)
  static int run_server(void)
  {
  	struct rdma_cm_id *listen_id;
@@ -41,7 +50,10 @@ index 94fc4cd..167f509 100644
  	int i, ret;
  
  	printf("cmatose: starting server\n");
-@@ -511,9 +511,6 @@ static int run_server(void)
+-	ret = rdma_create_id(test.channel, &listen_id, &test, RDMA_PS_TCP);
++	ret = rdma_create_id(test.channel, &listen_id, &test, hints.ai_port_space);
+ 	if (ret) {
+ 		perror("cmatose: listen request failed");
  		return ret;
  	}
  
