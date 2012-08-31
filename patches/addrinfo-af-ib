@@ -1,5 +1,5 @@
 Bottom: 4e01eb8a1c0681cd7bcca9c1bf3502036b929d4b
-Top:    b41f5d11d3f72c1bbe451336c858f7ebfb0a4da7
+Top:    a83c8510e141c14a58d3a80280254cbe08f2f4db
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-28 12:33:04 -0700
 
@@ -46,9 +46,16 @@ index 86e00ca..cd819c6 100755
  Address family for the source and destination address.  Supported families
  are: AF_INET, AF_INET6, and AF_IB.
 diff --git a/src/acm.c b/src/acm.c
-index 95eee73..76fc466 100755
+index 95eee73..125d44a 100755
 --- a/src/acm.c
 +++ b/src/acm.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2010 Intel Corporation.  All rights reserved.
++ * Copyright (c) 2010-2012 Intel Corporation.  All rights reserved.
+  *
+  * This software is available to you under a choice of one of two
+  * licenses.  You may choose to be licensed under the terms of the GNU
 @@ -128,16 +128,13 @@ static void ucma_set_sid(enum rdma_port_space ps, struct sockaddr *addr,
  {
  	uint16_t port;
