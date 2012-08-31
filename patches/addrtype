@@ -1,5 +1,5 @@
 Bottom: b41f5d11d3f72c1bbe451336c858f7ebfb0a4da7
-Top:    b06830efc3ecf71d460e71ce1f8d3080436b6b83
+Top:    6d90eae03c462c78e6bacc93c8eedddd5313d351
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-29 15:02:54 -0700
 
@@ -15,9 +15,16 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/cmatose.c b/examples/cmatose.c
-index 94fc4cd..8ebc959 100644
+index 94fc4cd..c00d28f 100644
 --- a/examples/cmatose.c
 +++ b/examples/cmatose.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2005-2006,2011 Intel Corporation.  All rights reserved.
++ * Copyright (c) 2005-2006,2011-2012 Intel Corporation.  All rights reserved.
+  *
+  * This software is available to you under a choice of one of two
+  * licenses.  You may choose to be licensed under the terms of the GNU
 @@ -81,6 +81,7 @@ static uint8_t tos;
  static uint8_t migrate = 0;
  static char *dst_addr;
@@ -58,16 +65,17 @@ index 94fc4cd..8ebc959 100644
  	ret = get_rdma_addr(src_addr, dst_addr, port, &hints, &test.rai);
  	if (ret) {
  		perror("cmatose: getaddrinfo error");
-@@ -646,7 +640,7 @@ int main(int argc, char **argv)
+@@ -646,7 +640,8 @@ int main(int argc, char **argv)
  {
  	int op, ret;
  
 -	while ((op = getopt(argc, argv, "s:b:c:C:S:t:p:m")) != -1) {
++	hints.ai_port_space = RDMA_PS_TCP;
 +	while ((op = getopt(argc, argv, "s:b:f:c:C:S:t:p:m")) != -1) {
  		switch (op) {
  		case 's':
  			dst_addr = optarg;
-@@ -654,6 +648,16 @@ int main(int argc, char **argv)
+@@ -654,6 +649,17 @@ int main(int argc, char **argv)
  		case 'b':
  			src_addr = optarg;
  			break;
@@ -77,6 +85,7 @@ index 94fc4cd..8ebc959 100644
 +			} else if (!strncasecmp("gid", optarg, 3)) {
 +				hints.ai_flags = RAI_NUMERICHOST | RAI_FAMILY;
 +				hints.ai_family = AF_IB;
++				hints.ai_port_space = RDMA_PS_IB;
 +			} else if (strncasecmp("name", optarg, 4)) {
 +				fprintf(stderr, "Warning: unknown address format\n");
 +			}
@@ -84,7 +93,7 @@ index 94fc4cd..8ebc959 100644
  		case 'c':
  			connections = atoi(optarg);
  			break;
-@@ -677,6 +681,8 @@ int main(int argc, char **argv)
+@@ -677,6 +683,8 @@ int main(int argc, char **argv)
  			printf("usage: %s\n", argv[0]);
  			printf("\t[-s server_address]\n");
  			printf("\t[-b bind_address]\n");
@@ -93,12 +102,11 @@ index 94fc4cd..8ebc959 100644
  			printf("\t[-c connections]\n");
  			printf("\t[-C message_count]\n");
  			printf("\t[-S message_size]\n");
-@@ -699,10 +705,13 @@ int main(int argc, char **argv)
+@@ -699,10 +707,12 @@ int main(int argc, char **argv)
  	if (alloc_nodes())
  		exit(1);
  
 -	if (dst_addr)
-+	hints.ai_port_space = RDMA_PS_TCP;
 +	if (dst_addr) {
  		ret = run_client();
 -	else
