@@ -1,0 +1,20 @@
+Bottom: b41f5d11d3f72c1bbe451336c858f7ebfb0a4da7
+Top:    a83c8510e141c14a58d3a80280254cbe08f2f4db
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-08-31 10:27:52 -0700
+
+Refresh of addrinfo-af-ib
+
+---
+
+diff --git a/src/acm.c b/src/acm.c
+index 76fc466..125d44a 100755
+--- a/src/acm.c
++++ b/src/acm.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2010 Intel Corporation.  All rights reserved.
++ * Copyright (c) 2010-2012 Intel Corporation.  All rights reserved.
+  *
+  * This software is available to you under a choice of one of two
+  * licenses.  You may choose to be licensed under the terms of the GNU
