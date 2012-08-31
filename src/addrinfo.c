@@ -53,6 +53,8 @@
 #define RDMA_QPT_XRC_RECV 10
 #endif
 
+struct rdma_addrinfo nohints;
+
 static void ucma_convert_to_ai(struct addrinfo *ai, struct rdma_addrinfo *rai)
 {
 	memset(ai, 0, sizeof *ai);
@@ -142,9 +144,7 @@ static int ucma_convert_to_rai(struct rdma_addrinfo *rai,
 {
 	int ret;
 
-	rai->ai_family = ai->ai_family;
-
-	if (hints && hints->ai_qp_type) {
+	if (hints->ai_qp_type) {
 		rai->ai_qp_type = hints->ai_qp_type;
 	} else {
 		switch (ai->ai_socktype) {
@@ -157,7 +157,7 @@ static int ucma_convert_to_rai(struct rdma_addrinfo *rai,
 		}
 	}
 
-	if (hints && hints->ai_port_space) {
+	if (hints->ai_port_space) {
 		rai->ai_port_space = hints->ai_port_space;
 	} else {
 		switch (ai->ai_protocol) {
@@ -170,17 +170,20 @@ static int ucma_convert_to_rai(struct rdma_addrinfo *rai,
 		}
 	}
 
-	if (ai->ai_flags & RAI_PASSIVE) {
+	if (ai->ai_flags & AI_PASSIVE) {
+		rai->ai_flags = RAI_PASSIVE
 		if (ai->ai_canonname)
 			rai->ai_src_canonname = strdup(ai->ai_canonname);
 
 		if ((hints->ai_flags & RAI_FAMILY) && (hints->ai_family == AF_IB) &&
 		    (hints->ai_flags & RAI_NUMERICHOST)) {
+			rai->ai_family = AF_IB;
 			ret = ucma_convert_in6((struct sockaddr_ib **) &rai->ai_src_addr,
 					       &rai->ai_src_len,
 					       (struct sockaddr_in6 *) ai->ai_addr,
 					       ai->ai_addrlen);
 		} else {
+			rai->ai_family = ai->ai_family;
 			ret = ucma_copy_addr(&rai->ai_src_addr, &rai->ai_src_len,
 					     ai->ai_addr, ai->ai_addrlen);
 		}
@@ -190,11 +193,13 @@ static int ucma_convert_to_rai(struct rdma_addrinfo *rai,
 
 		if ((hints->ai_flags & RAI_FAMILY) && (hints->ai_family == AF_IB) &&
 		    (hints->ai_flags & RAI_NUMERICHOST)) {
+			rai->ai_family = AF_IB;
 			ret = ucma_convert_in6((struct sockaddr_ib **) &rai->ai_dst_addr,
 					       &rai->ai_dst_len,
 					       (struct sockaddr_in6 *) ai->ai_addr,
 					       ai->ai_addrlen);
 		} else {
+			rai->ai_family = ai->ai_family;
 			ret = ucma_copy_addr(&rai->ai_dst_addr, &rai->ai_dst_len,
 					     ai->ai_addr, ai->ai_addrlen);
 		}
@@ -202,23 +207,20 @@ static int ucma_convert_to_rai(struct rdma_addrinfo *rai,
 	return ret;
 }
 
-static int ucma_convert_gai(char *node, char *service,
+static int ucma_getaddrinfo(char *node, char *service,
 			    struct rdma_addrinfo *hints,
 			    struct rdma_addrinfo *rai)
 {
 	struct addrinfo ai_hints;
-	struct addrinfo *ai, *aih;
+	struct addrinfo *ai;
 	int ret;
 
-	if (hints) {
+	if (hints != &nohints) {
 		ucma_convert_to_ai(&ai_hints, hints);
-		rai->ai_flags = hints->ai_flags;
-		aih = &ai_hints;
+		ret = getaddrinfo(node, service, &ai_hints, &ai);
 	} else {
-		aih = NULL;
+		ret = getaddrinfo(node, service, NULL, &ai);
 	}
-
-	ret = getaddrinfo(node, service, aih, &ai);
 	if (ret)
 		return ret;
 
@@ -245,8 +247,11 @@ int rdma_getaddrinfo(char *node, char *service,
 	if (!rai)
 		return ERR(ENOMEM);
 
+	if (!hints)
+		hints = &nohints;
+
 	if (node || service) {
-		ret = ucma_convert_gai(node, service, hints, rai);
+		ret = ucma_getaddrinfo(node, service, hints, rai);
 	} else {
 		rai->ai_flags = hints->ai_flags;
 		rai->ai_family = hints->ai_family;
@@ -260,7 +265,7 @@ int rdma_getaddrinfo(char *node, char *service,
 	if (ret)
 		goto err;
 
-	if (!rai->ai_src_len && hints && hints->ai_src_len) {
+	if (!rai->ai_src_len && hints->ai_src_len) {
 		ret = ucma_copy_addr(&rai->ai_src_addr, &rai->ai_src_len,
 				     hints->ai_src_addr, hints->ai_src_len);
 		if (ret)
