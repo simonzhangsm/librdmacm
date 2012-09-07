@@ -1,0 +1,13 @@
+Bottom: 4e01eb8a1c0681cd7bcca9c1bf3502036b929d4b
+Top:    4e01eb8a1c0681cd7bcca9c1bf3502036b929d4b
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-09-07 10:20:53 -0700
+
+rspreload: Fix state checks in dup2
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
