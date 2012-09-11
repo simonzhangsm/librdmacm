@@ -5,6 +5,10 @@ Date:   2012-09-10 14:32:45 -0700
 
 rsockets: Document rsocket protocol and design
 
+Include a brief overview of the rsocket protocol and underlying design
+with the source code to make it easier for someone trying to decipher
+the actual code.
+
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
