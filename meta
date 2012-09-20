@@ -1,13 +1,7 @@
 Version: 1
-Previous: 3799c079a44adcf5f499e03573c67e5b63bfbc01
+Previous: e1562eef4caf978025a926ad37a26b523e2bab48
 Head: e9feafcb10b48b7917ed34d7dd8a5a95269938a0
 Applied:
-  sa_family: 79ecff9afd483c22821eca679e7ed668035ab4c1
-  af_ib: ed14c624d882d21df3e2d0c022cffab0b7f664b9
-  ren-copy-rai: a7ae817991416863772d28d97839ee8daeefb07e
-  dup2: 3524c878f537ef2c57f973fad54b1204c299026d
-  addrinfo-af-ib: 7ada839ae4e288fadf40ffa49b6b6fb0e1a6bf78
-  rs-docs: e9feafcb10b48b7917ed34d7dd8a5a95269938a0
 Unapplied:
   addrtype: 066c2615bf5399848088a9771093a76c5e205bf1
   dbg-fork: 5679a32af8305db3c0406f9abb961259304a384a
