@@ -64,18 +64,6 @@ static pthread_mutex_t acm_lock = PTHREAD_MUTEX_INITIALIZER;
 static int sock = -1;
 static short server_port = 6125;
 
-struct ib_connect_hdr {
-	uint8_t  cma_version;
-	uint8_t  ip_version; /* IP version: 7:4 */
-	uint16_t port;
-	uint32_t src_addr[4];
-	uint32_t dst_addr[4];
-#define cma_src_ip4 src_addr[3]
-#define cma_src_ip6 src_addr[0]
-#define cma_dst_ip4 dst_addr[3]
-#define cma_dst_ip6 dst_addr[0]
-};
-
 static void ucma_set_server_port(void)
 {
 	FILE *f;
@@ -167,9 +155,6 @@ static int ucma_ib_set_connect(struct rdma_addrinfo *ib_rai,
 {
 	struct ib_connect_hdr *hdr;
 
-	if (rai->ai_family == AF_IB)
-		return 0;
-
 	hdr = calloc(1, sizeof *hdr);
 	if (!hdr)
 		return ERR(ENOMEM);
@@ -180,12 +165,21 @@ static int ucma_ib_set_connect(struct rdma_addrinfo *ib_rai,
 		       &((struct sockaddr_in *) rai->ai_src_addr)->sin_addr, 4);
 		memcpy(&hdr->cma_dst_ip4,
 		       &((struct sockaddr_in *) rai->ai_dst_addr)->sin_addr, 4);
-	} else {
+	} else if (rai->ai_family == AF_INET6) {
 		hdr->ip_version = 6 << 4;
 		memcpy(&hdr->cma_src_ip6,
 		       &((struct sockaddr_in6 *) rai->ai_src_addr)->sin6_addr, 16);
 		memcpy(&hdr->cma_dst_ip6,
 		       &((struct sockaddr_in6 *) rai->ai_dst_addr)->sin6_addr, 16);
+	} else if (rai->ai_family == AF_IB) {
+		hdr->ip_version = 6 << 4;
+		memcpy(&hdr->cma_src_ip6,
+		       &((struct sockaddr_ib *) rai->ai_src_addr)->sib_addr, 16);
+		memcpy(&hdr->cma_dst_ip6,
+		       &((struct sockaddr_ib *) rai->ai_dst_addr)->sib_addr, 16);
+	} else {
+		free(hdr);
+		return ERR(EINVAL);
 	}
 
 	ib_rai->ai_connect = hdr;
