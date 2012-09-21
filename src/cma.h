@@ -162,6 +162,18 @@ void ucma_ib_resolve(struct rdma_addrinfo **rai, struct rdma_addrinfo *hints);
 #define ucma_ib_resolve(x, y)
 #endif
 
+struct ib_connect_hdr {
+	uint8_t  cma_version;
+	uint8_t  ip_version; /* IP version: 7:4 */
+	uint16_t port;
+	uint32_t src_addr[4];
+	uint32_t dst_addr[4];
+#define cma_src_ip4 src_addr[3]
+#define cma_src_ip6 src_addr[0]
+#define cma_dst_ip4 dst_addr[3]
+#define cma_dst_ip6 dst_addr[0]
+};
+
 /* Define path record definition if using older version of libibverbs */
 #ifdef DEFINE_PATH_RECORD
 #define IBV_PATH_RECORD_REVERSIBLE 0x80
