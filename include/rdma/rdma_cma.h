@@ -38,6 +38,7 @@
 #include <sys/socket.h>
 #include <infiniband/verbs.h>
 #include <infiniband/sa.h>
+#include <infiniband/ib.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -96,12 +97,14 @@ struct rdma_addr {
 		struct sockaddr		src_addr;
 		struct sockaddr_in	src_sin;
 		struct sockaddr_in6	src_sin6;
+		struct sockaddr_ib	src_ib;
 		struct sockaddr_storage src_storage;
 	};
 	union {
 		struct sockaddr		dst_addr;
 		struct sockaddr_in	dst_sin;
 		struct sockaddr_in6	dst_sin6;
+		struct sockaddr_ib	dst_ib;
 		struct sockaddr_storage dst_storage;
 	};
 	union {
