@@ -1,7 +1,8 @@
 Version: 1
-Previous: e1562eef4caf978025a926ad37a26b523e2bab48
-Head: e9feafcb10b48b7917ed34d7dd8a5a95269938a0
+Previous: e9654f99a6bfb36e9c56b3a39955e7418128a8f2
+Head: eb0d1fd153da48d411e15a9ace059dd79efb4cb3
 Applied:
+  gid-conn: eb0d1fd153da48d411e15a9ace059dd79efb4cb3
 Unapplied:
   addrtype: 066c2615bf5399848088a9771093a76c5e205bf1
   dbg-fork: 5679a32af8305db3c0406f9abb961259304a384a

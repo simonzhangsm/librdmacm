@@ -1,0 +1,17 @@
+Bottom: fd25e5104198197967ac10d49db6570c49bf661c
+Top:    fd25e5104198197967ac10d49db6570c49bf661c
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-09-21 15:38:15 -0700
+
+librdmacm: Set connection information for AF_IB
+
+If an rdma_cm id is associated with AF_IB, then all private
+data is exposed to the user.  Format the private data
+according to the rdma_cm service annex.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
