@@ -1,0 +1,15 @@
+Bottom: fd25e5104198197967ac10d49db6570c49bf661c
+Top:    fd25e5104198197967ac10d49db6570c49bf661c
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-09-21 17:16:09 -0700
+
+librdmacm: Place container_of inside #ifdef
+
+verbs.h defines container_of.  Only define it if not defined
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
