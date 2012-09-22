@@ -1288,6 +1288,12 @@ static void ucma_copy_conn_param_to_kern(struct cma_id_private *id_priv,
 	if (id_priv->connect_len) {
 		memcpy(dst->private_data, id_priv->connect, id_priv->connect_len);
 		dst->private_data_len = id_priv->connect_len;
+	} else if (id_priv->id.route.addr.src_addr.sa_family == AF_IB) {
+		struct ib_connect_hdr *hdr = (struct ib_connect_hdr *) dst->private_data;
+		hdr->ip_version = 6 << 4;
+		memcpy(&hdr->cma_src_ip6, &id_priv->id.route.addr.src_ib.sib_addr, 16);
+		memcpy(&hdr->cma_dst_ip6, &id_priv->id.route.addr.dst_ib.sib_addr, 16);
+		dst->private_data_len = sizeof(*hdr);
 	}
 
 	if (src) {
