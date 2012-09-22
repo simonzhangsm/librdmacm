@@ -1,5 +1,5 @@
-Bottom: fd25e5104198197967ac10d49db6570c49bf661c
-Top:    70740cf339f3221216acd355b9e423de6dd18b8b
+Bottom: 2d834bd45b50141247cec98ef6807b7374d7cf2e
+Top:    acebc93d3ba52dd26ac077d8c4d5f4e3ea5d08b8
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-09-21 15:38:15 -0700
 
@@ -98,10 +98,10 @@ index 3d8c912..4b17043 100755
  
  	ib_rai->ai_connect = hdr;
 diff --git a/src/cma.c b/src/cma.c
-index d168df6..bd18993 100755
+index 91bf108..1888c99 100755
 --- a/src/cma.c
 +++ b/src/cma.c
-@@ -1288,6 +1288,12 @@ static void ucma_copy_conn_param_to_kern(struct cma_id_private *id_priv,
+@@ -1290,6 +1290,12 @@ static void ucma_copy_conn_param_to_kern(struct cma_id_private *id_priv,
  	if (id_priv->connect_len) {
  		memcpy(dst->private_data, id_priv->connect, id_priv->connect_len);
  		dst->private_data_len = id_priv->connect_len;
