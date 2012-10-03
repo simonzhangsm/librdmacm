@@ -1,8 +1,7 @@
 Version: 1
-Previous: 6b04e25490b6030109676d55da02d7030a50eebf
+Previous: fba6df8cbf1474020cdd7de9217f73f55a18e15e
 Head: 860b1a8784f1846be759eec46770cc723991479c
 Applied:
-  printf: ef84fae59dcaaa93d6be3a5baaec4d388daf1eee
   cont_of: e15e607d7759af7446d0184999736512b12d0cb3
   rping: 860b1a8784f1846be759eec46770cc723991479c
 Unapplied:
