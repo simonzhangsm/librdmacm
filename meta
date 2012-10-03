@@ -1,10 +1,9 @@
 Version: 1
-Previous: 53f0dcecef635949f3e6c4fe0118552e5ac94045
-Head: 2e87e4a64a7c6f821af2d49f57edf0332330dcae
+Previous: fd8736c0e7425167cdfc29b28ec39deac772e64c
+Head: a9d6145c5a8fae932052b003a1d00eaad0b76c0f
 Applied:
   rping: 5ed551f9ebc2af74eb2e330b258f0203cbf381e3
-  printf: 1b8918cff5cdad6593639a09a122178d069ab750
-  refresh-temp: 2e87e4a64a7c6f821af2d49f57edf0332330dcae
+  printf: a9d6145c5a8fae932052b003a1d00eaad0b76c0f
 Unapplied:
   cont_of: 3c70a581f12975b49cd1aac0236f09c6b8fb9950
   af-ib-conn: 5ce5f56950e0ed453c1798aedfa717bd18a2a754
