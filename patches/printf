@@ -1,0 +1,15 @@
+Bottom: cf9695fcbeea51e0388858a8b307228c9fdaaa42
+Top:    cf9695fcbeea51e0388858a8b307228c9fdaaa42
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-10-03 15:18:29 -0700
+
+addrinfo: Remove debug printf calls
+
+These never should have made it into the commit.  :P
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
