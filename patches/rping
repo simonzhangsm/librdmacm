@@ -11,6 +11,11 @@ retry_count is a 3 bit value on IB, reduce it from
 A value of 10 prevents rping from working over the Intel
 IB HCA.  Problem reported by Doug Ledford <dledford@redhat.com>
 
+The retry_count is also not set when calling rdma_accept.
+Rather than passing different values into rdma_accept than
+what was specified by the remote side, use the values given
+in the connection request.
+
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
