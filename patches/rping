@@ -1,0 +1,19 @@
+Bottom: fd25e5104198197967ac10d49db6570c49bf661c
+Top:    fd25e5104198197967ac10d49db6570c49bf661c
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-10-03 15:05:20 -0700
+
+rping: Reduce retry_count to fit in 3-bits
+
+retry_count is a 3 bit value on IB, reduce it from
+10 to 7.
+
+A value of 10 prevents rping from working over the Intel
+IB HCA.  Problem reported by Doug Ledford <dledford@redhat.com>
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+

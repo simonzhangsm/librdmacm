@@ -1,7 +1,8 @@
 Version: 1
-Previous: c6a44300624a6d77a2ec622afe123332d7f074cb
-Head: e9feafcb10b48b7917ed34d7dd8a5a95269938a0
+Previous: 7b7abf312239f7061d2e5965a918c796a7b63e87
+Head: da07c3e69841494fbf5749660082a2f8dd48bdf0
 Applied:
+  rping: da07c3e69841494fbf5749660082a2f8dd48bdf0
 Unapplied:
   cont_of: 3c70a581f12975b49cd1aac0236f09c6b8fb9950
   af-ib-conn: 5ce5f56950e0ed453c1798aedfa717bd18a2a754
