@@ -1,0 +1,17 @@
+Bottom: 456ce6603b09524564a80e7740e40381e5b2f6a8
+Top:    456ce6603b09524564a80e7740e40381e5b2f6a8
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-10-04 12:01:50 -0700
+
+ucmatose: Remove connect parameter passed into rdma_accept
+
+Pass in NULL for conn_param into rdma_accept to indicate
+that the passive side will use the values specified by the
+active side.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
