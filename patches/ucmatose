@@ -1,0 +1,24 @@
+Bottom: 292961092e4e0812d3138390081aa46cab16ba2b
+Top:    292961092e4e0812d3138390081aa46cab16ba2b
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-10-04 11:49:59 -0700
+
+ucmatose: Fix number of connections to disconnect
+
+When ucmatose aborts because of issues trying to connect
+to the server, it moves to disconnecting all connections.
+However, not all connections may have been established.
+The result is that ucmatose will hang in disconnect_events.
+Fix this by setting the number of times that we need to
+disconnect to the number of times that we successfully
+connect.
+
+This problem is based on a report by Doug Ledford
+<dledford@redhat.com>
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
