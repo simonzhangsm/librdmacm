@@ -212,7 +212,6 @@ static int post_sends(struct cmatest_node *node)
 
 static void connect_error(void)
 {
-	test.disconnects_left--;
 	test.connects_left--;
 }
 
@@ -324,6 +323,7 @@ static int cma_handler(struct rdma_cm_id *cma_id, struct rdma_cm_event *event)
 	case RDMA_CM_EVENT_ESTABLISHED:
 		((struct cmatest_node *) cma_id->context)->connected = 1;
 		test.connects_left--;
+		test.disconnects_left++;
 		break;
 	case RDMA_CM_EVENT_ADDR_ERROR:
 	case RDMA_CM_EVENT_ROUTE_ERROR:
@@ -704,7 +704,6 @@ int main(int argc, char **argv)
 	}
 
 	test.connects_left = connections;
-	test.disconnects_left = connections;
 
 	test.channel = rdma_create_event_channel();
 	if (!test.channel) {
