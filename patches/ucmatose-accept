@@ -1,5 +1,5 @@
-Bottom: 456ce6603b09524564a80e7740e40381e5b2f6a8
-Top:    6443f4654d85f13671d58f9637d8bd4822c954b5
+Bottom: f7d2ba0428817eeaa855ddb332d7f7e51db9326f
+Top:    7a63e115cc4adf073292cd3edca568d9910e1a6e
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-10-04 12:01:50 -0700
 
@@ -15,10 +15,10 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/cmatose.c b/examples/cmatose.c
-index 046d452..ab3e746 100644
+index 9ea6777..2b6b2b1 100644
 --- a/examples/cmatose.c
 +++ b/examples/cmatose.c
-@@ -267,7 +267,6 @@ err:
+@@ -266,7 +266,6 @@ err:
  static int connect_handler(struct rdma_cm_id *cma_id)
  {
  	struct cmatest_node *node;
@@ -26,7 +26,7 @@ index 046d452..ab3e746 100644
  	int ret;
  
  	if (test.conn_index == connections) {
-@@ -287,10 +286,7 @@ static int connect_handler(struct rdma_cm_id *cma_id)
+@@ -286,10 +285,7 @@ static int connect_handler(struct rdma_cm_id *cma_id)
  	if (ret)
  		goto err2;
  
