@@ -1,0 +1,37 @@
+Bottom: 292961092e4e0812d3138390081aa46cab16ba2b
+Top:    456ce6603b09524564a80e7740e40381e5b2f6a8
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-10-04 11:55:29 -0700
+
+Refresh of ucmatose
+
+---
+
+diff --git a/examples/cmatose.c b/examples/cmatose.c
+index 8ca2d88..046d452 100644
+--- a/examples/cmatose.c
++++ b/examples/cmatose.c
+@@ -212,7 +212,6 @@ static int post_sends(struct cmatest_node *node)
+ 
+ static void connect_error(void)
+ {
+-	test.disconnects_left--;
+ 	test.connects_left--;
+ }
+ 
+@@ -324,6 +323,7 @@ static int cma_handler(struct rdma_cm_id *cma_id, struct rdma_cm_event *event)
+ 	case RDMA_CM_EVENT_ESTABLISHED:
+ 		((struct cmatest_node *) cma_id->context)->connected = 1;
+ 		test.connects_left--;
++		test.disconnects_left++;
+ 		break;
+ 	case RDMA_CM_EVENT_ADDR_ERROR:
+ 	case RDMA_CM_EVENT_ROUTE_ERROR:
+@@ -704,7 +704,6 @@ int main(int argc, char **argv)
+ 	}
+ 
+ 	test.connects_left = connections;
+-	test.disconnects_left = connections;
+ 
+ 	test.channel = rdma_create_event_channel();
+ 	if (!test.channel) {
