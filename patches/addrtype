@@ -1,5 +1,5 @@
-Bottom: a62468b7702ac62192d599a9889e5197fe844ba5
-Top:    292961092e4e0812d3138390081aa46cab16ba2b
+Bottom: 5d9e0a431c854e5d6730391b6ffd28b9fd9c1da0
+Top:    6443f4654d85f13671d58f9637d8bd4822c954b5
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-29 15:02:54 -0700
 
@@ -15,7 +15,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/cmatose.c b/examples/cmatose.c
-index 94fc4cd..8ca2d88 100644
+index 2b6b2b1..ab3e746 100644
 --- a/examples/cmatose.c
 +++ b/examples/cmatose.c
 @@ -1,5 +1,5 @@
@@ -33,7 +33,7 @@ index 94fc4cd..8ca2d88 100644
  
  static int create_message(struct cmatest_node *node)
  {
-@@ -389,7 +390,7 @@ static int alloc_nodes(void)
+@@ -385,7 +386,7 @@ static int alloc_nodes(void)
  		if (dst_addr) {
  			ret = rdma_create_id(test.channel,
  					     &test.nodes[i].cma_id,
@@ -42,7 +42,7 @@ index 94fc4cd..8ca2d88 100644
  			if (ret)
  				goto err;
  		}
-@@ -501,19 +502,15 @@ static int migrate_channel(struct rdma_cm_id *listen_id)
+@@ -497,19 +498,15 @@ static int migrate_channel(struct rdma_cm_id *listen_id)
  static int run_server(void)
  {
  	struct rdma_cm_id *listen_id;
@@ -63,7 +63,7 @@ index 94fc4cd..8ca2d88 100644
  	ret = get_rdma_addr(src_addr, dst_addr, port, &hints, &test.rai);
  	if (ret) {
  		perror("cmatose: getrdmaaddr error");
-@@ -583,13 +580,10 @@ out:
+@@ -579,13 +576,10 @@ out:
  
  static int run_client(void)
  {
@@ -77,7 +77,7 @@ index 94fc4cd..8ca2d88 100644
  	ret = get_rdma_addr(src_addr, dst_addr, port, &hints, &test.rai);
  	if (ret) {
  		perror("cmatose: getaddrinfo error");
-@@ -646,7 +640,8 @@ int main(int argc, char **argv)
+@@ -642,7 +636,8 @@ int main(int argc, char **argv)
  {
  	int op, ret;
  
@@ -87,7 +87,7 @@ index 94fc4cd..8ca2d88 100644
  		switch (op) {
  		case 's':
  			dst_addr = optarg;
-@@ -654,6 +649,23 @@ int main(int argc, char **argv)
+@@ -650,6 +645,23 @@ int main(int argc, char **argv)
  		case 'b':
  			src_addr = optarg;
  			break;
@@ -111,7 +111,7 @@ index 94fc4cd..8ca2d88 100644
  		case 'c':
  			connections = atoi(optarg);
  			break;
-@@ -677,6 +689,10 @@ int main(int argc, char **argv)
+@@ -673,6 +685,10 @@ int main(int argc, char **argv)
  			printf("usage: %s\n", argv[0]);
  			printf("\t[-s server_address]\n");
  			printf("\t[-b bind_address]\n");
@@ -122,7 +122,7 @@ index 94fc4cd..8ca2d88 100644
  			printf("\t[-c connections]\n");
  			printf("\t[-C message_count]\n");
  			printf("\t[-S message_size]\n");
-@@ -699,10 +715,12 @@ int main(int argc, char **argv)
+@@ -694,10 +710,12 @@ int main(int argc, char **argv)
  	if (alloc_nodes())
  		exit(1);
  
