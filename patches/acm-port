@@ -14,6 +14,9 @@ is not found, simply disable ACM support.
 This has the effect of removing support for older versions
 of ibacm, unless the port file is created manually.
 
+Patch created based on feedback from Doug Ledford and Florian
+Weimer from RedHat.
+
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
