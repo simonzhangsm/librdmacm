@@ -1,0 +1,22 @@
+Bottom: 7a63e115cc4adf073292cd3edca568d9910e1a6e
+Top:    7a63e115cc4adf073292cd3edca568d9910e1a6e
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-10-08 10:33:21 -0700
+
+librdmacm: Disable ACM support if ibacm.port is not found
+
+The librdmacm will try to connect port 6125 if ibacm.port is
+not found.  The problem is that some other service or application
+could be using that port and respond with garbage.  Rather
+than falling back to a hard coded port number, if ibacm.port
+is not found, simply disable ACM support.
+
+This has the effect of removing support for older versions
+of ibacm, unless the port file is created manually.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
