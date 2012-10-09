@@ -1,0 +1,25 @@
+Bottom: 3c34d14a8ee4fe283d218672455efc104f3a737a
+Top:    17bcaa3096671f47384b47a6f4ce7f1e041dfd73
+Author: Dotan Barak <dotanb@dev.mellanox.co.il>
+Date:   2012-10-09 12:27:51 +0000
+
+[4/5,librdmacm] rstream: added missing return is accept() failed
+
+Signed-off-by: Dotan Barak <dotanb@dev.mellanox.co.il>
+Signed-off-by: Yishai Hadas <yishaih@mellanox.com>
+
+
+---
+
+diff --git a/examples/rstream.c b/examples/rstream.c
+index 6ef60a1..d65c48d 100644
+--- a/examples/rstream.c
++++ b/examples/rstream.c
+@@ -464,6 +464,7 @@ static int server_connect(void)
+ 	if (rs < 0) {
+ 		ret = rs;
+ 		perror("raccept");
++		return ret;
+ 	}
+ 
+ 	if (use_fork)

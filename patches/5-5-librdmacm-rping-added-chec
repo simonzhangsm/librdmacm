@@ -1,0 +1,69 @@
+Bottom: 17bcaa3096671f47384b47a6f4ce7f1e041dfd73
+Top:    d2e0cf1d12bba54243ad83d2a5c20fe5559cf757
+Author: Dotan Barak <dotanb@dev.mellanox.co.il>
+Date:   2012-10-09 12:27:52 +0000
+
+[5/5,librdmacm] rping: added checks to the return values functions
+
+This will make rping to exit with return value other than zero in case of an
+error.
+
+Signed-off-by: Dotan Barak <dotanb@dev.mellanox.co.il>
+Reviewed-by: Yishai Hadas <yishaih@mellanox.com>
+
+
+---
+
+diff --git a/examples/rping.c b/examples/rping.c
+index 32bd70a..d702592 100644
+--- a/examples/rping.c
++++ b/examples/rping.c
+@@ -881,7 +881,14 @@ static int rping_run_server(struct rping_cb *cb)
+ 		goto err2;
+ 	}
+ 
+-	rping_test_server(cb);
++	ret = rping_test_server(cb);
++	if (ret) {
++		fprintf(stderr, "rping server failed: %d\n", ret);
++		goto err3;
++	}
++
++	ret = 0;
++err3:
+ 	rdma_disconnect(cb->child_cm_id);
+ 	pthread_join(cb->cqthread, NULL);
+ 	rdma_destroy_id(cb->child_cm_id);
+@@ -1049,7 +1056,14 @@ static int rping_run_client(struct rping_cb *cb)
+ 		goto err2;
+ 	}
+ 
+-	rping_test_client(cb);
++	ret = rping_test_client(cb);
++	if (ret) {
++		fprintf(stderr, "rping client failed: %d\n", ret);
++		goto err3;
++	}
++
++	ret = 0;
++err3:
+ 	rdma_disconnect(cb->cm_id);
+ 	pthread_join(cb->cqthread, NULL);
+ err2:
+@@ -1189,6 +1203,7 @@ int main(int argc, char *argv[])
+ 	cb->cm_channel = rdma_create_event_channel();
+ 	if (!cb->cm_channel) {
+ 		perror("rdma_create_event_channel");
++		ret = ENOMEM;
+ 		goto out;
+ 	}
+ 
+@@ -1210,7 +1225,7 @@ int main(int argc, char *argv[])
+ 		ret = rping_run_client(cb);
+ 
+ 	DEBUG_LOG("destroy cm_id %p\n", cb->cm_id);
+-	rdma_destroy_id(cb->cm_id);
++	ret = rdma_destroy_id(cb->cm_id);
+ out2:
+ 	rdma_destroy_event_channel(cb->cm_channel);
+ out:

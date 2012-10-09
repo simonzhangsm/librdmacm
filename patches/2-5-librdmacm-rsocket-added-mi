@@ -1,0 +1,25 @@
+Bottom: f645979e703e3337aa2e7456b7e1742bc602ce6a
+Top:    39eb51ceb9f5ecf9dded46d0c3dd62f5e135e41d
+Author: Dotan Barak <dotanb@dev.mellanox.co.il>
+Date:   2012-10-09 12:27:49 +0000
+
+[2/5,librdmacm] rsocket: added missing break
+
+Signed-off-by: Dotan Barak <dotanb@dev.mellanox.co.il>
+Reviewed-by: Yishai Hadas <yishaih@mellanox.com>
+
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 278c8ec..4665ce7 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -1859,6 +1859,7 @@ int rsetsockopt(int socket, int level, int optname,
+ 		default:
+ 			break;
+ 		}
++		break;
+ 	case SOL_RDMA:
+ 		if (rs->state >= rs_opening) {
+ 			ret = ERR(EINVAL);

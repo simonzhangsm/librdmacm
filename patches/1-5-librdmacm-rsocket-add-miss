@@ -1,0 +1,27 @@
+Bottom: 7a63e115cc4adf073292cd3edca568d9910e1a6e
+Top:    f645979e703e3337aa2e7456b7e1742bc602ce6a
+Author: Dotan Barak <dotanb@dev.mellanox.co.il>
+Date:   2012-10-09 12:27:48 +0000
+
+[1/5,librdmacm] rsocket: add missing va_end() after calling va_end()
+
+Not doing so, may lead to resource leak.
+
+Signed-off-by: Dotan Barak <dotanb@dev.mellanox.co.il>
+Reviewed-by: Yishai Hadas <yishaih@mellanox.com>
+
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 4c4821b..278c8ec 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -2002,6 +2002,7 @@ int rfcntl(int socket, int cmd, ... /* arg */ )
+ 	va_start(args, cmd);
+ 	switch (cmd) {
+ 	case F_GETFL:
++		va_end(args);
+ 		return (int) rs->fd_flags;
+ 	case F_SETFL:
+ 		param = va_arg(args, long);

@@ -1,0 +1,29 @@
+Bottom: 39eb51ceb9f5ecf9dded46d0c3dd62f5e135e41d
+Top:    3c34d14a8ee4fe283d218672455efc104f3a737a
+Author: Dotan Barak <dotanb@dev.mellanox.co.il>
+Date:   2012-10-09 12:27:50 +0000
+
+[3/5,librdmacm] rstream: initialize return value in server_connect()
+
+If use_async == 0 and rs_accept() passes (i.e. non negative value), then
+the return value from the function was uninitialized.
+
+Signed-off-by: Dotan Barak <dotanb@dev.mellanox.co.il>
+Reviewed-by: Yishai Hadas <yishaih@mellanox.com>
+
+
+---
+
+diff --git a/examples/rstream.c b/examples/rstream.c
+index 1d221d0..6ef60a1 100644
+--- a/examples/rstream.c
++++ b/examples/rstream.c
+@@ -444,7 +444,7 @@ free:
+ static int server_connect(void)
+ {
+ 	struct pollfd fds;
+-	int ret;
++	int ret = 0;
+ 
+ 	set_options(lrs);
+ 	do {
