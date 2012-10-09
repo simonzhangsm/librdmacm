@@ -464,6 +464,7 @@ static int server_connect(void)
 	if (rs < 0) {
 		ret = rs;
 		perror("raccept");
+		return ret;
 	}
 
 	if (use_fork)
