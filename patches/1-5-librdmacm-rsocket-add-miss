@@ -9,6 +9,7 @@ Not doing so, may lead to resource leak.
 
 Signed-off-by: Dotan Barak <dotanb@dev.mellanox.co.il>
 Reviewed-by: Yishai Hadas <yishaih@mellanox.com>
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
 ---
