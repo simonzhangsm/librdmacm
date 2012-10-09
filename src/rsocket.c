@@ -2002,8 +2002,8 @@ int rfcntl(int socket, int cmd, ... /* arg */ )
 	va_start(args, cmd);
 	switch (cmd) {
 	case F_GETFL:
-		va_end(args);
-		return (int) rs->fd_flags;
+		ret = (int) rs->fd_flags;
+		break;
 	case F_SETFL:
 		param = va_arg(args, long);
 		if (param & O_NONBLOCK)
@@ -2014,6 +2014,7 @@ int rfcntl(int socket, int cmd, ... /* arg */ )
 		break;
 	default:
 		ret = ERR(ENOTSUP);
+		break;
 	}
 	va_end(args);
 	return ret;
