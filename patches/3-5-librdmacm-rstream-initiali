@@ -10,6 +10,7 @@ the return value from the function was uninitialized.
 
 Signed-off-by: Dotan Barak <dotanb@dev.mellanox.co.il>
 Reviewed-by: Yishai Hadas <yishaih@mellanox.com>
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
 ---
