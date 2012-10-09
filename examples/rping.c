@@ -1221,11 +1221,12 @@ int main(int argc, char *argv[])
 			ret = rping_run_persistent_server(cb);
 		else
 			ret = rping_run_server(cb);
-	} else
+	} else {
 		ret = rping_run_client(cb);
+	}
 
 	DEBUG_LOG("destroy cm_id %p\n", cb->cm_id);
-	ret = rdma_destroy_id(cb->cm_id);
+	rdma_destroy_id(cb->cm_id);
 out2:
 	rdma_destroy_event_channel(cb->cm_channel);
 out:
