@@ -2002,6 +2002,7 @@ int rfcntl(int socket, int cmd, ... /* arg */ )
 	va_start(args, cmd);
 	switch (cmd) {
 	case F_GETFL:
+		va_end(args);
 		return (int) rs->fd_flags;
 	case F_SETFL:
 		param = va_arg(args, long);
