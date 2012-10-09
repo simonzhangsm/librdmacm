@@ -1,5 +1,5 @@
 Bottom: 999b4967a7c98b417b409f2d9018478091879091
-Top:    56953b70ed305a979b2ac96939d54e07a2f02e4b
+Top:    04e079ae9012e8656c794388e68818b5bdb4670d
 Author: Dotan Barak <dotanb@dev.mellanox.co.il>
 Date:   2012-10-09 12:27:51 +0000
 
@@ -7,19 +7,22 @@ Date:   2012-10-09 12:27:51 +0000
 
 Signed-off-by: Dotan Barak <dotanb@dev.mellanox.co.il>
 Signed-off-by: Yishai Hadas <yishaih@mellanox.com>
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
 ---
 
 diff --git a/examples/rstream.c b/examples/rstream.c
-index 6ef60a1..d65c48d 100644
+index 6ef60a1..069b7c9 100644
 --- a/examples/rstream.c
 +++ b/examples/rstream.c
-@@ -464,6 +464,7 @@ static int server_connect(void)
+@@ -462,8 +462,8 @@ static int server_connect(void)
+ 		rs = rs_accept(lrs, NULL, 0);
+ 	} while (rs < 0 && (errno == EAGAIN || errno == EWOULDBLOCK));
  	if (rs < 0) {
- 		ret = rs;
+-		ret = rs;
  		perror("raccept");
-+		return ret;
++		return rs;
  	}
  
  	if (use_fork)
