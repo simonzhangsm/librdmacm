@@ -1,0 +1,24 @@
+Bottom: 56953b70ed305a979b2ac96939d54e07a2f02e4b
+Top:    04e079ae9012e8656c794388e68818b5bdb4670d
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-10-09 10:00:12 -0700
+
+Refresh of 4-5-librdmacm-rstream-added-mi
+
+---
+
+diff --git a/examples/rstream.c b/examples/rstream.c
+index d65c48d..069b7c9 100644
+--- a/examples/rstream.c
++++ b/examples/rstream.c
+@@ -462,9 +462,8 @@ static int server_connect(void)
+ 		rs = rs_accept(lrs, NULL, 0);
+ 	} while (rs < 0 && (errno == EAGAIN || errno == EWOULDBLOCK));
+ 	if (rs < 0) {
+-		ret = rs;
+ 		perror("raccept");
+-		return ret;
++		return rs;
+ 	}
+ 
+ 	if (use_fork)
