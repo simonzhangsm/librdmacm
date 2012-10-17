@@ -1,7 +1,8 @@
 Version: 1
-Previous: 2130fc9538006b03fae47d2c93239b6d311b1312
-Head: 507cc241e8b212c3cf3ed0ffb04e37095bbf8bb3
+Previous: 311cb7d7d311b26e7a67480b05adae462f10eb1c
+Head: 10d51c708bfc1d87f1db2faa04edc92da9675527
 Applied:
+  rdma_xserver-client-fix-man-pa: 10d51c708bfc1d87f1db2faa04edc92da9675527
 Unapplied:
   af-ib-conn: 70cdbcec6986d1fcc8146a73cf2d8b6a537e71f5
   addrtype: fffb812c9cbe707f830d1e7e713feb3ae3e2e8ec
