@@ -17,6 +17,7 @@ missing ".TP" so that the -p and -c options are not run together in the
 formatted output.
 
 Signed-off-by: Roland Dreier <roland@purestorage.com>
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
 ---

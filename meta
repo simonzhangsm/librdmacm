@@ -1,9 +1,8 @@
 Version: 1
-Previous: d8b29bb08ea13f85ee34d04cd4904c2b6c0e70dc
-Head: 6fda88e1ff7bdfa12b323eb24e54fb1dbe85c348
+Previous: 23e98eef4bf74429a7e5b6c4256316e177095f47
+Head: d2e96e99bf1fc3d14e33c741502cb689c810a27b
 Applied:
-  rdma_xserver-client-fix-man-pa: 10d51c708bfc1d87f1db2faa04edc92da9675527
-  refresh-temp: 6fda88e1ff7bdfa12b323eb24e54fb1dbe85c348
+  rdma_xserver-client-fix-man-pa: d2e96e99bf1fc3d14e33c741502cb689c810a27b
 Unapplied:
   af-ib-conn: 70cdbcec6986d1fcc8146a73cf2d8b6a537e71f5
   addrtype: fffb812c9cbe707f830d1e7e713feb3ae3e2e8ec
