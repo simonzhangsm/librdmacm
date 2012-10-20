@@ -3,23 +3,23 @@ Top:    134799972a9b123f7a629b2a58b8f87a86ed1773
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-10-20 09:19:22 -0700
 
-rsocket: Reserve bits in data transfer message
+rsocket: Reserve bits in rsocket message
 
 rsockets includes the length of a data transfer in the
 immediate data.  Currently 29 bits are reserved for the
-length, but the maximum transfer is currently capped
-at 64K.  For future expansion, limit the length field
+length, but the maximum transfer is capped at 64K.
+For future expansion, limit the length field
 to 17 bits and reserve the other 12.
 
 The interpretation of the 17 bits is modified as follows.
-The lower 16 bits indicate a length.  If the upper bit is
-0, then the lower 16 bits indicate a transfer size in bytes.
-If the upper bit is 1, the the total transfer size is
-calculated as (size carried in bits 0-15 + 1) * 64 KB.
+The lower 16 bits indicate a length, with the upper bit
+indicating a scaling factor.  If the upper bit is
+0, the scaling factor is 1.  The lower 16 bits indicate the
+transfer size in bytes.  If the upper bit is 1, then a
+scaling factor of 64K is applied.  The total transfer size is
+calculated as (value carried in bits 0-15 + 1) * 64 KB.
 
-This is backwards compatible with the current implementation,
-allows for transfers up to 4 GB, and provides us some
-additional bits for future use.
+This is backwards compatible with the current implementation.
 
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
