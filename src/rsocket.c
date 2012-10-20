@@ -54,6 +54,7 @@
 #include "indexer.h"
 
 #define RS_OLAP_START_SIZE 2048
+/* Data transfers over 64 KB not supported at this time */
 #define RS_MAX_TRANSFER 65536
 #define RS_QP_MAX_SIZE 0xFFFE
 #define RS_QP_CTRL_SIZE 4
@@ -76,7 +77,11 @@ static uint32_t polling_time = 10;
  * bit 29: more data, 0 - end of transfer, 1 - more data available
  *
  * for data transfers:
- * bits [28:0]: bytes transfered, 0 = 1 GB
+ * bits [28:17]: reserved
+ * bit  [16]: scaling factor for lower 16 bits
+ *            0 - length is in bytes, total transfer = length bytes
+ *            1 - length is in 64KB increments, transfer = (length + 1) & 64 KB
+ * bits [15:0] length of transfered
  * for control messages:
  * bits [28-0]: receive credits granted
  */
