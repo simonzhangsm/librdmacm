@@ -1,5 +1,5 @@
 Bottom: daf53db464152f40dc8d6f2c99844510b03f8567
-Top:    905a8f7c1ba58f27a6fdd44ab3080f3dd73ac6d7
+Top:    134799972a9b123f7a629b2a58b8f87a86ed1773
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-10-20 09:19:22 -0700
 
@@ -27,7 +27,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index cc5effe..fc21ce9 100644
+index cc5effe..6bfbed6 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -54,6 +54,7 @@
@@ -38,16 +38,23 @@ index cc5effe..fc21ce9 100644
  #define RS_MAX_TRANSFER 65536
  #define RS_QP_MAX_SIZE 0xFFFE
  #define RS_QP_CTRL_SIZE 4
-@@ -76,7 +77,11 @@ static uint32_t polling_time = 10;
+@@ -76,9 +77,17 @@ static uint32_t polling_time = 10;
   * bit 29: more data, 0 - end of transfer, 1 - more data available
   *
   * for data transfers:
 - * bits [28:0]: bytes transfered, 0 = 1 GB
 + * bits [28:17]: reserved
 + * bit  [16]: scaling factor for lower 16 bits
-+ *            0 - length is in bytes, total transfer = length bytes
-+ *            1 - length is in 64KB increments, transfer = (length + 1) & 64 KB
-+ * bits [15:0] length of transfered
++ *            0 - no scaling factor applied
++ *            1 - value is scaled by 64K, transfer = (value + 1) x 64
++ * bits [15:0] length of transfer
   * for control messages:
-  * bits [28-0]: receive credits granted
+- * bits [28-0]: receive credits granted
++ * bits [28-17]: reserved
++ * bit  [16]: scaling factor for lower 16 bits
++ *            0 - no scaling factor applied
++ *            1 - value is scaled by 64K, credits = (value + 1) x 64
++ * bits [15:0] receive credits granted
   */
+ 
+ enum {
