@@ -79,11 +79,15 @@ static uint32_t polling_time = 10;
  * for data transfers:
  * bits [28:17]: reserved
  * bit  [16]: scaling factor for lower 16 bits
- *            0 - length is in bytes, total transfer = length bytes
- *            1 - length is in 64KB increments, transfer = (length + 1) & 64 KB
- * bits [15:0] length of transfered
+ *            0 - no scaling factor applied
+ *            1 - value is scaled by 64K, transfer = (value + 1) x 64
+ * bits [15:0] length of transfer
  * for control messages:
- * bits [28-0]: receive credits granted
+ * bits [28-17]: reserved
+ * bit  [16]: scaling factor for lower 16 bits
+ *            0 - no scaling factor applied
+ *            1 - value is scaled by 64K, credits = (value + 1) x 64
+ * bits [15:0] receive credits granted
  */
 
 enum {
