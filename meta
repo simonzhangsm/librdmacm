@@ -1,10 +1,10 @@
 Version: 1
-Previous: 6d0f08b7cd8b62b3fe8b6b8980f7bdfeac7c0780
-Head: 7a07c80f2242e80c076dcf3ec6bb4c94626b284f
+Previous: 300c1f051f697f77a7d099f48b3a8a9b909d6da9
+Head: 7b6ff5c4894f54b221d877adcd709795dffb2fe9
 Applied:
   resv-rs-len: 7b6ff5c4894f54b221d877adcd709795dffb2fe9
-  rs-target-sgl: 7a07c80f2242e80c076dcf3ec6bb4c94626b284f
 Unapplied:
+  rs-target-sgl: 7a07c80f2242e80c076dcf3ec6bb4c94626b284f
   af-ib-conn: 70cdbcec6986d1fcc8146a73cf2d8b6a537e71f5
   addrtype: fffb812c9cbe707f830d1e7e713feb3ae3e2e8ec
   dbg-fork: 5679a32af8305db3c0406f9abb961259304a384a
