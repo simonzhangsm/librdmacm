@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Intel Corporation.  All rights reserved.
+ * Copyright (c) 2011-2012 Intel Corporation.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
  * licenses.  You may choose to be licensed under the terms of the GNU
@@ -84,6 +84,10 @@ int rsetsockopt(int socket, int level, int optname,
 int rgetsockopt(int socket, int level, int optname,
 		void *optval, socklen_t *optlen);
 int rfcntl(int socket, int cmd, ... /* arg */ );
+
+off_t riomap(int socket, void *buf, size_t len, int prot, int flags, off_t offset);
+int riounmap(int socket, void *buf, size_t len);
+size_t riowrite(int socket, const void *buf, size_t count, off_t offset, int flags);
 
 #ifdef __cplusplus
 }
