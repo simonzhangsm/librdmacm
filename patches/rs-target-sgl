@@ -1,0 +1,34 @@
+Bottom: 134799972a9b123f7a629b2a58b8f87a86ed1773
+Top:    134799972a9b123f7a629b2a58b8f87a86ed1773
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-10-20 23:43:13 -0700
+
+rsocket: Expand definition of target SGE
+
+During connection establishment, rsocket exchanges a
+target SGE.  The target SGE contains the address, rkey,
+and length of the target SGL.  The target SGL is the
+location where rsocket publishes data buffers at the
+remote peer.
+
+The length contained in the target SGE is the number of
+entries in the target SGL, which is currently set to 2.
+Divide the length field into 3 separate values.
+
+bits 31:16 - reserved
+bits 15:8  - use for direct data placement algorithm
+bits 7:0   - use for target SGL size
+
+Bits 15 and 7 are used as scaling factors.  If set, then
+the size specified in the corresponding lower bits is
+multiplied by 128.
+
+Backwards compatibility is maintained, since we never use
+a value greater than 2 anyway.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
