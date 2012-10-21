@@ -1,0 +1,13 @@
+Bottom: daf53db464152f40dc8d6f2c99844510b03f8567
+Top:    daf53db464152f40dc8d6f2c99844510b03f8567
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-10-21 14:16:03 -0700
+
+rsocket: Add direct data placement
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
