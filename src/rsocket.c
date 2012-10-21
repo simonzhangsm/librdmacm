@@ -124,6 +124,15 @@ struct rs_sge {
 #define rs_host_is_net() (1 == htonl(1))
 #define RS_CONN_FLAG_NET 1
 
+/*
+ * target_sgl:
+ *    addr   - Remote address to published target buffers
+ *    key    - Rkey of remote address for RDMA writes
+ *    length - Specifies sizes of target SGL areas
+ *             bits 31:16 - reserved
+ *             bits 15:8  - number of direct data placement target entries
+ *             bits  7:0  - number of network buffer target entries
+ */
 struct rs_conn_data {
 	uint8_t		  version;
 	uint8_t		  flags;
