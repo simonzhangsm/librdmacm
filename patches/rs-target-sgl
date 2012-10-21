@@ -1,5 +1,5 @@
 Bottom: 134799972a9b123f7a629b2a58b8f87a86ed1773
-Top:    134799972a9b123f7a629b2a58b8f87a86ed1773
+Top:    27891b225174785cd2bb770ded44484cbf710c4f
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-10-20 23:43:13 -0700
 
@@ -31,4 +31,23 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 ---
 
-
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 6bfbed6..fd31dfa 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -124,6 +124,15 @@ struct rs_sge {
+ #define rs_host_is_net() (1 == htonl(1))
+ #define RS_CONN_FLAG_NET 1
+ 
++/*
++ * target_sgl:
++ *    addr   - Remote address to published target buffers
++ *    key    - Rkey of remote address for RDMA writes
++ *    length - Specifies sizes of target SGL areas
++ *             bits 31:16 - reserved
++ *             bits 15:8  - number of direct data placement target entries
++ *             bits  7:0  - number of network buffer target entries
++ */
+ struct rs_conn_data {
+ 	uint8_t		  version;
+ 	uint8_t		  flags;
