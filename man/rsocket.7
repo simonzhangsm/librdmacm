@@ -47,7 +47,7 @@ This is also known as zero-copy support, since data is sent and
 received directly, bypassing copies into network controlled buffers.
 The following calls and options support direct data placement.
 .P
-riomap
+riomap, riounmap, riowrite
 .TP
 off_t riomap(int socket, void *buf, size_t len, int prot, int flags, off_t offset)
 .TP
@@ -91,6 +91,8 @@ RDMA_SQSIZE - Integer size of the underlying send queue.
 RDMA_RQSIZE - Integer size of the underlying receive queue.
 .TP
 RDMA_INLINE - Integer size of inline data.
+.TP
+RDMA_IOMAPSIZE - Integer number of remote IO mappings supported
 .P
 Note that rsockets fd's cannot be passed into non-rsocket calls.  For
 applications which must mix rsocket fd's with standard socket fd's or
@@ -124,6 +126,8 @@ sqsize_default - default size of send queue
 rqsize_default - default size of receive queue
 .P
 inline_default - default size of inline data
+.P
+iomap_size - default size of remote iomapping table
 .P
 If configuration files are not available, rsockets uses internal defaults.
 .SH "SEE ALSO"
