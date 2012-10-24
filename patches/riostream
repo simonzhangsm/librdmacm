@@ -1,4 +1,4 @@
-Bottom: 0f29fc79a2e44b45051dc6d32b885f356ac262aa
+Bottom: 7f355c2c4b9a69f80c172a756e9357d22ad478bf
 Top:    b7908a5c682466249184ca18ad389fa1b574c3b9
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-10-24 10:23:52 -0700
@@ -843,16 +843,3 @@ index 0000000..14e77fa
 +libibverbs README file for additional details.
 +.SH "SEE ALSO"
 +rdma_cm(7) rstream(1)
-diff --git a/src/rsocket.c b/src/rsocket.c
-index c534c61..afcc5b1 100644
---- a/src/rsocket.c
-+++ b/src/rsocket.c
-@@ -1453,7 +1453,7 @@ static int rs_send_iomaps(struct rsocket *rs, int flags)
- 			break;
- 	}
- 
--	rs->iomap_pending = dlist_empty(&rs->iomap_queue);
-+	rs->iomap_pending = !dlist_empty(&rs->iomap_queue);
- 	fastlock_release(&rs->iomap_lock);
- 	return ret;
- }
