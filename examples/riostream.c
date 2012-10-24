@@ -569,7 +569,7 @@ static int run(void)
 		if (ret)
 			goto free;
 
-		for (i = 0; i < TEST_CNT && !fork_pid; i++) {
+		for (i = 0; i < TEST_CNT; i++) {
 			if (test_size[i].option > size_option)
 				continue;
 			init_latency_test(test_size[i].size);
@@ -582,7 +582,7 @@ static int run(void)
 		ret = dst_addr ? client_connect() : server_connect();
 		if (ret)
 			goto free;
-		for (i = 0; i < TEST_CNT && !fork_pid; i++) {
+		for (i = 0; i < TEST_CNT; i++) {
 			if (test_size[i].option > size_option)
 				continue;
 			init_bandwidth_test(test_size[i].size);
