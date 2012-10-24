@@ -1,0 +1,22 @@
+Bottom: 5e887c322398445ed683aadd30b904e4d2498f54
+Top:    b7908a5c682466249184ca18ad389fa1b574c3b9
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-10-24 16:17:38 -0700
+
+Refresh of riostream
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index c534c61..afcc5b1 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -1453,7 +1453,7 @@ static int rs_send_iomaps(struct rsocket *rs, int flags)
+ 			break;
+ 	}
+ 
+-	rs->iomap_pending = dlist_empty(&rs->iomap_queue);
++	rs->iomap_pending = !dlist_empty(&rs->iomap_queue);
+ 	fastlock_release(&rs->iomap_lock);
+ 	return ret;
+ }
