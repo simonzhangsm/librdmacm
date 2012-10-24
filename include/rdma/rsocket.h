@@ -76,7 +76,8 @@ int rgetsockname(int socket, struct sockaddr *addr, socklen_t *addrlen);
 enum {
 	RDMA_SQSIZE,
 	RDMA_RQSIZE,
-	RDMA_INLINE
+	RDMA_INLINE,
+	RDMA_IOMAPSIZE
 };
 
 int rsetsockopt(int socket, int level, int optname,
