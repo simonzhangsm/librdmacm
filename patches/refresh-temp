@@ -1,0 +1,31 @@
+Bottom: dfeed2f52eb6f65a9782c15a2e73c0464df3b887
+Top:    9bf2cbf6a3b5360507622b949cd1a932b15de806
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-10-24 15:39:27 -0700
+
+Refresh of riostream
+
+---
+
+diff --git a/examples/riostream.c b/examples/riostream.c
+index cc7d888..ab0dc77 100644
+--- a/examples/riostream.c
++++ b/examples/riostream.c
+@@ -569,7 +569,7 @@ static int run(void)
+ 		if (ret)
+ 			goto free;
+ 
+-		for (i = 0; i < TEST_CNT && !fork_pid; i++) {
++		for (i = 0; i < TEST_CNT; i++) {
+ 			if (test_size[i].option > size_option)
+ 				continue;
+ 			init_latency_test(test_size[i].size);
+@@ -582,7 +582,7 @@ static int run(void)
+ 		ret = dst_addr ? client_connect() : server_connect();
+ 		if (ret)
+ 			goto free;
+-		for (i = 0; i < TEST_CNT && !fork_pid; i++) {
++		for (i = 0; i < TEST_CNT; i++) {
+ 			if (test_size[i].option > size_option)
+ 				continue;
+ 			init_bandwidth_test(test_size[i].size);
