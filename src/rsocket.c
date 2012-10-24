@@ -1453,7 +1453,7 @@ static int rs_send_iomaps(struct rsocket *rs, int flags)
 			break;
 	}
 
-	rs->iomap_pending = dlist_empty(&rs->iomap_queue);
+	rs->iomap_pending = !dlist_empty(&rs->iomap_queue);
 	fastlock_release(&rs->iomap_lock);
 	return ret;
 }
