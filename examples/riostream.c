@@ -235,6 +235,38 @@ static int do_poll(struct pollfd *fds)
 	return ret == 1 ? 0 : ret;
 }
 
+static int send_msg(int size)
+{
+	struct pollfd fds;
+	int offset, ret;
+
+	if (verify)
+		format_buf(buf, size);
+
+	if (use_async) {
+		fds.fd = rs;
+		fds.events = POLLOUT;
+	}
+
+	for (offset = 0; offset < size; ) {
+		if (use_async) {
+			ret = do_poll(&fds);
+			if (ret)
+				return ret;
+		}
+
+		ret = rsend(rs, buf + offset, size - offset, flags);
+		if (ret > 0) {
+			offset += ret;
+		} else if (errno != EWOULDBLOCK && errno != EAGAIN) {
+			perror("rsend");
+			return ret;
+		}
+	}
+
+	return 0;
+}
+
 static int send_xfer(int size)
 {
 	struct pollfd fds;
@@ -255,7 +287,7 @@ static int send_xfer(int size)
 				return ret;
 		}
 
-		ret = rsend(rs, buf + offset, size - offset, flags);
+		ret = riowrite(rs, buf + offset, size - offset, offset, flags);
 		if (ret > 0) {
 			offset += ret;
 		} else if (errno != EWOULDBLOCK && errno != EAGAIN) {
@@ -322,11 +354,11 @@ static int sync_test(void)
 {
 	int ret;
 
-	ret = dst_addr ? send_xfer(16) : recv_msg(16);
+	ret = dst_addr ? send_msg(16) : recv_msg(16);
 	if (ret)
 		return ret;
 
-	return dst_addr ? recv_msg(16) : send_xfer(16);
+	return dst_addr ? recv_msg(16) : send_msg(16);
 }
 
 static int run_test(void)
