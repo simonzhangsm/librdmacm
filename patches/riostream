@@ -1,5 +1,5 @@
 Bottom: 0f29fc79a2e44b45051dc6d32b885f356ac262aa
-Top:    290fe24e03efaea623d11e18320c59024beb9fbe
+Top:    5e887c322398445ed683aadd30b904e4d2498f54
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-10-24 10:23:52 -0700
 
@@ -35,10 +35,10 @@ index 4a8b9bc..d72016d 100644
  
 diff --git a/examples/riostream.c b/examples/riostream.c
 new file mode 100644
-index 0000000..ab0dc77
+index 0000000..7333a3d
 --- /dev/null
 +++ b/examples/riostream.c
-@@ -0,0 +1,702 @@
+@@ -0,0 +1,734 @@
 +/*
 + * Copyright (c) 2011-2012 Intel Corporation.  All rights reserved.
 + *
@@ -276,6 +276,38 @@ index 0000000..ab0dc77
 +	return ret == 1 ? 0 : ret;
 +}
 +
++static int send_msg(int size)
++{
++	struct pollfd fds;
++	int offset, ret;
++
++	if (verify)
++		format_buf(buf, size);
++
++	if (use_async) {
++		fds.fd = rs;
++		fds.events = POLLOUT;
++	}
++
++	for (offset = 0; offset < size; ) {
++		if (use_async) {
++			ret = do_poll(&fds);
++			if (ret)
++				return ret;
++		}
++
++		ret = rsend(rs, buf + offset, size - offset, flags);
++		if (ret > 0) {
++			offset += ret;
++		} else if (errno != EWOULDBLOCK && errno != EAGAIN) {
++			perror("rsend");
++			return ret;
++		}
++	}
++
++	return 0;
++}
++
 +static int send_xfer(int size)
 +{
 +	struct pollfd fds;
@@ -296,7 +328,7 @@ index 0000000..ab0dc77
 +				return ret;
 +		}
 +
-+		ret = rsend(rs, buf + offset, size - offset, flags);
++		ret = riowrite(rs, buf + offset, size - offset, offset, flags);
 +		if (ret > 0) {
 +			offset += ret;
 +		} else if (errno != EWOULDBLOCK && errno != EAGAIN) {
@@ -363,11 +395,11 @@ index 0000000..ab0dc77
 +{
 +	int ret;
 +
-+	ret = dst_addr ? send_xfer(16) : recv_msg(16);
++	ret = dst_addr ? send_msg(16) : recv_msg(16);
 +	if (ret)
 +		return ret;
 +
-+	return dst_addr ? recv_msg(16) : send_xfer(16);
++	return dst_addr ? recv_msg(16) : send_msg(16);
 +}
 +
 +static int run_test(void)
