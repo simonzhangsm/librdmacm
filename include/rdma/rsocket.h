@@ -39,6 +39,7 @@
 #include <errno.h>
 #include <poll.h>
 #include <sys/select.h>
+#include <sys/mman.h>
 
 #ifdef __cplusplus
 extern "C" {
