@@ -1,0 +1,147 @@
+Bottom: 99d8cf70184e482d774241ae32277d367ffabf7f
+Top:    9ccd39649c1e77168de53a85b3a90c448d674f74
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-10-24 09:52:03 -0700
+
+Refresh of rs-iomap
+
+---
+
+diff --git a/include/rdma/rsocket.h b/include/rdma/rsocket.h
+index 8634517..f220c13 100644
+--- a/include/rdma/rsocket.h
++++ b/include/rdma/rsocket.h
+@@ -39,6 +39,7 @@
+ #include <errno.h>
+ #include <poll.h>
+ #include <sys/select.h>
++#include <sys/mman.h>
+ 
+ #ifdef __cplusplus
+ extern "C" {
+diff --git a/src/rsocket.c b/src/rsocket.c
+index d620d04..0173555 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -219,7 +219,7 @@ struct rsocket {
+ 	int		  target_iomap_size;
+ 	void		 *target_buffer_list;
+ 	volatile struct rs_sge	  *target_sgl;
+-	volatile struct rs_iomap  *target_iomap;
++	struct rs_iomap  *target_iomap;
+ 
+ 	uint32_t	  rbuf_size;
+ 	struct ibv_mr	 *rmr;
+@@ -293,13 +293,13 @@ void rs_configure(void)
+ 			def_wmem = RS_SNDLOWAT << 1;
+ 	}
+ 
+-	if ((f = fopen(RS_CONN_DIR "/iomap_size", "r"))) {
++	if ((f = fopen(RS_CONF_DIR "/iomap_size", "r"))) {
+ 		fscanf(f, "%hu", &def_iomap_size);
+ 		fclose(f);
+ 
+ 		/* round to supported values */
+ 		def_iomap_size = (uint8_t) rs_value_to_scale(
+-			(uint16_t) rs_scale_to_value(def_iomap_size, 8), 8)
++			(uint16_t) rs_scale_to_value(def_iomap_size, 8), 8);
+ 	}
+ 	init = 1;
+ out:
+@@ -1466,7 +1466,7 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
+ {
+ 	struct rsocket *rs;
+ 	struct ibv_sge sge;
+-	size_t left;
++	size_t left = len;
+ 	uint32_t xfer_size, olen = RS_OLAP_START_SIZE;
+ 	int ret = 0;
+ 
+@@ -1486,7 +1486,7 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
+ 		if (ret)
+ 			goto out;
+ 	}
+-	for (left = len; left; left -= xfer_size, buf += xfer_size) {
++	for (; left; left -= xfer_size, buf += xfer_size) {
+ 		if (!rs_can_send(rs)) {
+ 			ret = rs_get_comp(rs, rs_nonblocking(rs, flags),
+ 					  rs_conn_can_send);
+@@ -1593,6 +1593,7 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
+ 	len = iov[0].iov_len;
+ 	for (i = 1; i < iovcnt; i++)
+ 		len += iov[i].iov_len;
++	left = len;
+ 
+ 	fastlock_acquire(&rs->slock);
+ 	if (rs->iomap_pending) {
+@@ -1600,7 +1601,7 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
+ 		if (ret)
+ 			goto out;
+ 	}
+-	for (left = len; left; left -= xfer_size) {
++	for (; left; left -= xfer_size) {
+ 		if (!rs_can_send(rs)) {
+ 			ret = rs_get_comp(rs, rs_nonblocking(rs, flags),
+ 					  rs_conn_can_send);
+@@ -2287,7 +2288,6 @@ int rfcntl(int socket, int cmd, ... /* arg */ )
+ 
+ static struct rs_iomap_mr *rs_get_iomap_mr(struct rsocket *rs)
+ {
+-	struct rs_iomap_mr *iomr;
+ 	int i;
+ 
+ 	if (!rs->remote_iomappings) {
+@@ -2301,7 +2301,7 @@ static struct rs_iomap_mr *rs_get_iomap_mr(struct rsocket *rs)
+ 	}
+ 
+ 	for (i = 0; i < rs->remote_iomap.length; i++) {
+-		if (!rs->remote_iomappings[i]->mr)
++		if (!rs->remote_iomappings[i].mr)
+ 			return &rs->remote_iomappings[i];
+ 	}
+ 	return NULL;
+@@ -2316,7 +2316,7 @@ off_t riomap(int socket, void *buf, size_t len, int prot, int flags, off_t offse
+ {
+ 	struct rsocket *rs;
+ 	struct rs_iomap_mr *iomr;
+-	int ret, access = IBV_ACCESS_LOCAL_WRITE;
++	int access = IBV_ACCESS_LOCAL_WRITE;
+ 
+ 	rs = idm_at(&idm, socket);
+ 	if ((rs->state != rs_connect_rdwr) || (prot & ~(PROT_WRITE | PROT_NONE)))
+@@ -2346,7 +2346,6 @@ off_t riomap(int socket, void *buf, size_t len, int prot, int flags, off_t offse
+ 	if (offset == -1)
+ 		offset = (uintptr_t) buf;
+ 	iomr->offset = offset;
+-	iomr->prot = prot;
+ 	atomic_init(&iomr->refcnt);
+ 	atomic_set(&iomr->refcnt, 1);
+ 
+@@ -2365,7 +2364,7 @@ int riounmap(int socket, void *buf, size_t len)
+ {
+ 	struct rsocket *rs;
+ 	struct rs_iomap_mr *iomr;
+-	struct dlist_entry *entry;
++	dlist_entry *entry;
+ 	int ret = 0;
+ 
+ 	rs = idm_at(&idm, socket);
+@@ -2411,7 +2410,7 @@ size_t riowrite(int socket, const void *buf, size_t count, off_t offset, int fla
+ 	struct rsocket *rs;
+ 	struct rs_iomap *iom = NULL;
+ 	struct ibv_sge sge;
+-	size_t left;
++	size_t left = count;
+ 	uint32_t xfer_size, olen = RS_OLAP_START_SIZE;
+ 	int ret = 0;
+ 
+@@ -2422,8 +2421,7 @@ size_t riowrite(int socket, const void *buf, size_t count, off_t offset, int fla
+ 		if (ret)
+ 			goto out;
+ 	}
+-	for (left = count; left;
+-	     left -= xfer_size, buf += xfer_size, offset += xfer_size) {
++	for (; left; left -= xfer_size, buf += xfer_size, offset += xfer_size) {
+ 		if (!iom || offset > iom->offset + iom->sge.length) {
+ 			iom = rs_find_iomap(rs, offset);
+ 			if (!iom)
