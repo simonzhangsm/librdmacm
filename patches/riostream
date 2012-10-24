@@ -1,5 +1,5 @@
 Bottom: 056b8bfd424c0057063f61bff98567c021510bde
-Top:    dfeed2f52eb6f65a9782c15a2e73c0464df3b887
+Top:    9bf2cbf6a3b5360507622b949cd1a932b15de806
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-10-24 10:23:52 -0700
 
@@ -35,7 +35,7 @@ index 4a8b9bc..d72016d 100644
  
 diff --git a/examples/riostream.c b/examples/riostream.c
 new file mode 100644
-index 0000000..cc7d888
+index 0000000..ab0dc77
 --- /dev/null
 +++ b/examples/riostream.c
 @@ -0,0 +1,702 @@
@@ -610,7 +610,7 @@ index 0000000..cc7d888
 +		if (ret)
 +			goto free;
 +
-+		for (i = 0; i < TEST_CNT && !fork_pid; i++) {
++		for (i = 0; i < TEST_CNT; i++) {
 +			if (test_size[i].option > size_option)
 +				continue;
 +			init_latency_test(test_size[i].size);
@@ -623,7 +623,7 @@ index 0000000..cc7d888
 +		ret = dst_addr ? client_connect() : server_connect();
 +		if (ret)
 +			goto free;
-+		for (i = 0; i < TEST_CNT && !fork_pid; i++) {
++		for (i = 0; i < TEST_CNT; i++) {
 +			if (test_size[i].option > size_option)
 +				continue;
 +			init_bandwidth_test(test_size[i].size);
