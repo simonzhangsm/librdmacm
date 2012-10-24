@@ -1,5 +1,5 @@
 Bottom: daf53db464152f40dc8d6f2c99844510b03f8567
-Top:    9ccd39649c1e77168de53a85b3a90c448d674f74
+Top:    f5779eb35742a3071e97dd98c5f5d30f75687733
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-10-21 14:16:03 -0700
 
@@ -50,6 +50,69 @@ index 65feda9..f220c13 100644
  #ifdef __cplusplus
  }
  #endif
+diff --git a/man/rsocket.7 b/man/rsocket.7
+index 2ed5ca4..6a9ea95 100644
+--- a/man/rsocket.7
++++ b/man/rsocket.7
+@@ -6,7 +6,7 @@ rsocket \- RDMA socket API
+ .SH "DESCRIPTION"
+ RDMA socket API and protocol
+ .SH "NOTES"
+-rsockets is a protocol over RDMA that supports a socket-level API
++Rsockets is a protocol over RDMA that supports a socket-level API
+ for applications.  rsocket APIs are intended to match the behavior
+ of corresponding socket calls, except where noted.  rsocket
+ functions match the name and function signature of socket calls,
+@@ -30,7 +30,7 @@ rgetpeername, rgetsockname
+ .P
+ rsetsockopt, rgetsockopt, rfcntl
+ .P
+-Functions take the same parameters as that use for sockets.  The
++Functions take the same parameters as that used for sockets.  The
+ follow capabilities and flags are supported at this time:
+ .P
+ PF_INET, PF_INET6, SOCK_STREAM, IPPROTO_TCP, TCP_MAXSEG
+@@ -41,6 +41,40 @@ SO_REUSEADDR, TCP_NODELAY, SO_ERROR, SO_SNDBUF, SO_RCVBUF
+ .P
+ O_NONBLOCK
+ .P
++Rsockets provides extensions beyond normal socket routines that
++allow for direct placement of data into an application's buffer.
++This is also known as zero-copy support, since data is sent and
++received directly, bypassing copies into network controlled buffers.
++The following calls and options support direct data placement.
++.P
++riomap
++.TP
++off_t riomap(int socket, void *buf, size_t len, int prot, int flags, off_t offset)
++.TP
++Riomap registers an application buffer with the RDMA hardware
++associated with an rsocket.  The buffer is registered either for
++local only access (PROT_NONE) or for remote write access (PROT_WRITE).
++When registered for remote access, the buffer is mapped to a given
++offset.  The offset is either provided by the user, or if the user
++selects -1 for the offset, rsockets selects one.  The remote peer may
++access an iomapped buffer directly by specifying the correct offset.
++The mapping is not guaranteed to be available until after the remote
++peer receives a data transfer initiated after riomap has completed.
++.P
++riounmap
++.TP
++int riounmap(int socket, void *buf, size_t len)
++.TP
++Riounmap removes the mapping between a buffer and an rsocket.
++.P
++riowrite
++.TP
++size_t riowrite(int socket, const void *buf, size_t count, off_t offset, int flags)
++.TP
++Riowrite allows an application to transfer data over an rsocket
++directly into a remotely iomapped buffer.  The remote buffer is specified
++through an offset parameter, which corresponds to a remote iomapped buffer. 
++.P
+ In addition to standard socket options, rsockets supports options
+ specific to RDMA devices and protocols.  These options are accessible
+ through rsetsockopt using SOL_RDMA option level.
 diff --git a/src/indexer.h b/src/indexer.h
 index 26e7f98..0c5f388 100644
 --- a/src/indexer.h
