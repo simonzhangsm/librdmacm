@@ -1,5 +1,5 @@
 Bottom: daf53db464152f40dc8d6f2c99844510b03f8567
-Top:    93fea4a0133ee9be5198c904501a510e1624c0d0
+Top:    056b8bfd424c0057063f61bff98567c021510bde
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-10-21 14:16:03 -0700
 
@@ -127,7 +127,7 @@ index 65feda9..f220c13 100644
  }
  #endif
 diff --git a/man/rsocket.7 b/man/rsocket.7
-index 2ed5ca4..a1171fd 100644
+index 2ed5ca4..5ecebc2 100644
 --- a/man/rsocket.7
 +++ b/man/rsocket.7
 @@ -6,7 +6,7 @@ rsocket \- RDMA socket API
@@ -158,7 +158,7 @@ index 2ed5ca4..a1171fd 100644
 +received directly, bypassing copies into network controlled buffers.
 +The following calls and options support direct data placement.
 +.P
-+riomap
++riomap, riounmap, riowrite
 +.TP
 +off_t riomap(int socket, void *buf, size_t len, int prot, int flags, off_t offset)
 +.TP
@@ -196,6 +196,24 @@ index 2ed5ca4..a1171fd 100644
  In addition to standard socket options, rsockets supports options
  specific to RDMA devices and protocols.  These options are accessible
  through rsetsockopt using SOL_RDMA option level.
+@@ -50,6 +91,8 @@ RDMA_SQSIZE - Integer size of the underlying send queue.
+ RDMA_RQSIZE - Integer size of the underlying receive queue.
+ .TP
+ RDMA_INLINE - Integer size of inline data.
++.TP
++RDMA_IOMAPSIZE - Integer number of remote IO mappings supported
+ .P
+ Note that rsockets fd's cannot be passed into non-rsocket calls.  For
+ applications which must mix rsocket fd's with standard socket fd's or
+@@ -84,6 +127,8 @@ rqsize_default - default size of receive queue
+ .P
+ inline_default - default size of inline data
+ .P
++iomap_size - default size of remote iomapping table
++.P
+ If configuration files are not available, rsockets uses internal defaults.
+ .SH "SEE ALSO"
+ rdma_cm(7)
 diff --git a/src/indexer.h b/src/indexer.h
 index 26e7f98..0c5f388 100644
 --- a/src/indexer.h
