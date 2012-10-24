@@ -1,5 +1,5 @@
 Bottom: daf53db464152f40dc8d6f2c99844510b03f8567
-Top:    99d8cf70184e482d774241ae32277d367ffabf7f
+Top:    9ccd39649c1e77168de53a85b3a90c448d674f74
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-10-21 14:16:03 -0700
 
@@ -11,7 +11,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/include/rdma/rsocket.h b/include/rdma/rsocket.h
-index 65feda9..8634517 100644
+index 65feda9..f220c13 100644
 --- a/include/rdma/rsocket.h
 +++ b/include/rdma/rsocket.h
 @@ -1,5 +1,5 @@
@@ -21,7 +21,15 @@ index 65feda9..8634517 100644
   *
   * This software is available to you under a choice of one of two
   * licenses.  You may choose to be licensed under the terms of the GNU
-@@ -76,7 +76,8 @@ int rgetsockname(int socket, struct sockaddr *addr, socklen_t *addrlen);
+@@ -39,6 +39,7 @@
+ #include <errno.h>
+ #include <poll.h>
+ #include <sys/select.h>
++#include <sys/mman.h>
+ 
+ #ifdef __cplusplus
+ extern "C" {
+@@ -76,7 +77,8 @@ int rgetsockname(int socket, struct sockaddr *addr, socklen_t *addrlen);
  enum {
  	RDMA_SQSIZE,
  	RDMA_RQSIZE,
@@ -31,7 +39,7 @@ index 65feda9..8634517 100644
  };
  
  int rsetsockopt(int socket, int level, int optname,
-@@ -85,6 +86,10 @@ int rgetsockopt(int socket, int level, int optname,
+@@ -85,6 +87,10 @@ int rgetsockopt(int socket, int level, int optname,
  		void *optval, socklen_t *optlen);
  int rfcntl(int socket, int cmd, ... /* arg */ );
  
@@ -101,7 +109,7 @@ index 26e7f98..0c5f388 100644
 +
 +#endif /* INDEXER_H */
 diff --git a/src/rsocket.c b/src/rsocket.c
-index cc5effe..d620d04 100644
+index cc5effe..0173555 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -55,6 +55,7 @@
@@ -206,7 +214,7 @@ index cc5effe..d620d04 100644
 +	int		  target_iomap_size;
 +	void		 *target_buffer_list;
 +	volatile struct rs_sge	  *target_sgl;
-+	volatile struct rs_iomap  *target_iomap;
++	struct rs_iomap  *target_iomap;
  
  	uint32_t	  rbuf_size;
  	struct ibv_mr	 *rmr;
@@ -237,7 +245,7 @@ index cc5effe..d620d04 100644
 +			def_wmem = RS_SNDLOWAT << 1;
 +	}
 +
-+	if ((f = fopen(RS_CONN_DIR "/iomap_size", "r"))) {
++	if ((f = fopen(RS_CONF_DIR "/iomap_size", "r"))) {
 +		fscanf(f, "%hu", &def_iomap_size);
 +		fclose(f);
  
@@ -245,7 +253,7 @@ index cc5effe..d620d04 100644
 -			def_wmem = 1;
 +		/* round to supported values */
 +		def_iomap_size = (uint8_t) rs_value_to_scale(
-+			(uint16_t) rs_scale_to_value(def_iomap_size, 8), 8)
++			(uint16_t) rs_scale_to_value(def_iomap_size, 8), 8);
  	}
  	init = 1;
  out:
@@ -619,18 +627,29 @@ index cc5effe..d620d04 100644
  /*
   * We overlap sending the data, by posting a small work request immediately,
   * then increasing the size of the send on each iteration.
-@@ -1239,6 +1481,11 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
+@@ -1224,7 +1466,7 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
+ {
+ 	struct rsocket *rs;
+ 	struct ibv_sge sge;
+-	size_t left;
++	size_t left = len;
+ 	uint32_t xfer_size, olen = RS_OLAP_START_SIZE;
+ 	int ret = 0;
+ 
+@@ -1239,7 +1481,12 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
  	}
  
  	fastlock_acquire(&rs->slock);
+-	for (left = len; left; left -= xfer_size, buf += xfer_size) {
 +	if (rs->iomap_pending) {
 +		ret = rs_send_iomaps(rs, flags);
 +		if (ret)
 +			goto out;
 +	}
- 	for (left = len; left; left -= xfer_size, buf += xfer_size) {
++	for (; left; left -= xfer_size, buf += xfer_size) {
  		if (!rs_can_send(rs)) {
  			ret = rs_get_comp(rs, rs_nonblocking(rs, flags),
+ 					  rs_conn_can_send);
 @@ -1289,6 +1536,7 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
  		if (ret)
  			break;
@@ -639,19 +658,24 @@ index cc5effe..d620d04 100644
  	fastlock_release(&rs->slock);
  
  	return (ret && left == len) ? ret : len - left;
-@@ -1347,6 +1595,11 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
+@@ -1345,9 +1593,15 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
+ 	len = iov[0].iov_len;
+ 	for (i = 1; i < iovcnt; i++)
  		len += iov[i].iov_len;
++	left = len;
  
  	fastlock_acquire(&rs->slock);
+-	for (left = len; left; left -= xfer_size) {
 +	if (rs->iomap_pending) {
 +		ret = rs_send_iomaps(rs, flags);
 +		if (ret)
 +			goto out;
 +	}
- 	for (left = len; left; left -= xfer_size) {
++	for (; left; left -= xfer_size) {
  		if (!rs_can_send(rs)) {
  			ret = rs_get_comp(rs, rs_nonblocking(rs, flags),
-@@ -1395,6 +1648,7 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
+ 					  rs_conn_can_send);
+@@ -1395,6 +1649,7 @@ static ssize_t rsendv(int socket, const struct iovec *iov, int iovcnt, int flags
  		if (ret)
  			break;
  	}
@@ -659,7 +683,7 @@ index cc5effe..d620d04 100644
  	fastlock_release(&rs->slock);
  
  	return (ret && left == len) ? ret : len - left;
-@@ -1725,8 +1979,8 @@ int rshutdown(int socket, int how)
+@@ -1725,8 +1980,8 @@ int rshutdown(int socket, int how)
  
  		if ((rs->state & rs_connected) && rs->ctrl_avail) {
  			rs->ctrl_avail--;
@@ -670,7 +694,7 @@ index cc5effe..d620d04 100644
  		}
  	}
  
-@@ -1814,6 +2068,8 @@ int rsetsockopt(int socket, int level, int optname,
+@@ -1814,6 +2069,8 @@ int rsetsockopt(int socket, int level, int optname,
  		case SO_SNDBUF:
  			if (!rs->sbuf)
  				rs->sbuf_size = (*(uint32_t *) optval) << 1;
@@ -679,7 +703,7 @@ index cc5effe..d620d04 100644
  			ret = 0;
  			break;
  		case SO_LINGER:
-@@ -1878,6 +2134,10 @@ int rsetsockopt(int socket, int level, int optname,
+@@ -1878,6 +2135,10 @@ int rsetsockopt(int socket, int level, int optname,
  			if (rs->sq_inline < RS_MIN_INLINE)
  				rs->sq_inline = RS_MIN_INLINE;
  			break;
@@ -690,7 +714,7 @@ index cc5effe..d620d04 100644
  		default:
  			break;
  		}
-@@ -1979,6 +2239,10 @@ int rgetsockopt(int socket, int level, int optname,
+@@ -1979,6 +2240,10 @@ int rgetsockopt(int socket, int level, int optname,
  			*((int *) optval) = rs->sq_inline;
  			*optlen = sizeof(int);
  			break;
@@ -701,14 +725,13 @@ index cc5effe..d620d04 100644
  		default:
  			ret = ENOTSUP;
  			break;
-@@ -2020,3 +2284,204 @@ int rfcntl(int socket, int cmd, ... /* arg */ )
+@@ -2020,3 +2285,201 @@ int rfcntl(int socket, int cmd, ... /* arg */ )
  	va_end(args);
  	return ret;
  }
 +
 +static struct rs_iomap_mr *rs_get_iomap_mr(struct rsocket *rs)
 +{
-+	struct rs_iomap_mr *iomr;
 +	int i;
 +
 +	if (!rs->remote_iomappings) {
@@ -722,7 +745,7 @@ index cc5effe..d620d04 100644
 +	}
 +
 +	for (i = 0; i < rs->remote_iomap.length; i++) {
-+		if (!rs->remote_iomappings[i]->mr)
++		if (!rs->remote_iomappings[i].mr)
 +			return &rs->remote_iomappings[i];
 +	}
 +	return NULL;
@@ -737,7 +760,7 @@ index cc5effe..d620d04 100644
 +{
 +	struct rsocket *rs;
 +	struct rs_iomap_mr *iomr;
-+	int ret, access = IBV_ACCESS_LOCAL_WRITE;
++	int access = IBV_ACCESS_LOCAL_WRITE;
 +
 +	rs = idm_at(&idm, socket);
 +	if ((rs->state != rs_connect_rdwr) || (prot & ~(PROT_WRITE | PROT_NONE)))
@@ -767,7 +790,6 @@ index cc5effe..d620d04 100644
 +	if (offset == -1)
 +		offset = (uintptr_t) buf;
 +	iomr->offset = offset;
-+	iomr->prot = prot;
 +	atomic_init(&iomr->refcnt);
 +	atomic_set(&iomr->refcnt, 1);
 +
@@ -786,7 +808,7 @@ index cc5effe..d620d04 100644
 +{
 +	struct rsocket *rs;
 +	struct rs_iomap_mr *iomr;
-+	struct dlist_entry *entry;
++	dlist_entry *entry;
 +	int ret = 0;
 +
 +	rs = idm_at(&idm, socket);
@@ -832,7 +854,7 @@ index cc5effe..d620d04 100644
 +	struct rsocket *rs;
 +	struct rs_iomap *iom = NULL;
 +	struct ibv_sge sge;
-+	size_t left;
++	size_t left = count;
 +	uint32_t xfer_size, olen = RS_OLAP_START_SIZE;
 +	int ret = 0;
 +
@@ -843,8 +865,7 @@ index cc5effe..d620d04 100644
 +		if (ret)
 +			goto out;
 +	}
-+	for (left = count; left;
-+	     left -= xfer_size, buf += xfer_size, offset += xfer_size) {
++	for (; left; left -= xfer_size, buf += xfer_size, offset += xfer_size) {
 +		if (!iom || offset > iom->offset + iom->sge.length) {
 +			iom = rs_find_iomap(rs, offset);
 +			if (!iom)
