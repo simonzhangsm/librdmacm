@@ -1,0 +1,156 @@
+Bottom: 5e887c322398445ed683aadd30b904e4d2498f54
+Top:    68f8388e805e7920ee120026e412c13fbcb57c25
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-10-24 16:16:12 -0700
+
+Refresh of iom-dbg
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index c534c61..91af055 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -46,6 +46,7 @@
+ #include <string.h>
+ #include <netinet/in.h>
+ #include <netinet/tcp.h>
++#include <stdio.h>
+ 
+ #include <rdma/rdma_cma.h>
+ #include <rdma/rdma_verbs.h>
+@@ -1046,6 +1047,7 @@ static int rs_poll_cq(struct rsocket *rs)
+ 				rs->sseq_comp = (uint16_t) rs_msg_data(imm_data);
+ 				break;
+ 			case RS_OP_IOMAP_SGL:
++				printf("%s - updated iomap %d\n", __func__, rs_msg_data(imm_data));
+ 				/* The iomap was updated, that's nice to know. */
+ 				break;
+ 			case RS_OP_CTRL:
+@@ -1057,6 +1059,7 @@ static int rs_poll_cq(struct rsocket *rs)
+ 				}
+ 				break;
+ 			case RS_OP_WRITE:
++				printf("%s - write op - BAD\n", __func__);
+ 				/* We really shouldn't be here. */
+ 				break;
+ 			default:
+@@ -1077,6 +1080,7 @@ static int rs_poll_cq(struct rsocket *rs)
+ 					rs->state = rs_disconnected;
+ 				break;
+ 			case RS_OP_IOMAP_SGL:
++				printf("%s - iomap update completed\n", __func__);
+ 				rs->sqe_avail++;
+ 				rs->sbuf_bytes_avail += sizeof(struct rs_iomap);
+ 				break;
+@@ -1398,6 +1402,7 @@ static int rs_send_iomaps(struct rsocket *rs, int flags)
+ 	struct rs_iomap iom;
+ 	int ret;
+ 
++	printf("%s\n", __func__);
+ 	fastlock_acquire(&rs->iomap_lock);
+ 	while (!dlist_empty(&rs->iomap_queue)) {
+ 		if (!rs_can_send(rs)) {
+@@ -1454,6 +1459,7 @@ static int rs_send_iomaps(struct rsocket *rs, int flags)
+ 	}
+ 
+ 	rs->iomap_pending = dlist_empty(&rs->iomap_queue);
++	printf("%s - pending = %d\n", __func__, rs->iomap_pending);
+ 	fastlock_release(&rs->iomap_lock);
+ 	return ret;
+ }
+@@ -2290,7 +2296,9 @@ static struct rs_iomap_mr *rs_get_iomap_mr(struct rsocket *rs)
+ {
+ 	int i;
+ 
++	printf("%s\n", __func__);
+ 	if (!rs->remote_iomappings) {
++		printf("%s - allocate remote iomappings\n", __func__);
+ 		rs->remote_iomappings = calloc(rs->remote_iomap.length,
+ 					       sizeof(*rs->remote_iomappings));
+ 		if (!rs->remote_iomappings)
+@@ -2301,9 +2309,11 @@ static struct rs_iomap_mr *rs_get_iomap_mr(struct rsocket *rs)
+ 	}
+ 
+ 	for (i = 0; i < rs->remote_iomap.length; i++) {
++		printf("%s - looking for empty slot %d\n", __func__, i);
+ 		if (!rs->remote_iomappings[i].mr)
+ 			return &rs->remote_iomappings[i];
+ 	}
++	printf("%s - all slots filled\n", __func__);
+ 	return NULL;
+ }
+ 
+@@ -2318,15 +2328,18 @@ off_t riomap(int socket, void *buf, size_t len, int prot, int flags, off_t offse
+ 	struct rs_iomap_mr *iomr;
+ 	int access = IBV_ACCESS_LOCAL_WRITE;
+ 
++	printf("%s\n", __func__);
+ 	rs = idm_at(&idm, socket);
+ 	if ((rs->state != rs_connect_rdwr) || (prot & ~(PROT_WRITE | PROT_NONE)))
+ 		return ERR(EINVAL);
+ 
+ 	fastlock_acquire(&rs->iomap_lock);
+ 	if (prot & PROT_WRITE) {
++		printf("%s - remote mapping\n", __func__);
+ 		iomr = rs_get_iomap_mr(rs);
+ 		access |= IBV_ACCESS_REMOTE_WRITE;
+ 	} else {
++		printf("%s - local mapping\n", __func__);
+ 		iomr = calloc(1, sizeof *iomr);
+ 		iomr->index = -1;
+ 	}
+@@ -2345,11 +2358,13 @@ off_t riomap(int socket, void *buf, size_t len, int prot, int flags, off_t offse
+ 
+ 	if (offset == -1)
+ 		offset = (uintptr_t) buf;
++	printf("%s mapped to offset %lld\n", __func__, offset);
+ 	iomr->offset = offset;
+ 	atomic_init(&iomr->refcnt);
+ 	atomic_set(&iomr->refcnt, 1);
+ 
+ 	if (iomr->index >= 0) {
++		printf("%s - map pending\n", __func__);
+ 		dlist_insert_tail(&iomr->entry, &rs->iomap_queue);
+ 		rs->iomap_pending = 1;
+ 	} else {
+@@ -2367,6 +2382,7 @@ int riounmap(int socket, void *buf, size_t len)
+ 	dlist_entry *entry;
+ 	int ret = 0;
+ 
++	printf("%s\n", __func__);
+ 	rs = idm_at(&idm, socket);
+ 	fastlock_acquire(&rs->iomap_lock);
+ 
+@@ -2396,12 +2412,15 @@ out:
+ static struct rs_iomap *rs_find_iomap(struct rsocket *rs, off_t offset)
+ {
+ 	int i;
++	printf("%s\n", __func__);
+ 
+ 	for (i = 0; i < rs->target_iomap_size; i++) {
++		printf("%s - checking target index %d\n", __func__, i);
+ 		if (offset >= rs->target_iomap[i].offset &&
+ 		    offset < rs->target_iomap[i].offset + rs->target_iomap[i].sge.length)
+ 			return &rs->target_iomap[i];
+ 	}
++	printf("%s - offset not found\n", __func__);
+ 	return NULL;
+ }
+ 
+@@ -2414,6 +2433,7 @@ size_t riowrite(int socket, const void *buf, size_t count, off_t offset, int fla
+ 	uint32_t xfer_size, olen = RS_OLAP_START_SIZE;
+ 	int ret = 0;
+ 
++	printf("%s\n", __func__);
+ 	rs = idm_at(&idm, socket);
+ 	fastlock_acquire(&rs->slock);
+ 	if (rs->iomap_pending) {
+@@ -2421,6 +2441,7 @@ size_t riowrite(int socket, const void *buf, size_t count, off_t offset, int fla
+ 		if (ret)
+ 			goto out;
+ 	}
++	printf("%s - initiating RDMA write\n", __func__);
+ 	for (; left; left -= xfer_size, buf += xfer_size, offset += xfer_size) {
+ 		if (!iom || offset > iom->offset + iom->sge.length) {
+ 			iom = rs_find_iomap(rs, offset);
