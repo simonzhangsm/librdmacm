@@ -89,7 +89,7 @@ static uint32_t polling_time = 10;
 enum {
 	RS_OP_DATA,
 	RS_OP_RSVD_DATA_MORE,
-	RS_OP_WRITE,
+	RS_OP_WRITE, /* opcode is not transmitted over the network */
 	RS_OP_RSVD_DRA_MORE,
 	RS_OP_SGL,
 	RS_OP_RSVD,
