@@ -1,5 +1,5 @@
 Bottom: e59a8c8a92560ce29975049974660fa4c31bbe33
-Top:    bcac157fe4319f286d40e44f6f1414ae79261a58
+Top:    50ab41d185d366054aa5519e3090748bd9eda7a4
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-10-24 16:00:03 -0700
 
@@ -9,7 +9,7 @@ debug iomap
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index afcc5b1..a26136d 100644
+index afcc5b1..09933f5 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -46,6 +46,7 @@
@@ -82,14 +82,18 @@ index afcc5b1..a26136d 100644
  	return NULL;
  }
  
-@@ -2318,15 +2328,18 @@ off_t riomap(int socket, void *buf, size_t len, int prot, int flags, off_t offse
+@@ -2318,15 +2328,22 @@ off_t riomap(int socket, void *buf, size_t len, int prot, int flags, off_t offse
  	struct rs_iomap_mr *iomr;
  	int access = IBV_ACCESS_LOCAL_WRITE;
  
 +	printf("%s\n", __func__);
  	rs = idm_at(&idm, socket);
  	if ((rs->state != rs_connect_rdwr) || (prot & ~(PROT_WRITE | PROT_NONE)))
++	{
++		printf("%s - invalid state ((%x) %d prot %d \n", __func__,
++			rs->state, (rs->state != rs_connect_rdwr), (prot & ~(PROT_WRITE | PROT_NONE)));
  		return ERR(EINVAL);
++	}
  
  	fastlock_acquire(&rs->iomap_lock);
  	if (prot & PROT_WRITE) {
@@ -101,7 +105,7 @@ index afcc5b1..a26136d 100644
  		iomr = calloc(1, sizeof *iomr);
  		iomr->index = -1;
  	}
-@@ -2345,11 +2358,13 @@ off_t riomap(int socket, void *buf, size_t len, int prot, int flags, off_t offse
+@@ -2345,11 +2362,13 @@ off_t riomap(int socket, void *buf, size_t len, int prot, int flags, off_t offse
  
  	if (offset == -1)
  		offset = (uintptr_t) buf;
@@ -115,7 +119,7 @@ index afcc5b1..a26136d 100644
  		dlist_insert_tail(&iomr->entry, &rs->iomap_queue);
  		rs->iomap_pending = 1;
  	} else {
-@@ -2367,6 +2382,7 @@ int riounmap(int socket, void *buf, size_t len)
+@@ -2367,6 +2386,7 @@ int riounmap(int socket, void *buf, size_t len)
  	dlist_entry *entry;
  	int ret = 0;
  
@@ -123,7 +127,7 @@ index afcc5b1..a26136d 100644
  	rs = idm_at(&idm, socket);
  	fastlock_acquire(&rs->iomap_lock);
  
-@@ -2396,12 +2412,15 @@ out:
+@@ -2396,12 +2416,15 @@ out:
  static struct rs_iomap *rs_find_iomap(struct rsocket *rs, off_t offset)
  {
  	int i;
@@ -139,7 +143,7 @@ index afcc5b1..a26136d 100644
  	return NULL;
  }
  
-@@ -2414,6 +2433,7 @@ size_t riowrite(int socket, const void *buf, size_t count, off_t offset, int fla
+@@ -2414,6 +2437,7 @@ size_t riowrite(int socket, const void *buf, size_t count, off_t offset, int fla
  	uint32_t xfer_size, olen = RS_OLAP_START_SIZE;
  	int ret = 0;
  
@@ -147,7 +151,7 @@ index afcc5b1..a26136d 100644
  	rs = idm_at(&idm, socket);
  	fastlock_acquire(&rs->slock);
  	if (rs->iomap_pending) {
-@@ -2421,6 +2441,7 @@ size_t riowrite(int socket, const void *buf, size_t count, off_t offset, int fla
+@@ -2421,6 +2445,7 @@ size_t riowrite(int socket, const void *buf, size_t count, off_t offset, int fla
  		if (ret)
  			goto out;
  	}
