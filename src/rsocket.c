@@ -2331,7 +2331,11 @@ off_t riomap(int socket, void *buf, size_t len, int prot, int flags, off_t offse
 	printf("%s\n", __func__);
 	rs = idm_at(&idm, socket);
 	if ((rs->state != rs_connect_rdwr) || (prot & ~(PROT_WRITE | PROT_NONE)))
+	{
+		printf("%s - invalid state ((%x) %d prot %d \n", __func__,
+			rs->state, (rs->state != rs_connect_rdwr), (prot & ~(PROT_WRITE | PROT_NONE)));
 		return ERR(EINVAL);
+	}
 
 	fastlock_acquire(&rs->iomap_lock);
 	if (prot & PROT_WRITE) {
