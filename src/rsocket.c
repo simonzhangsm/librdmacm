@@ -944,7 +944,6 @@ static int rs_write_direct(struct rsocket *rs, struct rs_iomap *iom, uint64_t of
 {
 	uint64_t addr;
 
-	rs->sseq_no++;
 	rs->sqe_avail--;
 	rs->sbuf_bytes_avail -= length;
 
