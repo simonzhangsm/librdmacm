@@ -1,5 +1,5 @@
 Bottom: daf53db464152f40dc8d6f2c99844510b03f8567
-Top:    915e0ee4505ffa5dc789b46752172eee702adae3
+Top:    52637b17efade61815ce9a543e6ac319af39e10a
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-10-21 14:16:03 -0700
 
@@ -204,7 +204,7 @@ index 65feda9..f220c13 100644
  }
  #endif
 diff --git a/man/rsocket.7 b/man/rsocket.7
-index 2ed5ca4..5ecebc2 100644
+index 2ed5ca4..dc3f9ab 100644
 --- a/man/rsocket.7
 +++ b/man/rsocket.7
 @@ -6,7 +6,7 @@ rsocket \- RDMA socket API
@@ -267,7 +267,7 @@ index 2ed5ca4..5ecebc2 100644
 +determined data buffer.  Data is received automatically, and the receiver
 +is not informed of the transfer.  However, iowrite data is still considered
 +part of the data stream, such that iowrite data will be written before a
-+subsequent transfer is received.  A  message sent immediately after initiating
++subsequent transfer is received.  A message sent immediately after initiating
 +an iowrite may be used to notify the receiver of the iowrite.
 +.P
  In addition to standard socket options, rsockets supports options
