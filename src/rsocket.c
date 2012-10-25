@@ -2319,7 +2319,7 @@ off_t riomap(int socket, void *buf, size_t len, int prot, int flags, off_t offse
 	int access = IBV_ACCESS_LOCAL_WRITE;
 
 	rs = idm_at(&idm, socket);
-	if ((rs->state != rs_connect_rdwr) || (prot & ~(PROT_WRITE | PROT_NONE)))
+	if (rs->cm_id->pd || (prot & ~(PROT_WRITE | PROT_NONE)))
 		return ERR(EINVAL);
 
 	fastlock_acquire(&rs->iomap_lock);
