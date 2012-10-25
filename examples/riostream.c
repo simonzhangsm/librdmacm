@@ -291,7 +291,7 @@ static int send_xfer(int size)
 		if (ret > 0) {
 			offset += ret;
 		} else if (errno != EWOULDBLOCK && errno != EAGAIN) {
-			perror("rsend");
+			perror("riowrite");
 			return ret;
 		}
 	}
@@ -371,6 +371,7 @@ static int run_test(void)
 	*poll_byte = -1;
 	offset = riomap(rs, buf, transfer_size, PROT_WRITE, 0, 0);
 	if (offset ==  -1) {
+		perror("riomap");
 		ret = -1;
 		goto out;
 	}
