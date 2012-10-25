@@ -78,7 +78,7 @@ static uint32_t polling_time = 10;
  * bit 29: more data, 0 - end of transfer, 1 - more data available
  *
  * for data transfers:
- * bits [28:0]: bytes transfered
+ * bits [28:0]: bytes transferred
  * for control messages:
  * SGL, CTRL
  * bits [28-0]: receive credits granted
@@ -518,13 +518,6 @@ static int rs_create_ep(struct rsocket *rs)
 	}
 	return 0;
 }
-
-/*
-static xxx rs_acquire_iomap_mr(struct rsocket *rs, ...)
-{
-	TODO: write me
-}
-*/
 
 static void rs_release_iomap_mr(struct rs_iomap_mr *iomr)
 {
