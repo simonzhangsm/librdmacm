@@ -5,6 +5,13 @@ Date:   2012-10-24 10:23:52 -0700
 
 riostream: Add example program for using iomap routines.
 
+riostream is based on rstream, but uses the new riomap, riounmap,
+and riowrite calls instead.  It runs a series of latency and
+bandwidth tests using remote iomapped memory.
+
+riostream is limited to using zero copy transfers at the
+receiving side only at this time.
+
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
