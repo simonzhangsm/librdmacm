@@ -1,10 +1,10 @@
 Version: 1
-Previous: 13751ae67cfdf4f8e1034da1342440846d4d2beb
-Head: 0841b5f6724681ed1859262c190a4dedf6df37e1
+Previous: 7188cd8be5da782bb274431c60b1c534364e551b
+Head: edef3f821b0265ee07b11e7a881720f72cf35fc8
 Applied:
   rs-iomap: 0841b5f6724681ed1859262c190a4dedf6df37e1
+  riostream: edef3f821b0265ee07b11e7a881720f72cf35fc8
 Unapplied:
-  riostream: 16e4d972aa49f8ac13a96adabb47d8367a8c1f01
   iom-dbg: 7bd24be8eaf628608ef82366cce40c1f6379fcb0
   resv-rs-len: 7b6ff5c4894f54b221d877adcd709795dffb2fe9
   rs-target-sgl: 7a07c80f2242e80c076dcf3ec6bb4c94626b284f
