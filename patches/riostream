@@ -1,5 +1,5 @@
 Bottom: 7f355c2c4b9a69f80c172a756e9357d22ad478bf
-Top:    b7908a5c682466249184ca18ad389fa1b574c3b9
+Top:    e59a8c8a92560ce29975049974660fa4c31bbe33
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-10-24 10:23:52 -0700
 
@@ -35,10 +35,10 @@ index 4a8b9bc..d72016d 100644
  
 diff --git a/examples/riostream.c b/examples/riostream.c
 new file mode 100644
-index 0000000..7333a3d
+index 0000000..dfb03e5
 --- /dev/null
 +++ b/examples/riostream.c
-@@ -0,0 +1,734 @@
+@@ -0,0 +1,735 @@
 +/*
 + * Copyright (c) 2011-2012 Intel Corporation.  All rights reserved.
 + *
@@ -332,7 +332,7 @@ index 0000000..7333a3d
 +		if (ret > 0) {
 +			offset += ret;
 +		} else if (errno != EWOULDBLOCK && errno != EAGAIN) {
-+			perror("rsend");
++			perror("riowrite");
 +			return ret;
 +		}
 +	}
@@ -412,6 +412,7 @@ index 0000000..7333a3d
 +	*poll_byte = -1;
 +	offset = riomap(rs, buf, transfer_size, PROT_WRITE, 0, 0);
 +	if (offset ==  -1) {
++		perror("riomap");
 +		ret = -1;
 +		goto out;
 +	}
