@@ -1458,12 +1458,8 @@ static int rs_send_iomaps(struct rsocket *rs, int flags)
 			break;
 	}
 
-<<<<<<< current
 	rs->iomap_pending = !dlist_empty(&rs->iomap_queue);
-=======
-	rs->iomap_pending = dlist_empty(&rs->iomap_queue);
 	printf("%s - pending = %d\n", __func__, rs->iomap_pending);
->>>>>>> patched
 	fastlock_release(&rs->iomap_lock);
 	return ret;
 }
