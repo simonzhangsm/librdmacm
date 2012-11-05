@@ -1,0 +1,13 @@
+Bottom: 59dfa020a0be74bc45df6be3de00c8ca1f997348
+Top:    59dfa020a0be74bc45df6be3de00c8ca1f997348
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-11-05 11:53:03 -0800
+
+rsocket: Remove fscanf build warnings
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
