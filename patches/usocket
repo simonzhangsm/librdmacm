@@ -1,0 +1,13 @@
+Bottom: 92d2aab8615c3d1003fee963587c4078b732e465
+Top:    92d2aab8615c3d1003fee963587c4078b732e465
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-11-09 10:26:38 -0800
+
+rsocket: Add datagram support
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
