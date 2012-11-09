@@ -2237,9 +2237,18 @@ void rdma_destroy_ep(struct rdma_cm_id *id)
 int ucma_max_qpsize(struct rdma_cm_id *id)
 {
 	struct cma_id_private *id_priv;
+	int i, max_size = 0;
 
 	id_priv = container_of(id, struct cma_id_private, id);
-	return id_priv->cma_dev->max_qpsize;
+	if (id && id_priv->cma_dev) {
+		max_size = id_priv->cma_dev->max_qpsize;
+	} else {
+		for (i = 0; i < cma_dev_cnt; i++) {
+			if (!max_size || max_size > cma_dev_array[i].max_qpsize)
+				max_size = cma_dev_array[i].max_qpsize;
+		}
+	}
+	return max_size;
 }
 
 uint16_t ucma_get_port(struct sockaddr *addr)
