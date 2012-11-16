@@ -1,0 +1,151 @@
+Bottom: d3cf6446fd6282f1865b0aab7918b786da23eafb
+Top:    cae235e68f5c1b9ddbefc3f6eb456f6481b17743
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-11-16 00:07:58 -0800
+
+Refresh of test-udp
+
+---
+
+diff --git a/src/preload.c b/src/preload.c
+index 01f0b0e..b913091 100644
+--- a/src/preload.c
++++ b/src/preload.c
+@@ -34,7 +34,7 @@
+ #if HAVE_CONFIG_H
+ #  include <config.h>
+ #endif /* HAVE_CONFIG_H */
+-
++#include <stdio.h>
+ #include <sys/types.h>
+ #include <sys/socket.h>
+ #include <sys/stat.h>
+@@ -132,11 +132,13 @@ static int fd_open(void)
+ 	if (!fdi)
+ 		return ERR(ENOMEM);
+ 
+-	index = real.socket(PF_INET, SOCK_DGRAM, 0);//open("/dev/null", O_RDONLY);
++	index = open("/dev/null", O_RDONLY);
+ 	if (index < 0) {
+ 		ret = index;
+ 		goto err1;
+ 	}
++	fdi->udp_fd = real.socket(PF_INET, SOCK_DGRAM, 0);
++	real.fcntl(fdi->udp_fd, F_SETFL, O_NONBLOCK);
+ 
+ 	fdi->dupfd = -1;
+ 	atomic_init(&fdi->refcnt);
+@@ -438,7 +440,9 @@ real:
+ int bind(int socket, const struct sockaddr *addr, socklen_t addrlen)
+ {
+ 	int fd;
+-	real.bind(socket, addr, addrlen);
++	printf("%s in\n", __func__);
++//	real.bind(socket, addr, addrlen);
++	printf("%s call out\n", __func__);
+ 	return (fd_get(socket, &fd) == fd_rsocket) ?
+ 		rbind(fd, addr, addrlen) : real.bind(fd, addr, addrlen);
+ }
+@@ -446,6 +450,7 @@ int bind(int socket, const struct sockaddr *addr, socklen_t addrlen)
+ int listen(int socket, int backlog)
+ {
+ 	int fd, ret;
++	printf("%s in\n", __func__);
+ 	if (fd_get(socket, &fd) == fd_rsocket) {
+ 		ret = rlisten(fd, backlog);
+ 	} else {
+@@ -453,6 +458,7 @@ int listen(int socket, int backlog)
+ 		if (!ret && fd_gets(socket) == fd_fork)
+ 			fd_store(socket, fd, fd_normal, fd_fork_listen);
+ 	}
++	printf("%s out\n", __func__);
+ 	return ret;
+ }
+ 
+@@ -472,6 +478,7 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
+ 		}
+ 
+ 		fd_store(index, ret, fd_rsocket, fd_ready);
++		printf("%s out\n", __func__);
+ 		return index;
+ 	} else if (fd_gets(socket) == fd_fork_listen) {
+ 		index = fd_open();
+@@ -638,8 +645,11 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
+ {
+ 	int fd, ret;
+ 
++	printf("%s in\n", __func__);
+ 	if (fd_get(socket, &fd) == fd_rsocket) {
++		printf("%s rconnect\n", __func__);
+ 		ret = rconnect(fd, addr, addrlen);
++		printf("%s ret %d\n", __func__, ret);
+ 		if (!ret || errno == EINPROGRESS)
+ 			return ret;
+ 
+@@ -659,9 +669,9 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
+ ssize_t recv(int socket, void *buf, size_t len, int flags)
+ {
+ 	int fd;
+-	struct sockaddr sa;
+-	socklen_t slen = sizeof sa;
+-	real.recvfrom(socket, buf, len, flags, &sa, &slen);
++//	struct sockaddr sa;
++//	socklen_t slen = sizeof sa;
++//	real.recvfrom(socket, buf, len, flags, &sa, &slen);
+ 	return (fd_fork_get(socket, &fd) == fd_rsocket) ?
+ 		rrecv(fd, buf, len, flags) : real.recv(fd, buf, len, flags);
+ }
+@@ -758,11 +768,13 @@ int poll(struct pollfd *fds, nfds_t nfds, int timeout)
+ 	struct pollfd *rfds;
+ 	int i, ret;
+ 
++//	printf("%s in\n", __func__);
+ 	init_preload();
+ 	for (i = 0; i < nfds; i++) {
+ 		if (fd_gett(fds[i].fd) == fd_rsocket)
+ 			goto use_rpoll;
+ 	}
++//	printf("%s call real poll\n", __func__);
+ 
+ 	return real.poll(fds, nfds, timeout);
+ 
+@@ -775,7 +787,7 @@ use_rpoll:
+ 		rfds[i].fd = fd_getd(fds[i].fd);
+ 		rfds[i].events = fds[i].events;
+ 		rfds[i].revents = 0;
+-		real.poll(&fds[i], 1, 0);
++//		real.poll(&fds[i], 1, 0);
+ 	}
+ 
+ 	ret = rpoll(rfds, nfds, timeout);
+@@ -783,6 +795,7 @@ use_rpoll:
+ 	for (i = 0; i < nfds; i++)
+ 		fds[i].revents = rfds[i].revents;
+ 
++//	printf("%s out\n", __func__);
+ 	return ret;
+ }
+ 
+@@ -941,6 +954,7 @@ int fcntl(int socket, int cmd, ... /* arg */)
+ 	void *pparam;
+ 	int fd, ret;
+ 
++	printf("%s in\n", __func__);
+ 	init_preload();
+ 	va_start(args, cmd);
+ 	switch (cmd) {
+@@ -963,7 +977,6 @@ int fcntl(int socket, int cmd, ... /* arg */)
+ 		lparam = va_arg(args, long);
+ 		ret = (fd_get(socket, &fd) == fd_rsocket) ?
+ 			rfcntl(fd, cmd, lparam) : real.fcntl(fd, cmd, lparam);
+-		real.fcntl(fd, cmd, lparam);
+ 		break;
+ 	default:
+ 		pparam = va_arg(args, void *);
+@@ -972,6 +985,7 @@ int fcntl(int socket, int cmd, ... /* arg */)
+ 		break;
+ 	}
+ 	va_end(args);
++	printf("%s out\n", __func__);
+ 	return ret;
+ }
