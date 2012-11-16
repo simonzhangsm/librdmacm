@@ -34,7 +34,7 @@
 #if HAVE_CONFIG_H
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
-
+#include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
@@ -120,6 +120,7 @@ struct fd_info {
 	int fd;
 	int dupfd;
 	atomic_t refcnt;
+	int udp_fd;
 };
 
 static int fd_open(void)
@@ -136,6 +137,8 @@ static int fd_open(void)
 		ret = index;
 		goto err1;
 	}
+	fdi->udp_fd = real.socket(PF_INET, SOCK_DGRAM, 0);
+	ret = real.fcntl(fdi->udp_fd, F_SETFL, O_NONBLOCK);
 
 	fdi->dupfd = -1;
 	atomic_init(&fdi->refcnt);
@@ -188,6 +191,14 @@ static inline int fd_getd(int index)
 	return fdi ? fdi->fd : index;
 }
 
+static inline int fd_getudp(int index)
+{
+	struct fd_info *fdi;
+
+	fdi = idm_lookup(&idm, index);
+	return fdi->udp_fd;
+}
+
 static inline enum fd_fork_state fd_gets(int index)
 {
 	struct fd_info *fdi;
@@ -215,6 +226,7 @@ static enum fd_type fd_close(int index, int *fd)
 		*fd = fdi->fd;
 		type = fdi->type;
 		real.close(index);
+		real.close(fdi->udp_fd);
 		free(fdi);
 	} else {
 		*fd = index;
@@ -437,6 +449,7 @@ real:
 int bind(int socket, const struct sockaddr *addr, socklen_t addrlen)
 {
 	int fd;
+	real.bind(fd_getudp(socket), addr, addrlen);
 	return (fd_get(socket, &fd) == fd_rsocket) ?
 		rbind(fd, addr, addrlen) : real.bind(fd, addr, addrlen);
 }
@@ -638,6 +651,8 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
 
 	if (fd_get(socket, &fd) == fd_rsocket) {
 		ret = rconnect(fd, addr, addrlen);
+		if (!ret)
+			real.connect(fd_getudp(socket), addr, addrlen);
 		if (!ret || errno == EINPROGRESS)
 			return ret;
 
@@ -657,6 +672,9 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
 ssize_t recv(int socket, void *buf, size_t len, int flags)
 {
 	int fd;
+	struct sockaddr sa;
+	socklen_t slen = sizeof sa;
+	real.recvfrom(fd_getudp(socket), buf, len, flags, &sa, &slen);
 	return (fd_fork_get(socket, &fd) == fd_rsocket) ?
 		rrecv(fd, buf, len, flags) : real.recv(fd, buf, len, flags);
 }
@@ -770,6 +788,7 @@ use_rpoll:
 		rfds[i].fd = fd_getd(fds[i].fd);
 		rfds[i].events = fds[i].events;
 		rfds[i].revents = 0;
+//		real.poll(&fds[i], 1, 0);
 	}
 
 	ret = rpoll(rfds, nfds, timeout);
