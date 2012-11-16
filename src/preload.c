@@ -120,6 +120,7 @@ struct fd_info {
 	int fd;
 	int dupfd;
 	atomic_t refcnt;
+	int udp_fd;
 };
 
 static int fd_open(void)
@@ -131,7 +132,7 @@ static int fd_open(void)
 	if (!fdi)
 		return ERR(ENOMEM);
 
-	index = open("/dev/null", O_RDONLY);
+	index = real.socket(PF_INET, SOCK_DGRAM, 0);//open("/dev/null", O_RDONLY);
 	if (index < 0) {
 		ret = index;
 		goto err1;
@@ -437,6 +438,7 @@ real:
 int bind(int socket, const struct sockaddr *addr, socklen_t addrlen)
 {
 	int fd;
+	real.bind(socket, addr, addrlen);
 	return (fd_get(socket, &fd) == fd_rsocket) ?
 		rbind(fd, addr, addrlen) : real.bind(fd, addr, addrlen);
 }
@@ -657,6 +659,9 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
 ssize_t recv(int socket, void *buf, size_t len, int flags)
 {
 	int fd;
+	struct sockaddr sa;
+	socklen_t slen = sizeof sa;
+	real.recvfrom(socket, buf, len, flags, &sa, &slen);
 	return (fd_fork_get(socket, &fd) == fd_rsocket) ?
 		rrecv(fd, buf, len, flags) : real.recv(fd, buf, len, flags);
 }
@@ -770,6 +775,7 @@ use_rpoll:
 		rfds[i].fd = fd_getd(fds[i].fd);
 		rfds[i].events = fds[i].events;
 		rfds[i].revents = 0;
+		real.poll(&fds[i], 1, 0);
 	}
 
 	ret = rpoll(rfds, nfds, timeout);
@@ -957,6 +963,7 @@ int fcntl(int socket, int cmd, ... /* arg */)
 		lparam = va_arg(args, long);
 		ret = (fd_get(socket, &fd) == fd_rsocket) ?
 			rfcntl(fd, cmd, lparam) : real.fcntl(fd, cmd, lparam);
+		real.fcntl(fd, cmd, lparam);
 		break;
 	default:
 		pparam = va_arg(args, void *);
