@@ -660,8 +660,8 @@ ssize_t recv(int socket, void *buf, size_t len, int flags)
 {
 	int fd;
 	struct sockaddr sa;
-	socklen_t len = sizeof sa;
-	real.recvfrom(socket, buf, len, flags, &sa, &len);
+	socklen_t slen = sizeof sa;
+	real.recvfrom(socket, buf, len, flags, &sa, &slen);
 	return (fd_fork_get(socket, &fd) == fd_rsocket) ?
 		rrecv(fd, buf, len, flags) : real.recv(fd, buf, len, flags);
 }
@@ -775,7 +775,7 @@ use_rpoll:
 		rfds[i].fd = fd_getd(fds[i].fd);
 		rfds[i].events = fds[i].events;
 		rfds[i].revents = 0;
-		real.poll(&fds[i], 1, timeout);
+		real.poll(&fds[i], 1, 0);
 	}
 
 	ret = rpoll(rfds, nfds, timeout);
