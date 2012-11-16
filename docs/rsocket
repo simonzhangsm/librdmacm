@@ -1,7 +1,7 @@
-rsocket Protocol and Design Guide               9/10/2012
+rsocket Protocol and Design Guide               11/11/2012
 
-Overview
---------
+Data Streaming (TCP) Overview
+-----------------------------
 Rsockets is a protocol over RDMA that supports a socket-level API
 for applications.  For details on the current state of the
 implementation, readers should refer to the rsocket man page.  This
@@ -189,3 +189,47 @@ registered remote data buffer.
 From host A's perspective, the transfer appears as a normal send/write
 operation, with the data stream redirected directly into the receiving
 application's buffer.
+
+
+
+Datagram Overview
+-----------------
+THe rsocket API supports datagram sockets.  Datagram support is handled through an
+entirely different protocol and internal implementation.  Unlike connected rsockets,
+datagram rsockets are not necessarily bound to a network (IP) address.  A datagram
+socket may use any number of network (IP) addresses, including those which map to
+different RDMA devices.  As a result, a single datagram rsocket must support
+using multiple RDMA devices and ports, and a datagram rsocket references a single
+UDP socket, plus zero or more UD QPs.
+
+Rsockets uses headers inserted before user data sent over UDP sockets to resolve
+remote UD QP numbers.  When a user first attempts to send a datagram to a remote
+address (IP and UDP port), rsockets will take the following steps.  First, it
+will allocate and store the destination address into a lookup table for future
+use.  Then it will resolve which local network address should be used when sending
+to the specified destination.  It will allocate a UD QP on the RDMA device
+associated with the local address.  Finally, rsockets will send the user's
+datagram to the remote UDP socket, but inserting a header before the datagram.
+The header specifies the UD QP number associated with the local network address
+(IP and UDP port) of the send.
+
+Under many circumstances, the rsocket UDP header also provides enough path
+information for the receiver to send the reply using a UD QP.  However, certain
+fabric topologies may require contacting a subnet administrator.  Whenever
+rsockets lacks sufficient information to send data to a remote peer using
+a UD QP, it will automatically fall back to using a standard UDP socket.  This
+helps minimize the latency for performing a given send, while lenghty address
+and route resolution protocols complete.
+
+Currently, rsockets allocates a single UD QP, with an infrastructure is provided
+to support more.  Future enhancements may add support for multiple UD QPs, each
+associated with a single network (IP) address.  Multiplexing different network
+addresses over a single UD QP and using shared receive queues are other possible
+enhancements.
+
+Because rsockets may use multiple UD QPs, buffer management can become an issue.
+The total size of receive buffers is specified by the mem_default configuration
+files, but may be overridden with rsetsockopt.  The buffer is divided into
+MTU sized messages and distributed among the allocated QPs.  As new QPs are
+created, the receive buffers may be redistributed by posting loopback sends
+on a QP in order to free the receive buffers for reposting to a different QP.  
