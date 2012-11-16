@@ -1,8 +1,8 @@
 Version: 1
-Previous: c4ca7ea17d063404aa5deeb24fb21031d6810ae0
+Previous: 1a37348ae7c8dd4c895799ce3915f238a6d367cf
 Head: 158ea5a8c1a0fcf3ca61c642095023af16759c90
 Applied:
-  usocket: 158ea5a8c1a0fcf3ca61c642095023af16759c90
+  dsocket: 158ea5a8c1a0fcf3ca61c642095023af16759c90
 Unapplied:
   test-udp: f6c78ad2a26f452cf166aff1baa7b76160bd8bf7
   iom-dbg: 88434072d07f8edc58f454ac954d78bd39441eed
