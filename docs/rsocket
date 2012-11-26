@@ -194,7 +194,7 @@ application's buffer.
 
 Datagram Overview
 -----------------
-THe rsocket API supports datagram sockets.  Datagram support is handled through an
+The rsocket API supports datagram sockets.  Datagram support is handled through an
 entirely different protocol and internal implementation.  Unlike connected rsockets,
 datagram rsockets are not necessarily bound to a network (IP) address.  A datagram
 socket may use any number of network (IP) addresses, including those which map to
@@ -204,32 +204,19 @@ UDP socket, plus zero or more UD QPs.
 
 Rsockets uses headers inserted before user data sent over UDP sockets to resolve
 remote UD QP numbers.  When a user first attempts to send a datagram to a remote
-address (IP and UDP port), rsockets will take the following steps.  First, it
-will allocate and store the destination address into a lookup table for future
-use.  Then it will resolve which local network address should be used when sending
-to the specified destination.  It will allocate a UD QP on the RDMA device
-associated with the local address.  Finally, rsockets will send the user's
-datagram to the remote UDP socket, but inserting a header before the datagram.
-The header specifies the UD QP number associated with the local network address
-(IP and UDP port) of the send.
+address (IP and UDP port), rsockets will take the following steps:
 
-Under many circumstances, the rsocket UDP header also provides enough path
-information for the receiver to send the reply using a UD QP.  However, certain
-fabric topologies may require contacting a subnet administrator.  Whenever
-rsockets lacks sufficient information to send data to a remote peer using
-a UD QP, it will automatically fall back to using a standard UDP socket.  This
-helps minimize the latency for performing a given send, while lenghty address
-and route resolution protocols complete.
+1. Store the destination address into a lookup table.
+2. Resolve which local network address should be used when sending
+   to the specified destination.
+3. Allocate a UD QP on the RDMA device associated with the local address.
+4. Send the user's datagram to the remote UDP socket.
 
-Currently, rsockets allocates a single UD QP, with an infrastructure is provided
-to support more.  Future enhancements may add support for multiple UD QPs, each
-associated with a single network (IP) address.  Multiplexing different network
-addresses over a single UD QP and using shared receive queues are other possible
-enhancements.
+A header is inserted before the user's datagram.  The header specifies the
+UD QP number associated with the local network address (IP and UDP port) of
+the send.
 
-Because rsockets may use multiple UD QPs, buffer management can become an issue.
-The total size of receive buffers is specified by the mem_default configuration
-files, but may be overridden with rsetsockopt.  The buffer is divided into
-MTU sized messages and distributed among the allocated QPs.  As new QPs are
-created, the receive buffers may be redistributed by posting loopback sends
-on a QP in order to free the receive buffers for reposting to a different QP.  
+A service thread is used to process messages received on the UDP socket.  This
+thread updates the rsocket lookup tables with the remote QPN and path record
+data.  The service thread forwards data received on the UDP socket to an
+rsocket QP.
