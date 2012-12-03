@@ -354,6 +354,9 @@ struct ds_udp_header {
 	} addr;
 };
 
+#define DS_UDP_IPV4_HDR_LEN 16
+#define DS_UDP_IPV6_HDR_LEN 28
+
 #define ds_next_qp(qp) container_of((qp)->list.next, struct ds_qp, list)
 
 static void ds_insert_qp(struct rsocket *rs, struct ds_qp *qp)
@@ -2486,11 +2489,18 @@ static ssize_t ds_sendv_udp(struct rsocket *rs, const struct iovec *iov,
 	if (iovcnt > 8)
 		return ERR(ENOTSUP);
 
-	hdr.tag = htonll(DS_UDP_TAG);
+	hdr.tag = htonl(DS_UDP_TAG);
 	hdr.version = 1;
 	hdr.op = op;
-	memset(&hdr->reserved, 0, sizeof hdr->reserved);
+	hdr.reserved = 0;
 	hdr.qpn = htonl(rs->conn_dest->qp->cm_id->qp->qp_num & 0xFFFFFF);
+	if (rs->conn_dest->qp->hdr.version == 4) {
+		hdr.length = DS_UDP_IPV4_HDR_LEN;
+		hdr.addr.ipv4 = rs->conn_dest->qp->hdr.addr.ipv4;
+	} else {
+		hdr.length = DS_UDP_IPV6_HDR_LEN;
+		memcpy(hdr.addr.ipv6.addr, rs->conn_dest->qp->hdr.addr.ipv6.addr, 16);
+	}
 
 	miov[0].iov_base = &hdr;
 	miov[0].iov_len = sizeof hdr;
