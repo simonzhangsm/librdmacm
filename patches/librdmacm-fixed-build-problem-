@@ -9,6 +9,7 @@ rsocket.c wasn't passing compilation as of missing definition for the
 container_of macro, fix it. Reported-by: Eyal Salamon <esalomon@mellanox.com>
 
 Signed-off-by: Or Gerlitz <ogerlitz@mellanox.com>
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
 ---
