@@ -513,7 +513,7 @@ int rdma_destroy_id(struct rdma_cm_id *id)
 	return 0;
 }
 
-static int ucma_addrlen(struct sockaddr *addr)
+int ucma_addrlen(struct sockaddr *addr)
 {
 	if (!addr)
 		return 0;
