@@ -116,46 +116,6 @@ static void *buf;
 #define rs_getsockopt(s,l,n,v,ol) \
 	use_rs ? rgetsockopt(s,l,n,v,ol) : getsockopt(s,l,n,v,ol)
 
-static void size_str(char *str, size_t ssize, long long size)
-{
-	long long base, fraction = 0;
-	char mag;
-
-	if (size >= (1 << 30)) {
-		base = 1 << 30;
-		mag = 'g';
-	} else if (size >= (1 << 20)) {
-		base = 1 << 20;
-		mag = 'm';
-	} else if (size >= (1 << 10)) {
-		base = 1 << 10;
-		mag = 'k';
-	} else {
-		base = 1;
-		mag = '\0';
-	}
-
-	if (size / base < 10)
-		fraction = (size % base) * 10 / base;
-	if (fraction) {
-		snprintf(str, ssize, "%lld.%lld%c", size / base, fraction, mag);
-	} else {
-		snprintf(str, ssize, "%lld%c", size / base, mag);
-	}
-}
-
-static void cnt_str(char *str, size_t ssize, long long cnt)
-{
-	if (cnt >= 1000000000)
-		snprintf(str, ssize, "%lldb", cnt / 1000000000);
-	else if (cnt >= 1000000)
-		snprintf(str, ssize, "%lldm", cnt / 1000000);
-	else if (cnt >= 1000)
-		snprintf(str, ssize, "%lldk", cnt / 1000);
-	else
-		snprintf(str, ssize, "%lld", cnt);
-}
-
 static void show_perf(void)
 {
 	char str[32];
@@ -180,20 +140,6 @@ static void show_perf(void)
 		(usec / iterations) / (transfer_count * 2));
 }
 
-static int size_to_count(int size)
-{
-	if (size >= 1000000)
-		return 100;
-	else if (size >= 100000)
-		return 1000;
-	else if (size >= 10000)
-		return 10000;
-	else if (size >= 1000)
-		return 100000;
-	else
-		return 1000000;
-}
-
 static void init_latency_test(int size)
 {
 	char sstr[5];
@@ -216,43 +162,6 @@ static void init_bandwidth_test(int size)
 	transfer_count = size_to_count(transfer_size);
 }
 
-static void format_buf(void *buf, int size)
-{
-	uint8_t *array = buf;
-	static uint8_t data;
-	int i;
-
-	for (i = 0; i < size; i++)
-		array[i] = data++;
-}
-
-static int verify_buf(void *buf, int size)
-{
-	static long long total_bytes;
-	uint8_t *array = buf;
-	static uint8_t data;
-	int i;
-
-	for (i = 0; i < size; i++, total_bytes++) {
-		if (array[i] != data++) {
-			printf("data verification failed byte %lld\n", total_bytes);
-			return -1;
-		}
-	}
-	return 0;
-}
-
-static int do_poll(struct pollfd *fds)
-{
-	int ret;
-
-	do {
-		ret = rs_poll(fds, 1, poll_timeout);
-	} while (!ret);
-
-	return ret == 1 ? 0 : ret;
-}
-
 static int send_xfer(int size)
 {
 	struct pollfd fds;
@@ -268,7 +177,7 @@ static int send_xfer(int size)
 
 	for (offset = 0; offset < size; ) {
 		if (use_async) {
-			ret = do_poll(&fds);
+			ret = do_poll(&fds, poll_timeout);
 			if (ret)
 				return ret;
 		}
@@ -297,7 +206,7 @@ static int recv_xfer(int size)
 
 	for (offset = 0; offset < size; ) {
 		if (use_async) {
-			ret = do_poll(&fds);
+			ret = do_poll(&fds, poll_timeout);
 			if (ret)
 				return ret;
 		}
@@ -402,7 +311,7 @@ static int server_listen(void)
 	int val, ret;
 
 	memset(&hints, 0, sizeof hints);
-	hints.ai_flags = RAI_PASSIVE;
+	hints.ai_flags = AI_PASSIVE;
  	ret = getaddrinfo(src_addr, port, &hints, &res);
 	if (ret) {
 		perror("getaddrinfo");
@@ -452,7 +361,7 @@ static int server_connect(void)
 			fds.fd = lrs;
 			fds.events = POLLIN;
 
-			ret = do_poll(&fds);
+			ret = do_poll(&fds, poll_timeout);
 			if (ret) {
 				perror("rpoll");
 				return ret;
@@ -505,7 +414,7 @@ static int client_connect(void)
 	if (ret && (errno == EINPROGRESS)) {
 		fds.fd = rs;
 		fds.events = POLLOUT;
-		ret = do_poll(&fds);
+		ret = do_poll(&fds, poll_timeout);
 		if (ret)
 			goto close;
 
