@@ -45,7 +45,7 @@
 
 #include <rdma/rdma_cma.h>
 #include <rdma/rsocket.h>
-include "common.h"
+#include "common.h"
 
 struct test_size_param {
 	int size;
@@ -80,7 +80,6 @@ enum rs_optimization {
 };
 
 static int rs, lrs;
-static int use_rs = 1;
 static int use_async;
 static int verify;
 static int flags = MSG_DONTWAIT;
@@ -100,22 +99,6 @@ static char *dst_addr;
 static char *src_addr;
 static struct timeval start, end;
 static void *buf;
-
-#define rs_socket(f,t,p)  use_rs ? rsocket(f,t,p)  : socket(f,t,p)
-#define rs_bind(s,a,l)    use_rs ? rbind(s,a,l)    : bind(s,a,l)
-#define rs_listen(s,b)    use_rs ? rlisten(s,b)    : listen(s,b)
-#define rs_connect(s,a,l) use_rs ? rconnect(s,a,l) : connect(s,a,l)
-#define rs_accept(s,a,l)  use_rs ? raccept(s,a,l)  : accept(s,a,l)
-#define rs_shutdown(s,h)  use_rs ? rshutdown(s,h)  : shutdown(s,h)
-#define rs_close(s)       use_rs ? rclose(s)       : close(s)
-#define rs_recv(s,b,l,f)  use_rs ? rrecv(s,b,l,f)  : recv(s,b,l,f)
-#define rs_send(s,b,l,f)  use_rs ? rsend(s,b,l,f)  : send(s,b,l,f)
-#define rs_poll(f,n,t)	  use_rs ? rpoll(f,n,t)	   : poll(f,n,t)
-#define rs_fcntl(s,c,p)   use_rs ? rfcntl(s,c,p)   : fcntl(s,c,p)
-#define rs_setsockopt(s,l,n,v,ol) \
-	use_rs ? rsetsockopt(s,l,n,v,ol) : setsockopt(s,l,n,v,ol)
-#define rs_getsockopt(s,l,n,v,ol) \
-	use_rs ? rgetsockopt(s,l,n,v,ol) : getsockopt(s,l,n,v,ol)
 
 static void show_perf(void)
 {

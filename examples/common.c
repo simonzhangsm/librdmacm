@@ -45,6 +45,8 @@
 #include <rdma/rdma_cma.h>
 #include "common.h"
 
+int use_rs = 1;
+
 int get_rdma_addr(char *src, char *dst, char *port,
 		  struct rdma_addrinfo *hints, struct rdma_addrinfo **rai)
 {
