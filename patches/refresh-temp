@@ -1,0 +1,54 @@
+Bottom: a4b0430790ade98d23b1a462b910e19286b747b0
+Top:    e9c95ad102b85dd4ad2970df253388b475935d48
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-12-06 23:25:52 -0800
+
+Refresh of udpong
+
+---
+
+diff --git a/Makefile.am b/Makefile.am
+index d72016d..ac3a6b6 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -46,12 +46,14 @@ examples_rdma_xclient_SOURCES = examples/rdma_xclient.c
+ examples_rdma_xclient_LDADD = $(top_builddir)/src/librdmacm.la
+ examples_rdma_xserver_SOURCES = examples/rdma_xserver.c
+ examples_rdma_xserver_LDADD = $(top_builddir)/src/librdmacm.la
+-examples_rstream_SOURCES = examples/rstream.c
++examples_rstream_SOURCES = examples/rstream.c examples/common.c
+ examples_rstream_LDADD = $(top_builddir)/src/librdmacm.la
+-examples_riostream_SOURCES = examples/riostream.c
++examples_riostream_SOURCES = examples/riostream.c examples/common.c
+ examples_riostream_LDADD = $(top_builddir)/src/librdmacm.la
+ examples_rcopy_SOURCES = examples/rcopy.c
+ examples_rcopy_LDADD = $(top_builddir)/src/librdmacm.la
++examples_udpong_SOURCES = examples/udpong.c examples/common.c
++examples_udpong_LDADD = $(top_builddir)/src/librdmacm.la
+ 
+ librdmacmincludedir = $(includedir)/rdma
+ infinibandincludedir = $(includedir)/infiniband
+diff --git a/examples/riostream.c b/examples/riostream.c
+index d73a43f..718b20d 100644
+--- a/examples/riostream.c
++++ b/examples/riostream.c
+@@ -45,6 +45,7 @@
+ 
+ #include <rdma/rdma_cma.h>
+ #include <rdma/rsocket.h>
++#include "common.h"
+ 
+ struct test_size_param {
+ 	int size;
+diff --git a/examples/rstream.c b/examples/rstream.c
+index ae3b8ad..fa7491c 100644
+--- a/examples/rstream.c
++++ b/examples/rstream.c
+@@ -45,6 +45,7 @@
+ 
+ #include <rdma/rdma_cma.h>
+ #include <rdma/rsocket.h>
++include "common.h"
+ 
+ struct test_size_param {
+ 	int size;
