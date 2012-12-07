@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2011 Intel Corporation.  All rights reserved.
+ * Copyright (c) 2005-2012 Intel Corporation.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
  * licenses.  You may choose to be licensed under the terms of the GNU
@@ -46,5 +46,18 @@ static inline uint64_t cpu_to_be64(uint64_t x) { return bswap_64(x); }
 static inline uint32_t cpu_to_be32(uint32_t x) { return bswap_32(x); }
 #endif
 
+union socket_addr {
+	struct sockaddr		sa;
+	struct sockaddr_in	sin;
+	struct sockaddr_in6	sin6;
+};
+
 int get_rdma_addr(char *src, char *dst, char *port,
 		  struct rdma_addrinfo *hints, struct rdma_addrinfo **rai);
+
+void size_str(char *str, size_t ssize, long long size);
+void cnt_str(char *str, size_t ssize, long long cnt);
+int size_to_count(int size);
+void format_buf(void *buf, int size);
+int verify_buf(void *buf, int size);
+int do_poll(struct pollfd *fds, int timeout);
