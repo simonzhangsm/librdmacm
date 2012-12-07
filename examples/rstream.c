@@ -45,6 +45,7 @@
 
 #include <rdma/rdma_cma.h>
 #include <rdma/rsocket.h>
+include "common.h"
 
 struct test_size_param {
 	int size;
