@@ -1,5 +1,5 @@
 Bottom: ae4df7b46b3d1c519383a31cb018c70f3e4e8201
-Top:    e9c95ad102b85dd4ad2970df253388b475935d48
+Top:    2e4c0d441a2f3b1ce7007c61679306e6d64bd8b1
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-12-05 15:58:03 -0800
 
@@ -32,10 +32,19 @@ index d72016d..ac3a6b6 100644
  librdmacmincludedir = $(includedir)/rdma
  infinibandincludedir = $(includedir)/infiniband
 diff --git a/examples/common.c b/examples/common.c
-index 3eeb1e9..43bfb6b 100644
+index 3eeb1e9..939f50c 100644
 --- a/examples/common.c
 +++ b/examples/common.c
-@@ -72,3 +72,94 @@ int get_rdma_addr(char *src, char *dst, char *port,
+@@ -45,6 +45,8 @@
+ #include <rdma/rdma_cma.h>
+ #include "common.h"
+ 
++int use_rs = 1;
++
+ int get_rdma_addr(char *src, char *dst, char *port,
+ 		  struct rdma_addrinfo *hints, struct rdma_addrinfo **rai)
+ {
+@@ -72,3 +74,94 @@ int get_rdma_addr(char *src, char *dst, char *port,
  
  	return ret;
  }
@@ -131,7 +140,7 @@ index 3eeb1e9..43bfb6b 100644
 +	return ret == 1 ? 0 : ret;
 +}
 diff --git a/examples/common.h b/examples/common.h
-index 8d9fea0..ef0ea7b 100644
+index 8d9fea0..37dc79e 100644
 --- a/examples/common.h
 +++ b/examples/common.h
 @@ -1,5 +1,5 @@
@@ -141,10 +150,43 @@ index 8d9fea0..ef0ea7b 100644
   *
   * This software is available to you under a choice of one of two
   * licenses.  You may choose to be licensed under the terms of the GNU
-@@ -46,5 +46,18 @@ static inline uint64_t cpu_to_be64(uint64_t x) { return bswap_64(x); }
+@@ -35,8 +35,10 @@
+ #include <stdlib.h>
+ #include <sys/types.h>
+ #include <byteswap.h>
++#include <poll.h>
+ 
+ #include <rdma/rdma_cma.h>
++#include <rdma/rsocket.h>
+ 
+ #if __BYTE_ORDER == __BIG_ENDIAN
+ static inline uint64_t cpu_to_be64(uint64_t x) { return x; }
+@@ -46,5 +48,40 @@ static inline uint64_t cpu_to_be64(uint64_t x) { return bswap_64(x); }
  static inline uint32_t cpu_to_be32(uint32_t x) { return bswap_32(x); }
  #endif
  
++extern int use_rs;
++
++#define rs_socket(f,t,p)  use_rs ? rsocket(f,t,p)  : socket(f,t,p)
++#define rs_bind(s,a,l)    use_rs ? rbind(s,a,l)    : bind(s,a,l)
++#define rs_listen(s,b)    use_rs ? rlisten(s,b)    : listen(s,b)
++#define rs_connect(s,a,l) use_rs ? rconnect(s,a,l) : connect(s,a,l)
++#define rs_accept(s,a,l)  use_rs ? raccept(s,a,l)  : accept(s,a,l)
++#define rs_shutdown(s,h)  use_rs ? rshutdown(s,h)  : shutdown(s,h)
++#define rs_close(s)       use_rs ? rclose(s)       : close(s)
++#define rs_recv(s,b,l,f)  use_rs ? rrecv(s,b,l,f)  : recv(s,b,l,f)
++#define rs_send(s,b,l,f)  use_rs ? rsend(s,b,l,f)  : send(s,b,l,f)
++#define rs_recvfrom(s,b,l,f,a,al) \
++	use_rs ? rrecvfrom(s,b,l,f,a,al) : recvfrom(s,b,l,f,a,al)
++#define rs_sendto(s,b,l,f,a,al) \
++	use_rs ? rsendto(s,b,l,f,a,al)   : sendto(s,b,l,fa,al)
++#define rs_poll(f,n,t)	  use_rs ? rpoll(f,n,t)	   : poll(f,n,t)
++#define rs_fcntl(s,c,p)   use_rs ? rfcntl(s,c,p)   : fcntl(s,c,p)
++#define rs_setsockopt(s,l,n,v,ol) \
++	use_rs ? rsetsockopt(s,l,n,v,ol) : setsockopt(s,l,n,v,ol)
++#define rs_getsockopt(s,l,n,v,ol) \
++	use_rs ? rgetsockopt(s,l,n,v,ol) : getsockopt(s,l,n,v,ol)
++
 +union socket_addr {
 +	struct sockaddr		sa;
 +	struct sockaddr_in	sin;
@@ -339,21 +381,45 @@ index dfb03e5..718b20d 100644
  			goto close;
  
 diff --git a/examples/rstream.c b/examples/rstream.c
-index 069b7c9..fa7491c 100644
+index 069b7c9..617710e 100644
 --- a/examples/rstream.c
 +++ b/examples/rstream.c
 @@ -45,6 +45,7 @@
  
  #include <rdma/rdma_cma.h>
  #include <rdma/rsocket.h>
-+include "common.h"
++#include "common.h"
  
  struct test_size_param {
  	int size;
-@@ -116,46 +117,6 @@ static void *buf;
- #define rs_getsockopt(s,l,n,v,ol) \
- 	use_rs ? rgetsockopt(s,l,n,v,ol) : getsockopt(s,l,n,v,ol)
+@@ -79,7 +80,6 @@ enum rs_optimization {
+ };
  
+ static int rs, lrs;
+-static int use_rs = 1;
+ static int use_async;
+ static int verify;
+ static int flags = MSG_DONTWAIT;
+@@ -100,62 +100,6 @@ static char *src_addr;
+ static struct timeval start, end;
+ static void *buf;
+ 
+-#define rs_socket(f,t,p)  use_rs ? rsocket(f,t,p)  : socket(f,t,p)
+-#define rs_bind(s,a,l)    use_rs ? rbind(s,a,l)    : bind(s,a,l)
+-#define rs_listen(s,b)    use_rs ? rlisten(s,b)    : listen(s,b)
+-#define rs_connect(s,a,l) use_rs ? rconnect(s,a,l) : connect(s,a,l)
+-#define rs_accept(s,a,l)  use_rs ? raccept(s,a,l)  : accept(s,a,l)
+-#define rs_shutdown(s,h)  use_rs ? rshutdown(s,h)  : shutdown(s,h)
+-#define rs_close(s)       use_rs ? rclose(s)       : close(s)
+-#define rs_recv(s,b,l,f)  use_rs ? rrecv(s,b,l,f)  : recv(s,b,l,f)
+-#define rs_send(s,b,l,f)  use_rs ? rsend(s,b,l,f)  : send(s,b,l,f)
+-#define rs_poll(f,n,t)	  use_rs ? rpoll(f,n,t)	   : poll(f,n,t)
+-#define rs_fcntl(s,c,p)   use_rs ? rfcntl(s,c,p)   : fcntl(s,c,p)
+-#define rs_setsockopt(s,l,n,v,ol) \
+-	use_rs ? rsetsockopt(s,l,n,v,ol) : setsockopt(s,l,n,v,ol)
+-#define rs_getsockopt(s,l,n,v,ol) \
+-	use_rs ? rgetsockopt(s,l,n,v,ol) : getsockopt(s,l,n,v,ol)
+-
 -static void size_str(char *str, size_t ssize, long long size)
 -{
 -	long long base, fraction = 0;
@@ -397,7 +463,7 @@ index 069b7c9..fa7491c 100644
  static void show_perf(void)
  {
  	char str[32];
-@@ -180,20 +141,6 @@ static void show_perf(void)
+@@ -180,20 +124,6 @@ static void show_perf(void)
  		(usec / iterations) / (transfer_count * 2));
  }
  
@@ -418,7 +484,7 @@ index 069b7c9..fa7491c 100644
  static void init_latency_test(int size)
  {
  	char sstr[5];
-@@ -216,43 +163,6 @@ static void init_bandwidth_test(int size)
+@@ -216,43 +146,6 @@ static void init_bandwidth_test(int size)
  	transfer_count = size_to_count(transfer_size);
  }
  
@@ -462,7 +528,7 @@ index 069b7c9..fa7491c 100644
  static int send_xfer(int size)
  {
  	struct pollfd fds;
-@@ -268,7 +178,7 @@ static int send_xfer(int size)
+@@ -268,7 +161,7 @@ static int send_xfer(int size)
  
  	for (offset = 0; offset < size; ) {
  		if (use_async) {
@@ -471,7 +537,7 @@ index 069b7c9..fa7491c 100644
  			if (ret)
  				return ret;
  		}
-@@ -297,7 +207,7 @@ static int recv_xfer(int size)
+@@ -297,7 +190,7 @@ static int recv_xfer(int size)
  
  	for (offset = 0; offset < size; ) {
  		if (use_async) {
@@ -480,7 +546,7 @@ index 069b7c9..fa7491c 100644
  			if (ret)
  				return ret;
  		}
-@@ -402,7 +312,7 @@ static int server_listen(void)
+@@ -402,7 +295,7 @@ static int server_listen(void)
  	int val, ret;
  
  	memset(&hints, 0, sizeof hints);
@@ -489,7 +555,7 @@ index 069b7c9..fa7491c 100644
   	ret = getaddrinfo(src_addr, port, &hints, &res);
  	if (ret) {
  		perror("getaddrinfo");
-@@ -452,7 +362,7 @@ static int server_connect(void)
+@@ -452,7 +345,7 @@ static int server_connect(void)
  			fds.fd = lrs;
  			fds.events = POLLIN;
  
@@ -498,7 +564,7 @@ index 069b7c9..fa7491c 100644
  			if (ret) {
  				perror("rpoll");
  				return ret;
-@@ -505,7 +415,7 @@ static int client_connect(void)
+@@ -505,7 +398,7 @@ static int client_connect(void)
  	if (ret && (errno == EINPROGRESS)) {
  		fds.fd = rs;
  		fds.events = POLLOUT;
@@ -509,10 +575,10 @@ index 069b7c9..fa7491c 100644
  
 diff --git a/examples/udpong.c b/examples/udpong.c
 new file mode 100644
-index 0000000..d29e584
+index 0000000..4adec2f
 --- /dev/null
 +++ b/examples/udpong.c
-@@ -0,0 +1,565 @@
+@@ -0,0 +1,550 @@
 +/*
 + * Copyright (c) 2012 Intel Corporation.  All rights reserved.
 + *
@@ -560,6 +626,7 @@ index 0000000..d29e584
 +
 +#include <rdma/rdma_cma.h>
 +#include <rdma/rsocket.h>
++#include "common.h"
 +
 +static int test_size[] = {
 +	{ 1 <<  6 },
@@ -595,7 +662,6 @@ index 0000000..d29e584
 +static int id;
 +
 +static int rs;
-+static int use_rs = 1;
 +static int use_async;
 +static int flags = MSG_DONTWAIT;
 +static int poll_timeout;
@@ -612,21 +678,6 @@ index 0000000..d29e584
 +static socklen_t addrlen;
 +static struct timeval start, end;
 +static struct message msg;
-+
-+#define rs_socket(f,t,p)  use_rs ? rsocket(f,t,p)  : socket(f,t,p)
-+#define rs_bind(s,a,l)    use_rs ? rbind(s,a,l)    : bind(s,a,l)
-+#define rs_connect(s,a,l) use_rs ? rconnect(s,a,l) : connect(s,a,l)
-+#define rs_close(s)       use_rs ? rclose(s)       : close(s)
-+#define rs_recvfrom(s,b,l,f,a,al) \
-+	use_rs ? rrecvfrom(s,b,l,f,a,al) : recvfrom(s,b,l,f,a,al)
-+#define rs_sendto(s,b,l,f,a,al) \
-+	use_rs ? rsendto(s,b,l,f,a,al)   : sendto(s,b,l,fa,al)
-+#define rs_poll(f,n,t)	  use_rs ? rpoll(f,n,t)	   : poll(f,n,t)
-+#define rs_fcntl(s,c,p)   use_rs ? rfcntl(s,c,p)   : fcntl(s,c,p)
-+#define rs_setsockopt(s,l,n,v,ol) \
-+	use_rs ? rsetsockopt(s,l,n,v,ol) : setsockopt(s,l,n,v,ol)
-+#define rs_getsockopt(s,l,n,v,ol) \
-+	use_rs ? rgetsockopt(s,l,n,v,ol) : getsockopt(s,l,n,v,ol)
 +
 +static void show_perf(void)
 +{
