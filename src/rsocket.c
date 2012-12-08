@@ -1119,7 +1119,7 @@ int raccept(int socket, struct sockaddr *addr, socklen_t *addrlen)
 	if (ret)
 		goto err;
 
-	ret = rs_insert(new_rs, rs->cm_id->channel->fd);
+	ret = rs_insert(new_rs, new_rs->cm_id->channel->fd);
 	if (ret < 0)
 		goto err;
 
