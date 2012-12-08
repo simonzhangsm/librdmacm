@@ -48,11 +48,11 @@
 #include "common.h"
 
 static int test_size[] = {
-	{ 1 <<  6 },
-	{ 1 <<  7 }, { (1 <<  7) + (1 <<  6) },
-	{ 1 <<  8 }, { (1 <<  8) + (1 <<  7) },
-	{ 1 <<  9 }, { (1 <<  9) + (1 <<  8) },
-	{ 1 << 10 }, { (1 << 10) + (1 <<  9) },
+	(1 <<  6),
+	(1 <<  7), ((1 <<  7) + (1 << 6)),
+	(1 <<  8), ((1 <<  8) + (1 << 7)),
+	(1 <<  9), ((1 <<  9) + (1 << 8)),
+	(1 << 10), ((1 << 10) + (1 << 9)),
 };
 #define TEST_CNT (sizeof test_size / sizeof test_size[0])
 
@@ -78,7 +78,7 @@ struct client {
 };
 
 static struct client clients[256];
-static int id;
+static uint8_t id;
 
 static int rs;
 static int use_async;
@@ -106,13 +106,8 @@ static void show_perf(void)
 	int transfers;
 
 	usec = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec);
-	if (echo) {
-		transfers = transfer_count;
-		bytes = (long long) transfer_count * transfer_size * 2;
-	} else {
-		transfers = ntohl(msg.data);
-		bytes = (long long) transfers * transfer_size;
-	}
+	transfers = echo ? transfer_count * 2 : ntohl(msg.data);
+	bytes = (long long) transfers * transfer_size;
 
 	/* name size transfers bytes seconds Gb/sec usec/xfer */
 	printf("%-10s", test_name);
@@ -124,7 +119,7 @@ static void show_perf(void)
 	printf("%-8s", str);
 	printf("%8.2fs%10.2f%11.2f\n",
 		usec / 1000000., (bytes * 8) / (1000. * usec),
-		(usec / iterations) / (transfers * 2));
+		(usec / transfers));
 }
 
 static void init_latency_test(int size)
@@ -208,7 +203,7 @@ static ssize_t svr_recv(struct message *msg, size_t size,
 
 	do {
 		if (use_async) {
-			ret = do_poll(fds, poll_timeout);
+			ret = do_poll(&fds, poll_timeout);
 			if (ret)
 				return ret;
 		}
@@ -230,7 +225,7 @@ static int svr_process(struct message *msg, size_t size,
 	switch (msg->op) {
 	case msg_op_start:
 		memset(&clients[id], 0, sizeof clients[id]);
-		msg.id = id++;
+		msg->id = id++;
 		break;
 	case msg_op_echo:
 		clients[msg->id].recvcnt++;
@@ -331,7 +326,7 @@ static ssize_t client_recv(struct message *msg, size_t size, int timeout)
 		fds.fd = rs;
 		fds.events = POLLIN;
 
-		ret = rs_poll(fds, 1, timeout);
+		ret = rs_poll(&fds, 1, timeout);
 		if (ret <= 0)
 			return ret;
 	}
@@ -360,7 +355,7 @@ static int client_send_recv(struct message *msg, size_t size)
 
 static int run_test(void)
 {
-	int ret, i, t;
+	int ret, i;
 
 	msg.op = msg_op_start;
 	ret = client_send_recv(&msg, CTRL_MSG_SIZE);
@@ -396,7 +391,7 @@ static int client_connect(void)
 
 	memset(&hints, 0, sizeof hints);
 	hints.ai_socktype = SOCK_DGRAM;
- 	ret = getaddrinfo(dst_addr, port, hints, &res);
+ 	ret = getaddrinfo(dst_addr, port, &hints, &res);
 	if (ret) {
 		perror("getaddrinfo");
 		return ret;

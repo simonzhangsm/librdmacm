@@ -62,7 +62,7 @@ extern int use_rs;
 #define rs_recvfrom(s,b,l,f,a,al) \
 	use_rs ? rrecvfrom(s,b,l,f,a,al) : recvfrom(s,b,l,f,a,al)
 #define rs_sendto(s,b,l,f,a,al) \
-	use_rs ? rsendto(s,b,l,f,a,al)   : sendto(s,b,l,fa,al)
+	use_rs ? rsendto(s,b,l,f,a,al)   : sendto(s,b,l,f,a,al)
 #define rs_poll(f,n,t)	  use_rs ? rpoll(f,n,t)	   : poll(f,n,t)
 #define rs_fcntl(s,c,p)   use_rs ? rfcntl(s,c,p)   : fcntl(s,c,p)
 #define rs_setsockopt(s,l,n,v,ol) \
