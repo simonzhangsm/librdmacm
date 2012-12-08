@@ -554,8 +554,10 @@ static struct rsocket *rs_alloc(struct rsocket *inherited_rs, int type)
 
 	rs->type = type;
 	rs->index = -1;
-	rs->udp_sock = -1;
-	rs->epfd = -1;
+	if (type == SOCK_DGRAM) {
+		rs->udp_sock = -1;
+		rs->epfd = -1;
+	}
 
 	if (inherited_rs) {
 		rs->sbuf_size = inherited_rs->sbuf_size;
@@ -563,16 +565,20 @@ static struct rsocket *rs_alloc(struct rsocket *inherited_rs, int type)
 		rs->sq_inline = inherited_rs->sq_inline;
 		rs->sq_size = inherited_rs->sq_size;
 		rs->rq_size = inherited_rs->rq_size;
-		rs->ctrl_avail = inherited_rs->ctrl_avail;
-		rs->target_iomap_size = inherited_rs->target_iomap_size;
+		if (type == SOCK_STREAM) {
+			rs->ctrl_avail = inherited_rs->ctrl_avail;
+			rs->target_iomap_size = inherited_rs->target_iomap_size;
+		}
 	} else {
 		rs->sbuf_size = def_wmem;
 		rs->rbuf_size = def_mem;
 		rs->sq_inline = def_inline;
 		rs->sq_size = def_sqsize;
 		rs->rq_size = def_rqsize;
-		rs->ctrl_avail = RS_QP_CTRL_SIZE;
-		rs->target_iomap_size = def_iomap_size;
+		if (type == SOCK_STREAM) {
+			rs->ctrl_avail = RS_QP_CTRL_SIZE;
+			rs->target_iomap_size = def_iomap_size;
+		}
 	}
 	fastlock_init(&rs->slock);
 	fastlock_init(&rs->rlock);
