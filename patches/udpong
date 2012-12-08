@@ -1,5 +1,5 @@
 Bottom: d58bea7ff66215f5a1631dca9de9254822217783
-Top:    d5fe7aec8cca640b7e39056a864e0c1e0cc6dc7c
+Top:    854184ce75f3902fa1b4d84530045ee2fb8fbb05
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-12-05 15:58:03 -0800
 
@@ -11,9 +11,18 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/Makefile.am b/Makefile.am
-index d72016d..ac3a6b6 100644
+index d72016d..3198165 100644
 --- a/Makefile.am
 +++ b/Makefile.am
+@@ -29,7 +29,7 @@ src_librspreload_la_LIBADD = $(top_builddir)/src/librdmacm.la
+ bin_PROGRAMS = examples/ucmatose examples/rping examples/udaddy examples/mckey \
+ 	       examples/rdma_client examples/rdma_server examples/rdma_xclient \
+ 	       examples/rdma_xserver examples/rstream examples/rcopy \
+-	       examples/riostream
++	       examples/riostream examples/udpong
+ examples_ucmatose_SOURCES = examples/cmatose.c examples/common.c
+ examples_ucmatose_LDADD = $(top_builddir)/src/librdmacm.la
+ examples_rping_SOURCES = examples/rping.c
 @@ -46,12 +46,14 @@ examples_rdma_xclient_SOURCES = examples/rdma_xclient.c
  examples_rdma_xclient_LDADD = $(top_builddir)/src/librdmacm.la
  examples_rdma_xserver_SOURCES = examples/rdma_xserver.c
