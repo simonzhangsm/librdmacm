@@ -1,5 +1,5 @@
 Bottom: 1fa07c62817ac4b6cb8d9c5e327ea2cdc75dbd21
-Top:    a927494883404a78f78c17da5df3f0065d13f8cb
+Top:    d58bea7ff66215f5a1631dca9de9254822217783
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-11-09 10:26:38 -0800
 
@@ -112,7 +112,7 @@ index 0a0370e..7135a61 100644
  {
  	errno = err;
 diff --git a/src/rsocket.c b/src/rsocket.c
-index a060f66..f35abeb 100644
+index a060f66..024c634 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -47,6 +47,8 @@
@@ -942,7 +942,7 @@ index a060f66..f35abeb 100644
  		goto err;
  
 -	ret = rs_insert(new_rs);
-+	ret = rs_insert(new_rs, rs->cm_id->channel->fd);
++	ret = rs_insert(new_rs, new_rs->cm_id->channel->fd);
  	if (ret < 0)
  		goto err;
  
