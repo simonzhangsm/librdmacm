@@ -1,0 +1,21 @@
+Bottom: a927494883404a78f78c17da5df3f0065d13f8cb
+Top:    d58bea7ff66215f5a1631dca9de9254822217783
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-12-07 17:08:04 -0800
+
+Refresh of dsocket
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index f35abeb..024c634 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -1119,7 +1119,7 @@ int raccept(int socket, struct sockaddr *addr, socklen_t *addrlen)
+ 	if (ret)
+ 		goto err;
+ 
+-	ret = rs_insert(new_rs, rs->cm_id->channel->fd);
++	ret = rs_insert(new_rs, new_rs->cm_id->channel->fd);
+ 	if (ret < 0)
+ 		goto err;
