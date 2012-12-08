@@ -1,9 +1,9 @@
 Version: 1
-Previous: 6f3f6c0b3fba6c42bae9b73a67ee907d388a6ccb
-Head: 017c83e85700bb3411fe7abd46eeeae229ac6012
+Previous: d2b10a8a9a0bd9686ba680ef86d4e63a726017dd
+Head: c6bfc1c5b15e6207188a97e8a5df0405cfd2587f
 Applied:
-  dsocket: 017c83e85700bb3411fe7abd46eeeae229ac6012
 Unapplied:
+  dsocket: 017c83e85700bb3411fe7abd46eeeae229ac6012
   udpong: 87e18a2dc15e31fa2ef06b729a0142c1c7354e4a
   test-udp: f6c78ad2a26f452cf166aff1baa7b76160bd8bf7
   iom-dbg: 88434072d07f8edc58f454ac954d78bd39441eed
