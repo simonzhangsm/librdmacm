@@ -1,0 +1,84 @@
+Bottom: 3855a3afdaa94a3f44bd0f049eea2e89afa14c9a
+Top:    3140a37a0a670a0494c2686793288c824d2df113
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-12-10 10:59:43 -0800
+
+Refresh of udpong
+
+---
+
+diff --git a/examples/udpong.c b/examples/udpong.c
+index d4f43ac..99bcade 100644
+--- a/examples/udpong.c
++++ b/examples/udpong.c
+@@ -66,7 +66,8 @@ enum {
+ struct message {
+ 	uint8_t op;
+ 	uint8_t id;
+-	uint16_t reserved;
++	uint8_t seqno;
++	uint8_t reserved;
+ 	uint32_t data;
+ 	uint8_t  buf[2048];
+ };
+@@ -263,6 +264,8 @@ static int svr_bind(void)
+ 	}
+ 
+ 	set_options(rs);
++printf("svr bind af %d type %d prot %d port %d\n", res->ai_family, res->ai_socktype, res->ai_protocol,
++		((struct sockaddr_in *) res->ai_addr)->sin_port);
+ 	ret = rs_bind(rs, res->ai_addr, res->ai_addrlen);
+ 	if (ret) {
+ 		perror("rbind");
+@@ -331,7 +334,7 @@ static ssize_t client_recv(struct message *msg, size_t size, int timeout)
+ 			return ret;
+ 	}
+ 
+-	ret = rs_recv(rs, msg, size, flags);
++	ret = rs_recv(rs, msg, size, flags | MSG_DONTWAIT);
+ 	if (ret < 0 && (errno == EWOULDBLOCK || errno == EAGAIN))
+ 		perror("rrecv");
+ 
+@@ -340,16 +343,19 @@ static ssize_t client_recv(struct message *msg, size_t size, int timeout)
+ 
+ static int client_send_recv(struct message *msg, size_t size)
+ {
++	static uint8_t seqno;
+ 	int ret;
+ 
++	msg->seqno = seqno;
+ 	do {
+ 		ret = client_send(msg, size);
+ 		if (ret != size)
+ 			return ret;
+ 
+ 		ret = client_recv(msg, size, 1);
+-	} while (ret <= 0);
++	} while (ret <= 0 && msg->seqno != seqno);
+ 
++	seqno++;
+ 	return ret;
+ }
+ 
+@@ -405,6 +411,8 @@ static int client_connect(void)
+ 	}
+ 
+ 	set_options(rs);
++printf("client connect af %d type %d prot %d port %d\n", res->ai_family, res->ai_socktype, res->ai_protocol,
++		((struct sockaddr_in *) res->ai_addr)->sin_port);
+ 	ret = rs_connect(rs, res->ai_addr, res->ai_addrlen);
+ 	if (ret) {
+ 		perror("rconnect");
+@@ -430,10 +438,12 @@ static int client_run(void)
+ 	if (!custom) {
+ 		for (i = 0; i < TEST_CNT; i++) {
+ 			init_latency_test(test_size[i]);
++transfer_count = 10;
+ 			run_test();
+ 		}
+ 		for (i = 0; i < TEST_CNT; i++) {
+ 			init_bandwidth_test(test_size[i]);
++transfer_count = 10;
+ 			run_test();
+ 		}
+ 	} else {
