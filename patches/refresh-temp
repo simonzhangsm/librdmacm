@@ -1,0 +1,30 @@
+Bottom: d58bea7ff66215f5a1631dca9de9254822217783
+Top:    149a333bd2b79ef125e96607d91fa8f10b9155e8
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-12-10 15:01:47 -0800
+
+Refresh of dsocket
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 024c634..56f6f39 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -1009,7 +1009,7 @@ static int ds_init(struct rsocket *rs, int domain)
+ 	if (rs->udp_sock < 0)
+ 		return rs->udp_sock;
+ 
+-	rs->epfd = epoll_create(0);
++	rs->epfd = epoll_create(2);
+ 	if (rs->epfd < 0)
+ 		return rs->epfd;
+ 
+@@ -1040,6 +1040,7 @@ int rsocket(int domain, int type, int protocol)
+ 		rs->cm_id->route.addr.src_addr.sa_family = domain;
+ 		index = rs->cm_id->channel->fd;
+ 	} else {
++printf("rsocket DGRAM\n");
+ 		ret = ds_init(rs, domain);
+ 		if (ret)
+ 			goto err;
