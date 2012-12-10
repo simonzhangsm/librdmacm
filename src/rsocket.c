@@ -1040,7 +1040,6 @@ int rsocket(int domain, int type, int protocol)
 		rs->cm_id->route.addr.src_addr.sa_family = domain;
 		index = rs->cm_id->channel->fd;
 	} else {
-printf("rsocket DGRAM\n");
 		ret = ds_init(rs, domain);
 		if (ret)
 			goto err;
@@ -1887,6 +1886,9 @@ static void ds_poll_cqs(struct rsocket *rs)
 	int ret, cnt;
 
 	qp = rs->qp_list;
+	if (!qp)
+		return;
+
 	do {
 		cnt = 0;
 		do {
