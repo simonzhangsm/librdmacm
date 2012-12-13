@@ -2238,6 +2238,7 @@ int ucma_max_qpsize(struct rdma_cm_id *id)
 	if (id && id_priv->cma_dev) {
 		max_size = id_priv->cma_dev->max_qpsize;
 	} else {
+		ucma_init();
 		for (i = 0; i < cma_dev_cnt; i++) {
 			if (!max_size || max_size > cma_dev_array[i].max_qpsize)
 				max_size = cma_dev_array[i].max_qpsize;
