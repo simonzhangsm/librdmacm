@@ -2242,9 +2242,9 @@ ssize_t rrecv(int socket, void *buf, size_t len, int flags)
 
 	rs = idm_at(&idm, socket);
 	if (rs->type == SOCK_DGRAM) {
-		fastlock_acquire(&rs->slock);
+		fastlock_acquire(&rs->rlock);
 		ret = ds_recvfrom(rs, buf, len, flags, NULL, 0);
-		fastlock_release(&rs->slock);
+		fastlock_release(&rs->rlock);
 		return ret;
 	}
 
@@ -2311,9 +2311,9 @@ ssize_t rrecvfrom(int socket, void *buf, size_t len, int flags,
 
 	rs = idm_at(&idm, socket);
 	if (rs->type == SOCK_DGRAM) {
-		fastlock_acquire(&rs->slock);
+		fastlock_acquire(&rs->rlock);
 		ret = ds_recvfrom(rs, buf, len, flags, src_addr, addrlen);
-		fastlock_release(&rs->slock);
+		fastlock_release(&rs->rlock);
 		return ret;
 	}
 
@@ -2500,7 +2500,7 @@ static ssize_t dsend(struct rsocket *rs, const void *buf, size_t len, int flags)
 	memcpy((void *) msg + rs->conn_dest->qp->hdr.length, buf, len);
 	sge.addr = (uintptr_t) msg;
 	sge.length = rs->conn_dest->qp->hdr.length + len;
-	sge.lkey = rs->smr->lkey;
+	sge.lkey = rs->conn_dest->qp->smr->lkey;
 	offset = (uint8_t *) msg - rs->sbuf;
 
 	ret = ds_post_send(rs, &sge, ds_send_wr_id(offset, sge.length));
@@ -3741,6 +3741,7 @@ static void rs_svc_create_ah(struct rsocket *rs, struct ds_dest *dest, uint32_t 
 	}
 
 	ret = rdma_create_id(NULL, &id, NULL, dest->qp->cm_id->ps);
+	printf("%s rdma_create_id %d %s\n",__func__, ret, strerror(errno));
 	if  (ret)
 		return;
 
@@ -3751,10 +3752,12 @@ static void rs_svc_create_ah(struct rsocket *rs, struct ds_dest *dest, uint32_t 
 	else
 		saddr.sin6.sin6_port = 0;
 	ret = rdma_resolve_addr(id, &saddr.sa, &dest->addr.sa, 2000);
+	printf("%s rdma_resolve_addr %d %s\n",__func__, ret, strerror(errno));
 	if (ret)
 		goto out;
 
 	ret = rdma_resolve_route(id, 2000);
+	printf("%s rdma_resolve_route %d %s\n",__func__, ret, strerror(errno));
 	if (ret)
 		goto out;
 
@@ -3773,9 +3776,12 @@ static void rs_svc_create_ah(struct rsocket *rs, struct ds_dest *dest, uint32_t 
 	attr.static_rate = id->route.path_rec->rate;
 	attr.port_num  = id->port_num;
 
+	printf("%s getting slock \n",__func__);
 	fastlock_acquire(&rs->slock);
+	printf("%s why am I not here? \n",__func__);
 	dest->qpn = qpn;
 	dest->ah = ibv_create_ah(dest->qp->cm_id->pd, &attr);
+	printf("%s ibv_create_ah %p %s\n",__func__, dest->ah, strerror(errno));
 	fastlock_release(&rs->slock);
 out:
 	rdma_destroy_id(id);
@@ -3825,7 +3831,7 @@ static void rs_svc_forward(struct rsocket *rs, void *buf, size_t len,
 	memcpy((void *) msg + hdr.length, buf, len);
 	sge.addr = (uintptr_t) msg;
 	sge.length = hdr.length + len;
-	sge.lkey = rs->smr->lkey;
+	sge.lkey = rs->conn_dest->qp->smr->lkey;
 	offset = (uint8_t *) msg - rs->sbuf;
 
 	ds_post_send(rs, &sge, ds_send_wr_id(offset, sge.length));
@@ -3872,7 +3878,7 @@ static void rs_svc_process_rs(struct rsocket *rs)
 
 	rs->conn_dest = dest;
 	printf("%s sending resp\n",__func__);
-	ds_send_udp(rs, svc_buf + udp_hdr->length, len, 0, RS_OP_CTRL);
+	ds_send_udp(rs, NULL, 0, 0, RS_OP_CTRL);
 	rs->conn_dest = cur_dest;
 	fastlock_release(&rs->slock);
 }
