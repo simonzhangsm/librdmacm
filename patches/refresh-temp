@@ -1,0 +1,22 @@
+Bottom: 6f9f91ab484e485a49497024fdfd602b3f868fbc
+Top:    00c32d703a94a66f770fd892898d28fe8d8cbee7
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-12-15 00:40:41 -0800
+
+Refresh of udpong
+
+---
+
+diff --git a/examples/udpong.c b/examples/udpong.c
+index 3b0f961..2e3de3e 100644
+--- a/examples/udpong.c
++++ b/examples/udpong.c
+@@ -365,7 +365,7 @@ static int client_send_recv(struct message *msg, size_t size, int timeout)
+ 			return ret;
+ 
+ 		ret = client_recv(msg, size, timeout);
+-	} while (ret <= 0 && msg->seqno != seqno);
++	} while (ret <= 0 || msg->seqno != seqno);
+ 
+ 	seqno++;
+ 	return ret;
