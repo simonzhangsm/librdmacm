@@ -365,7 +365,7 @@ static int client_send_recv(struct message *msg, size_t size, int timeout)
 			return ret;
 
 		ret = client_recv(msg, size, timeout);
-	} while (ret <= 0 && msg->seqno != seqno);
+	} while (ret <= 0 || msg->seqno != seqno);
 
 	seqno++;
 	return ret;
