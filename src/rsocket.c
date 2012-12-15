@@ -1349,7 +1349,7 @@ out:
 static void ds_format_hdr(struct ds_header *hdr, union socket_addr *addr)
 {
 	if (addr->sa.sa_family == AF_INET) {
-		PRINTADDR(addr);
+//		PRINTADDR(addr);
 		hdr->version = 4;
 		hdr->length = DS_IPV4_HDR_LEN;
 		hdr->port = addr->sin.sin_port;
@@ -1400,7 +1400,7 @@ static int ds_create_qp(struct rsocket *rs, union socket_addr *src_addr,
 	struct epoll_event event;
 	int i, ret;
 
-	PRINTADDR(src_addr);
+//	PRINTADDR(src_addr);
 	qp = calloc(1, sizeof(*qp));
 	if (!qp)
 		return ERR(ENOMEM);
@@ -1489,7 +1489,7 @@ static int ds_get_dest(struct rsocket *rs, const struct sockaddr *addr,
 	struct ds_dest **tdest, *new_dest;
 	int ret = 0;
 
-	PRINTADDR(addr);
+//	PRINTADDR(addr);
 	fastlock_acquire(&rs->map_lock);
 	tdest = tfind(addr, &rs->dest_map, ds_compare_addr);
 	if (tdest)
@@ -1541,7 +1541,7 @@ int rconnect(int socket, const struct sockaddr *addr, socklen_t addrlen)
 		}
 
 		fastlock_acquire(&rs->slock);
-		PRINTADDR(addr);
+//		PRINTADDR(addr);
 		ret = connect(rs->udp_sock, addr, addrlen);
 		if (!ret)
 			ret = ds_get_dest(rs, addr, addrlen, &rs->conn_dest);
@@ -1899,7 +1899,7 @@ static int ds_valid_recv(struct ds_qp *qp, struct ibv_wc *wc)
 	struct ds_header *hdr;
 
 	hdr = (struct ds_header *) (qp->rbuf + ds_wr_offset(wc->wr_id));
-	return ((wc->byte_len >= sizeof(struct ibv_grh) + sizeof(*hdr)) &&
+	return ((wc->byte_len >= sizeof(struct ibv_grh) + DS_IPV4_HDR_LEN) &&
 		((hdr->version == 4 && hdr->length == DS_IPV4_HDR_LEN) ||
 		 (hdr->version == 6 && hdr->length == DS_IPV6_HDR_LEN)));
 }
@@ -1934,6 +1934,7 @@ static void ds_poll_cqs(struct rsocket *rs)
 			if (ds_wr_is_recv(wc.wr_id)) {
 				if (rs->rqe_avail && wc.status == IBV_WC_SUCCESS &&
 				    ds_valid_recv(qp, &wc)) {
+					printf("%s recv over QP\n", __func__);
 					rs->rqe_avail--;
 					rmsg = &rs->dmsg[rs->rmsg_tail];
 					rmsg->qp = qp;
@@ -1948,7 +1949,7 @@ static void ds_poll_cqs(struct rsocket *rs)
 			} else {
 				smsg = (struct ds_smsg *)
 				       (rs->sbuf + ds_wr_offset(wc.wr_id));
-				printf("%s send smsg %p free %p\n", __func__, smsg, rs->smsg_free);
+//				printf("%s send smsg %p free %p\n", __func__, smsg, rs->smsg_free);
 				smsg->next = rs->smsg_free;
 				rs->smsg_free = smsg;
 				rs->sqe_avail++;
@@ -2165,15 +2166,15 @@ static ssize_t ds_recvfrom(struct rsocket *rs, void *buf, size_t len, int flags,
 	struct ds_header *hdr;
 	int ret;
 
-	printf("%s \n", __func__);
+//	printf("%s \n", __func__);
 	if (!(rs->state & rs_readable))
 		return ERR(EINVAL);
 
 	if (!rs_have_rdata(rs)) {
-		printf("%s need rdata \n", __func__);
+//		printf("%s need rdata \n", __func__);
 		ret = ds_get_comp(rs, rs_nonblocking(rs, flags),
 				  rs_have_rdata);
-		printf("%s ret %d errno %s\n", __func__, ret, strerror(errno));
+//		printf("%s ret %d errno %s\n", __func__, ret, strerror(errno));
 		if (ret)
 			return ret;
 	}
@@ -2187,7 +2188,7 @@ static ssize_t ds_recvfrom(struct rsocket *rs, void *buf, size_t len, int flags,
 	if (addrlen)
 {
 		ds_set_src(src_addr, addrlen, hdr);
-PRINTADDR(src_addr);
+//PRINTADDR(src_addr);
 }
 
 	if (!(flags & MSG_PEEK)) {
@@ -2196,7 +2197,7 @@ PRINTADDR(src_addr);
 			rs->rmsg_head = 0;
 	}
 
-	printf("%s ret %d errno %s\n", __func__, ret, strerror(errno));
+//	printf("%s ret %d errno %s\n", __func__, ret, strerror(errno));
 	return len;
 }
 
@@ -2459,7 +2460,7 @@ static ssize_t ds_sendv_udp(struct rsocket *rs, const struct iovec *iov,
 	msg.msg_iovlen = iovcnt + 1;
 //	printf("%s iov cnt %d\n", __func__, msg.msg_iovlen);
 	ret = sendmsg(rs->udp_sock, &msg, flags);
-	return ret > 0 ? ret - sizeof hdr : ret;
+	return ret > 0 ? ret - hdr.length : ret;
 }
 
 static ssize_t ds_send_udp(struct rsocket *rs, const void *buf, size_t len,
@@ -2608,8 +2609,8 @@ ssize_t rsendto(int socket, const void *buf, size_t len, int flags,
 	struct rsocket *rs;
 	int ret;
 
-	PRINTADDR(dest_addr);
-	printf("%s sendto data 0x%x\n", __func__, *((uint32_t*)buf));
+//	PRINTADDR(dest_addr);
+//	printf("%s sendto data 0x%x\n", __func__, *((uint32_t*)buf));
 	rs = idm_at(&idm, socket);
 	if (rs->type == SOCK_STREAM) {
 		if (dest_addr || addrlen)
