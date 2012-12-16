@@ -1,5 +1,5 @@
 Bottom: 085131bec099e61aa57e12da9977ca49a5ea1a1e
-Top:    0193ea3f86e40817c7a07fa255410a2807ce8df3
+Top:    ce7ef4114d141880b0e48f6f365c5c2c0dfd730c
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-12-05 15:58:03 -0800
 
@@ -584,7 +584,7 @@ index 069b7c9..617710e 100644
  
 diff --git a/examples/udpong.c b/examples/udpong.c
 new file mode 100644
-index 0000000..af8deb9
+index 0000000..d7d6962
 --- /dev/null
 +++ b/examples/udpong.c
 @@ -0,0 +1,568 @@
@@ -722,7 +722,7 @@ index 0000000..af8deb9
 +	size_str(sstr, sizeof sstr, size);
 +	snprintf(test_name, sizeof test_name, "%s_lat", sstr);
 +	transfer_size = size;
-+	transfer_count = size_to_count(transfer_size) / 10;
++	transfer_count = 10;//size_to_count(transfer_size) / 10;
 +	echo = 1;
 +}
 +
@@ -733,7 +733,7 @@ index 0000000..af8deb9
 +	size_str(sstr, sizeof sstr, size);
 +	snprintf(test_name, sizeof test_name, "%s_bw", sstr);
 +	transfer_size = size;
-+	transfer_count = size_to_count(transfer_size);
++	transfer_count = 10;//size_to_count(transfer_size);
 +	echo = 0;
 +}
 +
