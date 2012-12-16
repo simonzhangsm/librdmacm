@@ -1,0 +1,46 @@
+Bottom: 8302a577be6c358d3314f45cc04981a1e2758a4a
+Top:    0193ea3f86e40817c7a07fa255410a2807ce8df3
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-12-15 17:41:21 -0800
+
+Refresh of udpong
+
+---
+
+diff --git a/examples/udpong.c b/examples/udpong.c
+index 2e3de3e..af8deb9 100644
+--- a/examples/udpong.c
++++ b/examples/udpong.c
+@@ -375,22 +375,11 @@ static int run_test(void)
+ {
+ 	int ret, i;
+ 
+-printf("send start msg 1\n");
+ 	msg.op = msg_op_start;
+ 	ret = client_send_recv(&msg, CTRL_MSG_SIZE, 1000);
+ 	if (ret != CTRL_MSG_SIZE)
+ 		goto out;
+ 
+-	printf("send start msg 2\n");
+-	ret = client_send_recv(&msg, CTRL_MSG_SIZE, 1000);
+-	if (ret != CTRL_MSG_SIZE)
+-		goto out;
+-	printf("send start msg 3\n");
+-	ret = client_send_recv(&msg, CTRL_MSG_SIZE, 1000);
+-	if (ret != CTRL_MSG_SIZE)
+-		goto out;
+-	printf("starting test\n");
+-
+ 	msg.op = echo ? msg_op_echo : msg_op_data;
+ 	gettimeofday(&start, NULL);
+ 	for (i = 0; i < transfer_count; i++) {
+@@ -440,10 +429,8 @@ static int client_connect(void)
+ 		rs_close(rs);
+ 	}
+ 
+-	printf("send login msg\n");
+ 	msg.op = msg_op_login;
+ 	ret = client_send_recv(&msg, CTRL_MSG_SIZE, 1000);
+-	printf("login %d %s\n", ret, strerror(errno));
+ 	if (ret == CTRL_MSG_SIZE)
+ 		ret = 0;
