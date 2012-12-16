@@ -1,0 +1,77 @@
+Bottom: 085131bec099e61aa57e12da9977ca49a5ea1a1e
+Top:    f8258dbc93f14acdb67621e51c1696fca92c841a
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-12-16 14:11:34 -0800
+
+Refresh of dsocket
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index a5a01ba..4631b1d 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -2010,30 +2010,41 @@ static int ds_get_cq_event(struct rsocket *rs)
+ 	return ret;
+ }
+ 
++static int rs_have_rdata(struct rsocket *rs);
++static int ds_can_send(struct rsocket *rs);
++
+ static int ds_process_cqs(struct rsocket *rs, int nonblock, int (*test)(struct rsocket *rs))
+ {
+ 	int ret = 0;
+ 
++	if (test == rs_have_rdata)
++		printf("%s test rs_have_rdata\n", __func__);
++	else if (test == ds_can_send)
++		printf("%s test ds_can_send\n", __func__);
++	else
++		printf("%s test ?\n", __func__);
++
+ 	fastlock_acquire(&rs->cq_lock);
+ 	do {
+ 		ds_poll_cqs(rs);
+ 		if (test(rs)) {
+-//			printf("%s test succeeded\n", __func__);
++			printf("%s test succeeded\n", __func__);
+ 			ret = 0;
+ 			break;
+ 		} else if (nonblock) {
+ 			ret = ERR(EWOULDBLOCK);
+-//			printf("%s nonblocking \n", __func__);
++			printf("%s nonblocking \n", __func__);
+ 		} else if (!rs->cq_armed) {
+-//			printf("%s req notify \n", __func__);
++			printf("%s req notify \n", __func__);
+ 			ds_req_notify_cqs(rs);
+ 			rs->cq_armed = 1;
+ 		} else {
+ 			fastlock_acquire(&rs->cq_wait_lock);
+ 			fastlock_release(&rs->cq_lock);
+ 
++			printf("%s wait for event \n", __func__);
+ 			ret = ds_get_cq_event(rs);
+-//			printf("%s get event ret %d %s\n", __func__, ret, strerror(errno));
++			printf("%s get event ret %d %s\n", __func__, ret, strerror(errno));
+ 			fastlock_release(&rs->cq_wait_lock);
+ 			fastlock_acquire(&rs->cq_lock);
+ 		}
+@@ -2196,6 +2207,7 @@ static ssize_t ds_recvfrom(struct rsocket *rs, void *buf, size_t len, int flags,
+ 		ds_post_recv(rs, rmsg->qp, rmsg->offset);
+ 		if (++rs->rmsg_head == rs->rq_size + 1)
+ 			rs->rmsg_head = 0;
++		rs->rqe_avail++;
+ 	}
+ 
+ //	printf("%s ret %d errno %s\n", __func__, ret, strerror(errno));
+@@ -2492,7 +2504,9 @@ static ssize_t dsend(struct rsocket *rs, const void *buf, size_t len, int flags)
+ 		return ds_send_udp(rs, buf, len, flags, RS_OP_DATA);
+ 
+ 	if (!ds_can_send(rs)) {
++		printf("can't send\n");
+ 		ret = ds_get_comp(rs, rs_nonblocking(rs, flags), ds_can_send);
++		printf("ds_get_comp %d\n", ret);
+ 		if (ret)
+ 			return ret;
+ 	}
