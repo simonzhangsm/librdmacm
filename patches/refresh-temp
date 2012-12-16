@@ -1,0 +1,125 @@
+Bottom: 118b72bdf8de5351caaf3d746984f9e4401d4253
+Top:    085131bec099e61aa57e12da9977ca49a5ea1a1e
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-12-15 17:37:49 -0800
+
+Refresh of dsocket
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 8fd901f..a5a01ba 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -458,7 +458,8 @@ static int ds_compare_addr(const void *dst1, const void *dst2)
+ 	sa2 = (const struct sockaddr *) dst2;
+ 
+ 	len = (sa1->sa_family == AF_INET6 && sa2->sa_family == AF_INET6) ?
+-	      sizeof(struct sockaddr_in6) : sizeof(struct sockaddr);
++	      sizeof(struct sockaddr_in6) : sizeof(struct sockaddr_in);
++//	printf("%s len %d sizeof sin %d memcmp %d\n", __func__, len, sizeof(struct sockaddr_in), memcmp(dst1,dst2,len));
+ 	return memcmp(dst1, dst2, len);
+ }
+ 
+@@ -1934,7 +1935,7 @@ static void ds_poll_cqs(struct rsocket *rs)
+ 			if (ds_wr_is_recv(wc.wr_id)) {
+ 				if (rs->rqe_avail && wc.status == IBV_WC_SUCCESS &&
+ 				    ds_valid_recv(qp, &wc)) {
+-					printf("%s recv over QP\n", __func__);
++//					printf("%s recv over QP\n", __func__);
+ 					rs->rqe_avail--;
+ 					rmsg = &rs->dmsg[rs->rmsg_tail];
+ 					rmsg->qp = qp;
+@@ -1943,7 +1944,7 @@ static void ds_poll_cqs(struct rsocket *rs)
+ 					if (++rs->rmsg_tail == rs->rq_size + 1)
+ 						rs->rmsg_tail = 0;
+ 				} else {
+-					printf("%s invalid recv\n", __func__);
++//					printf("%s invalid recv\n", __func__);
+ 					ds_post_recv(rs, qp, ds_wr_offset(wc.wr_id));
+ 				}
+ 			} else {
+@@ -2139,6 +2140,7 @@ static void ds_set_src(struct sockaddr *addr, socklen_t *addrlen,
+ {
+ 	union socket_addr sa;
+ 
++	memset(&sa, 0, sizeof sa);
+ 	if (hdr->version == 4) {
+ 		if (*addrlen > sizeof(sa.sin))
+ 			*addrlen = sizeof(sa.sin);
+@@ -2154,7 +2156,6 @@ static void ds_set_src(struct sockaddr *addr, socklen_t *addrlen,
+ 		sa.sin6.sin6_port = hdr->port;
+ 		sa.sin6.sin6_flowinfo = hdr->addr.ipv6.flowinfo;
+ 		memcpy(&sa.sin6.sin6_addr, &hdr->addr.ipv6.addr, 16);
+-		sa.sin6.sin6_scope_id = 0;
+ 	}
+ 	memcpy(addr, &sa, *addrlen);
+ }
+@@ -2486,7 +2487,7 @@ static ssize_t dsend(struct rsocket *rs, const void *buf, size_t len, int flags)
+ 	uint64_t offset;
+ 	int ret = 0;
+ 
+-	printf("%s\n", __func__);
++//	printf("%s\n", __func__);
+ 	if (!rs->conn_dest->ah)
+ 		return ds_send_udp(rs, buf, len, flags, RS_OP_DATA);
+ 
+@@ -2507,8 +2508,9 @@ static ssize_t dsend(struct rsocket *rs, const void *buf, size_t len, int flags)
+ 	sge.lkey = rs->conn_dest->qp->smr->lkey;
+ 	offset = (uint8_t *) msg - rs->sbuf;
+ 
+-	printf("%s - sending over QP\n", __func__);
++//	printf("%s - sending over QP\n", __func__);
+ 	ret = ds_post_send(rs, &sge, ds_send_wr_id(offset, sge.length));
++//	printf("%s - ds_post_send %d %s\n", __func__, ret, strerror(errno));
+ 	return ret ? ret : len;
+ }
+ 
+@@ -2626,13 +2628,28 @@ ssize_t rsendto(int socket, const void *buf, size_t len, int flags,
+ 	}
+ 
+ 	fastlock_acquire(&rs->slock);
++//	printf("%s - checking conn dest %p\n", __func__, rs->conn_dest);
++//	printf("dest addr: af %d", dest_addr->sa_family); PRINTADDR(dest_addr);
++//	if (rs->conn_dest) {
++//		int i;
++//		printf("conn addr: af %d", rs->conn_dest->addr.sa.sa_family); PRINTADDR(&rs->conn_dest->addr);
++//		for (i=0;i<16;i++)
++//			printf("%x", ((uint8_t *)dest_addr)[i]);
++//		printf("\n");
++//		for (i=0;i<16;i++)
++//			printf("%x", ((uint8_t *)&rs->conn_dest->addr)[i]);
++//		printf("\n");
++//	}
+ 	if (!rs->conn_dest || ds_compare_addr(dest_addr, &rs->conn_dest->addr)) {
++//		printf("%s - getting conn dest\n", __func__);
+ 		ret = ds_get_dest(rs, dest_addr, addrlen, &rs->conn_dest);
++//		printf("%s - get conn dest %d %s\n", __func__, ret, strerror(errno));
+ 		if (ret)
+ 			goto out;
+ 	}
+ 
+ 	ret = dsend(rs, buf, len, flags);
++//	printf("%s - dsend %d %s\n", __func__, ret, strerror(errno));
+ out:
+ 	fastlock_release(&rs->slock);
+ 	return ret;
+@@ -3757,15 +3774,15 @@ static void rs_svc_create_ah(struct rsocket *rs, struct ds_dest *dest, uint32_t
+ 		goto out;
+ 
+ 	memset(&attr, 0, sizeof attr);
+-	if (id->route.path_rec->hop_limit) {
++	if (id->route.path_rec->hop_limit > 1) {
+ 		attr.is_global = 1;
+ 		attr.grh.dgid = id->route.path_rec->dgid;
+-		attr.grh.flow_label = id->route.path_rec->flow_label;
++		attr.grh.flow_label = ntohl(id->route.path_rec->flow_label);
+ 		attr.grh.sgid_index = rs_svc_sgid_index(dest, &id->route.path_rec->sgid);
+ 		attr.grh.hop_limit = id->route.path_rec->hop_limit;
+ 		attr.grh.traffic_class = id->route.path_rec->traffic_class;
+ 	}
+-	attr.dlid = id->route.path_rec->dlid;
++	attr.dlid = ntohs(id->route.path_rec->dlid);
+ 	attr.sl = id->route.path_rec->sl;
+ 	attr.src_path_bits = id->route.path_rec->slid & rs_svc_path_bits(dest);
+ 	attr.static_rate = id->route.path_rec->rate;
