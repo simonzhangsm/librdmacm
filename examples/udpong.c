@@ -375,21 +375,10 @@ static int run_test(void)
 {
 	int ret, i;
 
-printf("send start msg 1\n");
 	msg.op = msg_op_start;
 	ret = client_send_recv(&msg, CTRL_MSG_SIZE, 1000);
 	if (ret != CTRL_MSG_SIZE)
 		goto out;
-
-	printf("send start msg 2\n");
-	ret = client_send_recv(&msg, CTRL_MSG_SIZE, 1000);
-	if (ret != CTRL_MSG_SIZE)
-		goto out;
-	printf("send start msg 3\n");
-	ret = client_send_recv(&msg, CTRL_MSG_SIZE, 1000);
-	if (ret != CTRL_MSG_SIZE)
-		goto out;
-	printf("starting test\n");
 
 	msg.op = echo ? msg_op_echo : msg_op_data;
 	gettimeofday(&start, NULL);
@@ -440,10 +429,8 @@ static int client_connect(void)
 		rs_close(rs);
 	}
 
-	printf("send login msg\n");
 	msg.op = msg_op_login;
 	ret = client_send_recv(&msg, CTRL_MSG_SIZE, 1000);
-	printf("login %d %s\n", ret, strerror(errno));
 	if (ret == CTRL_MSG_SIZE)
 		ret = 0;
 
