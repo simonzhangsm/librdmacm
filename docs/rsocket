@@ -219,4 +219,5 @@ the send.
 A service thread is used to process messages received on the UDP socket.  This
 thread updates the rsocket lookup tables with the remote QPN and path record
 data.  The service thread forwards data received on the UDP socket to an
-rsocket QP.
+rsocket QP.  After the remote QPN and path records have been resolved, datagram
+communication between two nodes are done over the UD QP.
