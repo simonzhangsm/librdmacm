@@ -132,7 +132,7 @@ static void init_latency_test(int size)
 	size_str(sstr, sizeof sstr, size);
 	snprintf(test_name, sizeof test_name, "%s_lat", sstr);
 	transfer_size = size;
-	transfer_count = 10;//size_to_count(transfer_size) / 10;
+	transfer_count = size_to_count(transfer_size) / 10;
 	echo = 1;
 }
 
@@ -143,7 +143,7 @@ static void init_bandwidth_test(int size)
 	size_str(sstr, sizeof sstr, size);
 	snprintf(test_name, sizeof test_name, "%s_bw", sstr);
 	transfer_size = size;
-	transfer_count = 10;//size_to_count(transfer_size);
+	transfer_count = size_to_count(transfer_size);
 	echo = 0;
 }
 
