@@ -2833,6 +2833,7 @@ static int rs_poll_arm(struct pollfd *rfds, struct pollfd *fds, nfds_t nfds)
 				else
 					rfds[i].fd = rs->cm_id->channel->fd;
 			} else {
+				printf("%s ready to poll epfd\n", __func__);
 				rfds[i].fd = rs->epfd;
 			}
 			rfds[i].events = POLLIN;
@@ -2841,7 +2842,6 @@ static int rs_poll_arm(struct pollfd *rfds, struct pollfd *fds, nfds_t nfds)
 			rfds[i].events = fds[i].events;
 		}
 		rfds[i].revents = 0;
-
 	}
 	return 0;
 }
@@ -2906,7 +2906,7 @@ int rpoll(struct pollfd *fds, nfds_t nfds, int timeout)
 		if (ret)
 			break;
 
-		ret = poll(rfds, nfds, timeout);
+		ret = poll(rfds, nfds, timeout ? 10000 : 0);
 		if (ret <= 0)
 			break;
 
