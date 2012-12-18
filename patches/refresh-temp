@@ -1,0 +1,30 @@
+Bottom: 67ad459730e99c7afea3017ede5e133ea5c07ba2
+Top:    e2b2c3d392d8eb2326d60d38ea68d53984cc2942
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-12-18 15:58:56 -0800
+
+Refresh of udpong
+
+---
+
+diff --git a/examples/udpong.c b/examples/udpong.c
+index d7d6962..af8deb9 100644
+--- a/examples/udpong.c
++++ b/examples/udpong.c
+@@ -132,7 +132,7 @@ static void init_latency_test(int size)
+ 	size_str(sstr, sizeof sstr, size);
+ 	snprintf(test_name, sizeof test_name, "%s_lat", sstr);
+ 	transfer_size = size;
+-	transfer_count = 10;//size_to_count(transfer_size) / 10;
++	transfer_count = size_to_count(transfer_size) / 10;
+ 	echo = 1;
+ }
+ 
+@@ -143,7 +143,7 @@ static void init_bandwidth_test(int size)
+ 	size_str(sstr, sizeof sstr, size);
+ 	snprintf(test_name, sizeof test_name, "%s_bw", sstr);
+ 	transfer_size = size;
+-	transfer_count = 10;//size_to_count(transfer_size);
++	transfer_count = size_to_count(transfer_size);
+ 	echo = 0;
+ }
