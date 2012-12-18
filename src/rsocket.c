@@ -405,11 +405,6 @@ static int rs_modify_svcs(struct rsocket *rs, int svcs)
 	ret = rdma_seterrno(msg.status);
 	if (svc_cnt)
 		goto unlock;
-//	if (ret && !svc_cnt)
-//		goto join;
-//
-//	pthread_mutex_unlock(&mut);
-//	return ret;
 
 	pthread_join(svc_id, NULL);
 closepair:
@@ -419,29 +414,6 @@ unlock:
 	pthread_mutex_unlock(&mut);
 	return ret;
 }
-
-//static void rs_remove_from_svc(struct rsocket *rs)
-//{
-//	struct rs_svc_msg msg;
-//	int ret;
-//
-//	pthread_mutex_lock(&mut);
-//	if (svc_cnt) {
-//		msg.op = RS_SVC_REMOVE;
-//		msg.status = EINVAL;
-//		msg.rs = rs;
-//		write(svc_sock[0], &msg, sizeof msg);
-//		read(svc_sock[0], &msg, sizeof msg);
-//	}
-//
-//	if (!svc_cnt) {
-//		pthread_join(svc_id, NULL);
-//		close(svc_sock[0]);
-//		close(svc_sock[1]);
-//	}
-//
-//	pthread_mutex_unlock(&mut);
-//}
 
 static int ds_compare_addr(const void *dst1, const void *dst2)
 {
@@ -1982,11 +1954,6 @@ static int ds_get_cq_event(struct rsocket *rs)
 	return ret;
 }
 
-static int rs_have_rdata(struct rsocket *rs);
-static int ds_can_send(struct rsocket *rs);
-static int rs_poll_all(struct rsocket *rs);
-static int ds_all_sends_done(struct rsocket *rs);
-
 static int ds_process_cqs(struct rsocket *rs, int nonblock, int (*test)(struct rsocket *rs))
 {
 	int ret = 0;
@@ -2833,7 +2800,6 @@ static int rs_poll_arm(struct pollfd *rfds, struct pollfd *fds, nfds_t nfds)
 				else
 					rfds[i].fd = rs->cm_id->channel->fd;
 			} else {
-				printf("%s ready to poll epfd\n", __func__);
 				rfds[i].fd = rs->epfd;
 			}
 			rfds[i].events = POLLIN;
