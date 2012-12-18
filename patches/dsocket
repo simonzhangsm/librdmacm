@@ -1,5 +1,5 @@
 Bottom: 1fa07c62817ac4b6cb8d9c5e327ea2cdc75dbd21
-Top:    89a1bd159135ab5aae205202e62cdc91b9ab3b0d
+Top:    8d2f75897b59b2230d826c1aa131f191ac2a54cb
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-11-09 10:26:38 -0800
 
@@ -113,7 +113,7 @@ index 0a0370e..7135a61 100644
  {
  	errno = err;
 diff --git a/src/rsocket.c b/src/rsocket.c
-index a060f66..219aa4a 100644
+index a060f66..42a28d2 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -47,6 +47,8 @@
@@ -1797,8 +1797,7 @@ index a060f66..219aa4a 100644
 -		return ERR(EISCONN);
 +	struct rsocket *rs;
 +	int ret;
- 
--	return rsend(socket, buf, len, flags);
++
 +	rs = idm_at(&idm, socket);
 +	if (rs->type == SOCK_STREAM) {
 +		if (dest_addr || addrlen)
@@ -1819,7 +1818,8 @@ index a060f66..219aa4a 100644
 +		if (ret)
 +			goto out;
 +	}
-+
+ 
+-	return rsend(socket, buf, len, flags);
 +	ret = dsend(rs, buf, len, flags);
 +out:
 +	fastlock_release(&rs->slock);
@@ -1873,7 +1873,7 @@ index a060f66..219aa4a 100644
  	}
  
  	if (rs->state == rs_listening) {
-@@ -1766,11 +2827,14 @@ static int rs_poll_arm(struct pollfd *rfds, struct pollfd *fds, nfds_t nfds)
+@@ -1766,18 +2827,21 @@ static int rs_poll_arm(struct pollfd *rfds, struct pollfd *fds, nfds_t nfds)
  			if (fds[i].revents)
  				return 1;
  
@@ -1888,11 +1888,19 @@ index a060f66..219aa4a 100644
 +				else
 +					rfds[i].fd = rs->cm_id->channel->fd;
 +			} else {
++				printf("%s ready to poll epfd\n", __func__);
 +				rfds[i].fd = rs->epfd;
 +			}
  			rfds[i].events = POLLIN;
  		} else {
  			rfds[i].fd = fds[i].fd;
+ 			rfds[i].events = fds[i].events;
+ 		}
+ 		rfds[i].revents = 0;
+-
+ 	}
+ 	return 0;
+ }
 @@ -1793,7 +2857,10 @@ static int rs_poll_events(struct pollfd *rfds, struct pollfd *fds, nfds_t nfds)
  
  		rs = idm_lookup(&idm, fds[i].fd);
@@ -1905,6 +1913,15 @@ index a060f66..219aa4a 100644
  			fds[i].revents = rs_poll_rs(rs, fds[i].events, 1, rs_poll_all);
  		} else {
  			fds[i].revents = rfds[i].revents;
+@@ -1839,7 +2906,7 @@ int rpoll(struct pollfd *fds, nfds_t nfds, int timeout)
+ 		if (ret)
+ 			break;
+ 
+-		ret = poll(rfds, nfds, timeout);
++		ret = poll(rfds, nfds, timeout ? 10000 : 0);
+ 		if (ret <= 0)
+ 			break;
+ 
 @@ -1949,7 +3016,7 @@ int rshutdown(int socket, int how)
  
  	rs = idm_at(&idm, socket);
