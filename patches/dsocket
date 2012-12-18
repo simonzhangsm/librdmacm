@@ -1,5 +1,5 @@
 Bottom: 1fa07c62817ac4b6cb8d9c5e327ea2cdc75dbd21
-Top:    8d2f75897b59b2230d826c1aa131f191ac2a54cb
+Top:    c4d4709d52e2de492239ded2a4b74e4ebde0db7a
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-11-09 10:26:38 -0800
 
@@ -11,7 +11,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/docs/rsocket b/docs/rsocket
-index 1484f65..a660208 100644
+index 1484f65..4192450 100644
 --- a/docs/rsocket
 +++ b/docs/rsocket
 @@ -1,7 +1,7 @@
@@ -25,7 +25,7 @@ index 1484f65..a660208 100644
  Rsockets is a protocol over RDMA that supports a socket-level API
  for applications.  For details on the current state of the
  implementation, readers should refer to the rsocket man page.  This
-@@ -189,3 +189,34 @@ registered remote data buffer.
+@@ -189,3 +189,35 @@ registered remote data buffer.
  From host A's perspective, the transfer appears as a normal send/write
  operation, with the data stream redirected directly into the receiving
  application's buffer.
@@ -59,7 +59,8 @@ index 1484f65..a660208 100644
 +A service thread is used to process messages received on the UDP socket.  This
 +thread updates the rsocket lookup tables with the remote QPN and path record
 +data.  The service thread forwards data received on the UDP socket to an
-+rsocket QP.
++rsocket QP.  After the remote QPN and path records have been resolved, datagram
++communication between two nodes are done over the UD QP.
 \ No newline at end of file
 diff --git a/src/cma.c b/src/cma.c
 index 388be61..ff9b426 100755
