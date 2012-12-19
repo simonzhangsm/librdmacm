@@ -5,6 +5,36 @@ Date:   2012-11-09 10:26:38 -0800
 
 rsocket: Add datagram support
 
+Add datagram support through the rsocket API.
+
+Datagram support is handled through an entirely different protocol and
+internal implementation than streaming sockets.  Unlike connected rsockets,
+datagram rsockets are not necessarily bound to a network (IP) address.
+A datagram socket may use any number of network (IP) addresses, including
+those which map to different RDMA devices.  As a result, a single datagram
+rsocket must support using multiple RDMA devices and ports, and a datagram
+rsocket references a single UDP socket, plus zero or more UD QPs.
+
+Rsockets uses headers inserted before user data sent over UDP sockets to
+resolve remote UD QP numbers.  When a user first attempts to send a datagram
+to a remote address (IP and UDP port), rsockets will take the following steps:
+
+1. Store the destination address into a lookup table.
+2. Resolve which local network address should be used when sending
+   to the specified destination.
+3. Allocate a UD QP on the RDMA device associated with the local address.
+4. Send the user's datagram to the remote UDP socket.
+
+A header is inserted before the user's datagram.  The header specifies the
+UD QP number associated with the local network address (IP and UDP port) of
+the send.
+
+A service thread is used to process messages received on the UDP socket.  This
+thread updates the rsocket lookup tables with the remote QPN and path record
+data.  The service thread forwards data received on the UDP socket to an
+rsocket QP.  After the remote QPN and path records have been resolved, datagram
+communication between two nodes are done over the UD QP.
+
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
