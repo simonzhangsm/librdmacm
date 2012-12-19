@@ -700,6 +700,11 @@ static int ds_init_bufs(struct ds_qp *qp)
 	return 0;
 }
 
+/*
+ * If a user is waiting on a datagram rsocket through poll or select, then
+ * we need the first completion to generate an event on the related epoll fd
+ * in order to signal the user.  We arm the CQ on creation for this purpose
+ */
 static int rs_create_cq(struct rsocket *rs, struct rdma_cm_id *cm_id)
 {
 	cm_id->recv_cq_channel = ibv_create_comp_channel(cm_id->verbs);
@@ -715,11 +720,8 @@ static int rs_create_cq(struct rsocket *rs, struct rdma_cm_id *cm_id)
 		if (fcntl(cm_id->recv_cq_channel->fd, F_SETFL, O_NONBLOCK))
 			goto err2;
 	}
-	//***
-	//else {
-		ibv_req_notify_cq(cm_id->recv_cq, 0);
-	//}
 
+	ibv_req_notify_cq(cm_id->recv_cq, 0);
 	cm_id->send_cq_channel = cm_id->recv_cq_channel;
 	cm_id->send_cq = cm_id->recv_cq;
 	return 0;
