@@ -76,6 +76,12 @@ union socket_addr {
 	struct sockaddr_in6	sin6;
 };
 
+enum rs_optimization {
+	opt_mixed,
+	opt_latency,
+	opt_bandwidth
+};
+
 int get_rdma_addr(char *src, char *dst, char *port,
 		  struct rdma_addrinfo *hints, struct rdma_addrinfo **rai);
 

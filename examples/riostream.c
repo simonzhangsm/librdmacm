@@ -73,12 +73,6 @@ static struct test_size_param test_size[] = {
 };
 #define TEST_CNT (sizeof test_size / sizeof test_size[0])
 
-enum rs_optimization {
-	opt_mixed,
-	opt_latency,
-	opt_bandwidth
-};
-
 static int rs, lrs;
 static int use_async;
 static int verify;
