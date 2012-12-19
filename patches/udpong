@@ -5,6 +5,10 @@ Date:   2012-12-05 15:58:03 -0800
 
 examples/udpong: Add test program for rsocket datagrams
 
+Add a sample test program to test datagram rsockets.  Move
+common routines used by udpong and other test programs into
+a common source file.
+
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
