@@ -1,0 +1,60 @@
+Bottom: e2b2c3d392d8eb2326d60d38ea68d53984cc2942
+Top:    2ba0685c99aaab7819bb95717eb462a7d2f14053
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2012-12-19 10:16:22 -0800
+
+Refresh of udpong
+
+---
+
+diff --git a/examples/common.h b/examples/common.h
+index eaffb57..7cf16d2 100644
+--- a/examples/common.h
++++ b/examples/common.h
+@@ -76,6 +76,12 @@ union socket_addr {
+ 	struct sockaddr_in6	sin6;
+ };
+ 
++enum rs_optimization {
++	opt_mixed,
++	opt_latency,
++	opt_bandwidth
++};
++
+ int get_rdma_addr(char *src, char *dst, char *port,
+ 		  struct rdma_addrinfo *hints, struct rdma_addrinfo **rai);
+ 
+diff --git a/examples/riostream.c b/examples/riostream.c
+index 718b20d..a1d3671 100644
+--- a/examples/riostream.c
++++ b/examples/riostream.c
+@@ -73,12 +73,6 @@ static struct test_size_param test_size[] = {
+ };
+ #define TEST_CNT (sizeof test_size / sizeof test_size[0])
+ 
+-enum rs_optimization {
+-	opt_mixed,
+-	opt_latency,
+-	opt_bandwidth
+-};
+-
+ static int rs, lrs;
+ static int use_async;
+ static int verify;
+diff --git a/examples/rstream.c b/examples/rstream.c
+index 617710e..a408b9e 100644
+--- a/examples/rstream.c
++++ b/examples/rstream.c
+@@ -73,12 +73,6 @@ static struct test_size_param test_size[] = {
+ };
+ #define TEST_CNT (sizeof test_size / sizeof test_size[0])
+ 
+-enum rs_optimization {
+-	opt_mixed,
+-	opt_latency,
+-	opt_bandwidth
+-};
+-
+ static int rs, lrs;
+ static int use_async;
+ static int verify;
