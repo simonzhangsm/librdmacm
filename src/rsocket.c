@@ -714,9 +714,11 @@ static int rs_create_cq(struct rsocket *rs, struct rdma_cm_id *cm_id)
 	if (rs->fd_flags & O_NONBLOCK) {
 		if (fcntl(cm_id->recv_cq_channel->fd, F_SETFL, O_NONBLOCK))
 			goto err2;
-	} else {
-		ibv_req_notify_cq(cm_id->recv_cq, 0);
 	}
+	//***
+	//else {
+		ibv_req_notify_cq(cm_id->recv_cq, 0);
+	//}
 
 	cm_id->send_cq_channel = cm_id->recv_cq_channel;
 	cm_id->send_cq = cm_id->recv_cq;
@@ -2872,7 +2874,7 @@ int rpoll(struct pollfd *fds, nfds_t nfds, int timeout)
 		if (ret)
 			break;
 
-		ret = poll(rfds, nfds, timeout ? 10000 : 0);
+		ret = poll(rfds, nfds, timeout);
 		if (ret <= 0)
 			break;
 
