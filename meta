@@ -1,9 +1,8 @@
 Version: 1
-Previous: 76126a910a4b559d158b9b448d195546a5d6dc3a
-Head: 7f4f86d0efa766d23f2979cc75d5ec3e185d97bc
+Previous: a079607dbf4355b066f099878de0ee7e414cf294
+Head: e6e93ed4231976eeab707b31e283be0a7acff6db
 Applied:
-  dsocket: 1dfcf482516208ea9c84bcb9f13054553213c82c
-  refresh-temp: 7f4f86d0efa766d23f2979cc75d5ec3e185d97bc
+  dsocket: e6e93ed4231976eeab707b31e283be0a7acff6db
 Unapplied:
   udpong: ecf6d20467feb7aec39bcf77bfc8795186290eb1
   test-udp: f6c78ad2a26f452cf166aff1baa7b76160bd8bf7
