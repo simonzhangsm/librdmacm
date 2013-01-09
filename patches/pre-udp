@@ -1,0 +1,15 @@
+Bottom: cf8998b9f06f893b499b9478f40610fb02b1993a
+Top:    cf8998b9f06f893b499b9478f40610fb02b1993a
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-01-09 14:54:47 -0800
+
+rspreload: Add support for existing UDP apps
+
+Support existing UDP applications through the UDP library.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
