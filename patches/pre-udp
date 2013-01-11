@@ -1,5 +1,5 @@
 Bottom: cf8998b9f06f893b499b9478f40610fb02b1993a
-Top:    8366bf1c1029c0a297a281677772f089895218e9
+Top:    1d1da945e49647331f04f82a45cc353e9541a6ae
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-01-09 14:54:47 -0800
 
@@ -13,7 +13,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index 7be42ca..6882528 100644
+index 7be42ca..9b6c667 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -1,5 +1,5 @@
@@ -23,12 +23,13 @@ index 7be42ca..6882528 100644
   *
   * This software is available to you under a choice of one of two
   * licenses.  You may choose to be licensed under the terms of the GNU
-@@ -452,6 +452,9 @@ void rs_configure(void)
+@@ -452,6 +452,10 @@ void rs_configure(void)
  	if (init)
  		goto out;
  
 +	if (ucma_init())
 +		goto out;
++	ucma_ib_init();
 +
  	if ((f = fopen(RS_CONF_DIR "/polling_time", "r"))) {
  		(void) fscanf(f, "%u", &polling_time);
