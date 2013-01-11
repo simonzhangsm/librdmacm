@@ -8,7 +8,23 @@ rsockets: Add support for existing UDP apps
 Support for existing UDP applications is done via the rspreload
 library.  However, when the preload library is loaded, socket
 calls used by rsockets get intercepted and converted into
-rsocket calls. The preload library was able to handle this
+rsocket calls.
+
+The preload library was able to handle this for TCP rsockets
+by using a per thread variable and checking for recursive calls
+coming from rsockets back into the preload library.  The preload
+library would direct such calls to the real socket calls.
+
+The problem is more complex for UDP rsockets, which can invoke
+socket calls from an internal rsocket thread.  The result is that
+the preload library intercepts socket calls that originate from
+the rsocket library which are not recursive.
+
+Although, this is really a problem with the preload library,
+the simplest solution is for rsockets to fully initialize the
+library when allocating the first rsocket, versus deferring
+initialization until required.  The preload library can then
+detect the recursive calls.
 
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
