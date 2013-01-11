@@ -1,5 +1,5 @@
 Bottom: cf8998b9f06f893b499b9478f40610fb02b1993a
-Top:    26d22c27ce9f6ea665ee146c378b4269df197ab2
+Top:    8366bf1c1029c0a297a281677772f089895218e9
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-01-09 14:54:47 -0800
 
@@ -12,14 +12,24 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 ---
 
-diff --git a/src/preload.c b/src/preload.c
-index fb2149b..04ac6a0 100644
---- a/src/preload.c
-+++ b/src/preload.c
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 7be42ca..6882528 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
 @@ -1,5 +1,5 @@
  /*
-- * Copyright (c) 2011-2012 Intel Corporation.  All rights reserved.
-+ * Copyright (c) 2011-2013 Intel Corporation.  All rights reserved.
+- * Copyright (c) 2008-2012 Intel Corporation.  All rights reserved.
++ * Copyright (c) 2008-2013 Intel Corporation.  All rights reserved.
   *
   * This software is available to you under a choice of one of two
   * licenses.  You may choose to be licensed under the terms of the GNU
+@@ -452,6 +452,9 @@ void rs_configure(void)
+ 	if (init)
+ 		goto out;
+ 
++	if (ucma_init())
++		goto out;
++
+ 	if ((f = fopen(RS_CONF_DIR "/polling_time", "r"))) {
+ 		(void) fscanf(f, "%u", &polling_time);
+ 		fclose(f);
