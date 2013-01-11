@@ -454,6 +454,7 @@ void rs_configure(void)
 
 	if (ucma_init())
 		goto out;
+	ucma_ib_init();
 
 	if ((f = fopen(RS_CONF_DIR "/polling_time", "r"))) {
 		(void) fscanf(f, "%u", &polling_time);
