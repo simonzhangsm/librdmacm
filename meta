@@ -1,10 +1,9 @@
 Version: 1
-Previous: 2c117d724f7f9cbcdb50087dce958438871eafa2
-Head: bf393e70803e2e5f5e07d31c8d66136f6cc8ff33
+Previous: fd8880b9f294520986fe870f2c846b9fb6ad3a27
+Head: 20738f850a5d3d5747b0f367b04853d0dcff58fd
 Applied:
   af-ib-conn: 1eff252c0991d7348a8e069d7f2aa6ee8c7c8615
-  addrtype: d786711388f128e005d7c4a2c5c9bea97b6acb02
-  refresh-temp: bf393e70803e2e5f5e07d31c8d66136f6cc8ff33
+  addrtype: 20738f850a5d3d5747b0f367b04853d0dcff58fd
 Unapplied:
   resv-rs-len: 7b6ff5c4894f54b221d877adcd709795dffb2fe9
   rs-target-sgl: 7a07c80f2242e80c076dcf3ec6bb4c94626b284f

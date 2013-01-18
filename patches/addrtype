@@ -1,5 +1,5 @@
 Bottom: c3c95597a157fcea6aa3cbdacf6b26631247389b
-Top:    c3c95597a157fcea6aa3cbdacf6b26631247389b
+Top:    2e6f4dece8cca4dd8c0321e28afcaa4853b56547
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-29 15:02:54 -0700
 
@@ -14,4 +14,198 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 ---
 
-
+diff --git a/examples/cmatose.c b/examples/cmatose.c
+index 2b6b2b1..ab3e746 100644
+--- a/examples/cmatose.c
++++ b/examples/cmatose.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2005-2006,2011 Intel Corporation.  All rights reserved.
++ * Copyright (c) 2005-2006,2011-2012 Intel Corporation.  All rights reserved.
+  *
+  * This software is available to you under a choice of one of two
+  * licenses.  You may choose to be licensed under the terms of the GNU
+@@ -81,6 +81,7 @@ static uint8_t tos;
+ static uint8_t migrate = 0;
+ static char *dst_addr;
+ static char *src_addr;
++static struct rdma_addrinfo hints;
+ 
+ static int create_message(struct cmatest_node *node)
+ {
+@@ -385,7 +386,7 @@ static int alloc_nodes(void)
+ 		if (dst_addr) {
+ 			ret = rdma_create_id(test.channel,
+ 					     &test.nodes[i].cma_id,
+-					     &test.nodes[i], RDMA_PS_TCP);
++					     &test.nodes[i], hints.ai_port_space);
+ 			if (ret)
+ 				goto err;
+ 		}
+@@ -497,19 +498,15 @@ static int migrate_channel(struct rdma_cm_id *listen_id)
+ static int run_server(void)
+ {
+ 	struct rdma_cm_id *listen_id;
+-	struct rdma_addrinfo hints;
+ 	int i, ret;
+ 
+ 	printf("cmatose: starting server\n");
+-	ret = rdma_create_id(test.channel, &listen_id, &test, RDMA_PS_TCP);
++	ret = rdma_create_id(test.channel, &listen_id, &test, hints.ai_port_space);
+ 	if (ret) {
+ 		perror("cmatose: listen request failed");
+ 		return ret;
+ 	}
+ 
+-	memset(&hints, 0, sizeof hints);
+-	hints.ai_flags = RAI_PASSIVE;
+-	hints.ai_port_space = RDMA_PS_TCP;
+ 	ret = get_rdma_addr(src_addr, dst_addr, port, &hints, &test.rai);
+ 	if (ret) {
+ 		perror("cmatose: getrdmaaddr error");
+@@ -579,13 +576,10 @@ out:
+ 
+ static int run_client(void)
+ {
+-	struct rdma_addrinfo hints;
+ 	int i, ret, ret2;
+ 
+ 	printf("cmatose: starting client\n");
+ 
+-	memset(&hints, 0, sizeof hints);
+-	hints.ai_port_space = RDMA_PS_TCP;
+ 	ret = get_rdma_addr(src_addr, dst_addr, port, &hints, &test.rai);
+ 	if (ret) {
+ 		perror("cmatose: getaddrinfo error");
+@@ -642,7 +636,8 @@ int main(int argc, char **argv)
+ {
+ 	int op, ret;
+ 
+-	while ((op = getopt(argc, argv, "s:b:c:C:S:t:p:m")) != -1) {
++	hints.ai_port_space = RDMA_PS_TCP;
++	while ((op = getopt(argc, argv, "s:b:f:P:c:C:S:t:p:m")) != -1) {
+ 		switch (op) {
+ 		case 's':
+ 			dst_addr = optarg;
+@@ -650,6 +645,23 @@ int main(int argc, char **argv)
+ 		case 'b':
+ 			src_addr = optarg;
+ 			break;
++		case 'f':
++			if (!strncasecmp("ip", optarg, 2)) {
++				hints.ai_flags = RAI_NUMERICHOST;
++			} else if (!strncasecmp("gid", optarg, 3)) {
++				hints.ai_flags = RAI_NUMERICHOST | RAI_FAMILY;
++				hints.ai_family = AF_IB;
++			} else if (strncasecmp("name", optarg, 4)) {
++				fprintf(stderr, "Warning: unknown address format\n");
++			}
++			break;
++		case 'P':
++			if (!strncasecmp("ib", optarg, 2)) {
++				hints.ai_port_space = RDMA_PS_IB;
++			} else if (strncasecmp("tcp", optarg, 3)) {
++				fprintf(stderr, "Warning: unknown port space format\n");
++			}
++			break;
+ 		case 'c':
+ 			connections = atoi(optarg);
+ 			break;
+@@ -673,6 +685,10 @@ int main(int argc, char **argv)
+ 			printf("usage: %s\n", argv[0]);
+ 			printf("\t[-s server_address]\n");
+ 			printf("\t[-b bind_address]\n");
++			printf("\t[-f address_format]\n");
++			printf("\t    name, ip, ipv6, or gid\n");
++			printf("\t[-P port_space]\n");
++			printf("\t    tcp or ib\n");
+ 			printf("\t[-c connections]\n");
+ 			printf("\t[-C message_count]\n");
+ 			printf("\t[-S message_size]\n");
+@@ -694,10 +710,12 @@ int main(int argc, char **argv)
+ 	if (alloc_nodes())
+ 		exit(1);
+ 
+-	if (dst_addr)
++	if (dst_addr) {
+ 		ret = run_client();
+-	else
++	} else {
++		hints.ai_flags |= RAI_PASSIVE;
+ 		ret = run_server();
++	}
+ 
+ 	printf("test complete\n");
+ 	destroy_nodes();
+diff --git a/examples/common.c b/examples/common.c
+index 939f50c..94057cb 100644
+--- a/examples/common.c
++++ b/examples/common.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2005-2006 Intel Corporation.  All rights reserved.
++ * Copyright (c) 2005-2006,2012 Intel Corporation.  All rights reserved.
+  *
+  * This software is available to you under a choice of one of two
+  * licenses.  You may choose to be licensed under the terms of the GNU
+@@ -58,7 +58,7 @@ int get_rdma_addr(char *src, char *dst, char *port,
+ 
+ 	rai_hints = *hints;
+ 	if (src) {
+-		rai_hints.ai_flags = RAI_PASSIVE;
++		rai_hints.ai_flags |= RAI_PASSIVE;
+ 		ret = rdma_getaddrinfo(src, NULL, &rai_hints, &res);
+ 		if (ret)
+ 			return ret;
+diff --git a/examples/common.h b/examples/common.h
+index 7cf16d2..f7511f0 100644
+--- a/examples/common.h
++++ b/examples/common.h
+@@ -39,6 +39,7 @@
+ 
+ #include <rdma/rdma_cma.h>
+ #include <rdma/rsocket.h>
++#include <infiniband/ib.h>
+ 
+ #if __BYTE_ORDER == __BIG_ENDIAN
+ static inline uint64_t cpu_to_be64(uint64_t x) { return x; }
+diff --git a/man/ucmatose.1 b/man/ucmatose.1
+index 73477ea..95dc2d6 100644
+--- a/man/ucmatose.1
++++ b/man/ucmatose.1
+@@ -4,10 +4,12 @@ ucmatose \- RDMA CM connection and simple ping-pong test.
+ .SH SYNOPSIS
+ .sp
+ .nf
+-\fIucmatose\fR [-s server_address] [-b bind_address] [-c connections]
+-		[-C message_count] [-S message_size]
+-\fIucmatose\fR -s server_address [-b bind_address] [-c connections]
+-		[-C message_count] [-S message_size] [-t tos]
++\fIucmatose\fR [-s server_address] [-b bind_address]
++		[-f address_format] [-P port_space]
++		[-c connections] [-C message_count] [-S message_size]
++\fIucmatose\fR -s server_address [-b bind_address]
++		[-f address_format] [-P port_space]
++		[-c connections] [-C message_count] [-S message_size] [-t tos]
+ .fi
+ .SH "DESCRIPTION"
+ Establishes a set of reliable RDMA connections between two nodes using the
+@@ -22,6 +24,18 @@ This option must be specified by the client.
+ \-b bind_address
+ The local network address to bind to.
+ .TP
++\-f address_format
++Specifies the format of the server and bind address.  Be default, the
++format is determined by getaddrinfo() as either being a hostname, an IPv4
++address, or an IPv6 address.  This option may be used to indicate that
++a specific address format has been provided.  Supported address_format
++values are: name, ip, ipv6, and gid.
++.TP
++\-P port_space
++Specifies the port space for the connection.  Be default, the port space
++is the RDMA TCP port space. (Note that the RDMA port space may be separate
++from that used for IP.)  Supported port_space values are: tcp and ib.
++.TP
+ \-c connections
+ The number of connections to establish between the client and server.
+ (default 1)
