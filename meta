@@ -1,7 +1,8 @@
 Version: 1
-Previous: fe5eb1784251624b7335a8178ec841b20354e2dd
+Previous: cc6cb95b5a3dd30abb8c7696dcf8f03e8888c3d3
 Head: fa37ec50248e8bc04a9a6662dcd2183bfc93af54
 Applied:
+  rsockets-add-support-for-exist: fa37ec50248e8bc04a9a6662dcd2183bfc93af54
 Unapplied:
   af-ib-conn: 08fc3e9eddae4f550c43a25eb8fdb73091aef28f
   addrtype: 168846ffb332698287dbca5c970ab9cdf1a91830
