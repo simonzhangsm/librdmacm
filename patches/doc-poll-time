@@ -1,9 +1,12 @@
 Bottom: 87aac2094972e0392ac4742a2c54ba76c2f5747a
-Top:    46d2c09b14ffdd019ea7f40457e85e20b4dc1fa2
+Top:    251ce87c0cff93e0365c1bd08504d77240b0f0c8
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-01-21 15:28:39 -0800
 
-rsockets: Document polling_time configuration file
+rsockets: Update rsocket man page
+
+Update man page to include recently added rsocket options
+and undocumented configuration file.
 
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
@@ -11,10 +14,37 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/man/rsocket.7 b/man/rsocket.7
-index bc5bb10..7b49e46 100644
+index bc5bb10..9cc33f5 100644
 --- a/man/rsocket.7
 +++ b/man/rsocket.7
-@@ -129,6 +129,15 @@ inline_default - default size of inline data
+@@ -1,4 +1,4 @@
+-.TH "RSOCKET" 7 "2010-07-19" "librdmacm" "Librdmacm Programmer's Manual" librdmacm
++.TH "RSOCKET" 7 "2013-01-21" "librdmacm" "Librdmacm Programmer's Manual" librdmacm
+ .SH NAME
+ rsocket \- RDMA socket API
+ .SH SYNOPSIS
+@@ -33,13 +33,16 @@ rsetsockopt, rgetsockopt, rfcntl
+ Functions take the same parameters as that used for sockets.  The
+ follow capabilities and flags are supported at this time:
+ .P
+-PF_INET, PF_INET6, SOCK_STREAM, IPPROTO_TCP, TCP_MAXSEG
++PF_INET, PF_INET6, SOCK_STREAM, SOCK_DGRAM
+ .P
+-MSG_DONTWAIT, MSG_PEEK
++SOL_SOCKET - SO_ERROR, SO_KEEPALIVE (flag supported, but ignored),
++SO_LINGER, SO_OOBINLINE, SO_RCVBUF, SO_REUSEADDR, SO_SNDBUF
++.P 
++IPPROTO_TCP - TCP_NODELAY, TCP_MAXSEG
+ .P
+-SO_REUSEADDR, TCP_NODELAY, SO_ERROR, SO_SNDBUF, SO_RCVBUF
++IPPROTO_IPV6 - IPV6_V6ONLY
+ .P
+-O_NONBLOCK
++MSG_DONTWAIT, MSG_PEEK, O_NONBLOCK
+ .P
+ Rsockets provides extensions beyond normal socket routines that
+ allow for direct placement of data into an application's buffer.
+@@ -129,6 +132,15 @@ inline_default - default size of inline data
  .P
  iomap_size - default size of remote iomapping table
  .P
