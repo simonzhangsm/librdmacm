@@ -129,6 +129,15 @@ inline_default - default size of inline data
 .P
 iomap_size - default size of remote iomapping table
 .P
+polling_time - default number of microseconds to poll for data before waiting
+.P
+All configuration files should contain a single integer value.  Values may
+be set by issuing a command similar to the following example.
+.P
+echo 1000000 > /etc/rdma/rsocket/mem_default
+.P
 If configuration files are not available, rsockets uses internal defaults.
+Applications can override default values programmatically through the
+rsetsockopt routine.
 .SH "SEE ALSO"
 rdma_cm(7)
