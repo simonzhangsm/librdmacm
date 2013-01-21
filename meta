@@ -1,7 +1,8 @@
 Version: 1
-Previous: 7a5b13174f8dd3ff87c5fb57e46ff1b309deec13
-Head: 56e1a7cd4904fbfde59adbdfedd5374e5bde2e87
+Previous: 5218d0c88207293b4a566d76649efda1e3450d7b
+Head: c42fa51bde14e78092852cfa0cf32a85f68d7b0d
 Applied:
+  doc-poll-time: c42fa51bde14e78092852cfa0cf32a85f68d7b0d
 Unapplied:
   af-ib-conn: 703ed114b9a72ec637838cbbb761cf380f849c13
   addrtype: 78ab6dcea90cc315ed43b84c466290adcf3e224d

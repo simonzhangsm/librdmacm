@@ -1,0 +1,13 @@
+Bottom: 87aac2094972e0392ac4742a2c54ba76c2f5747a
+Top:    87aac2094972e0392ac4742a2c54ba76c2f5747a
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-01-21 15:28:39 -0800
+
+rsockets: Document polling_time configuration file
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
