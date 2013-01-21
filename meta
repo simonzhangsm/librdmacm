@@ -1,8 +1,9 @@
 Version: 1
-Previous: 5218d0c88207293b4a566d76649efda1e3450d7b
-Head: c42fa51bde14e78092852cfa0cf32a85f68d7b0d
+Previous: 6c5da029d570f62e43c0c96845677659d5d358d7
+Head: 2773558c7bb9d4403db83e3d2d72f54e4aef47b6
 Applied:
   doc-poll-time: c42fa51bde14e78092852cfa0cf32a85f68d7b0d
+  refresh-temp: 2773558c7bb9d4403db83e3d2d72f54e4aef47b6
 Unapplied:
   af-ib-conn: 703ed114b9a72ec637838cbbb761cf380f849c13
   addrtype: 78ab6dcea90cc315ed43b84c466290adcf3e224d

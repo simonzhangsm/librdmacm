@@ -1,0 +1,29 @@
+Bottom: 87aac2094972e0392ac4742a2c54ba76c2f5747a
+Top:    46d2c09b14ffdd019ea7f40457e85e20b4dc1fa2
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-01-21 15:35:28 -0800
+
+Refresh of doc-poll-time
+
+---
+
+diff --git a/man/rsocket.7 b/man/rsocket.7
+index bc5bb10..7b49e46 100644
+--- a/man/rsocket.7
++++ b/man/rsocket.7
+@@ -129,6 +129,15 @@ inline_default - default size of inline data
+ .P
+ iomap_size - default size of remote iomapping table
+ .P
++polling_time - default number of microseconds to poll for data before waiting
++.P
++All configuration files should contain a single integer value.  Values may
++be set by issuing a command similar to the following example.
++.P
++echo 1000000 > /etc/rdma/rsocket/mem_default
++.P
+ If configuration files are not available, rsockets uses internal defaults.
++Applications can override default values programmatically through the
++rsetsockopt routine.
+ .SH "SEE ALSO"
+ rdma_cm(7)
