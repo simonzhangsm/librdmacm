@@ -1,0 +1,19 @@
+Bottom: 251ce87c0cff93e0365c1bd08504d77240b0f0c8
+Top:    251ce87c0cff93e0365c1bd08504d77240b0f0c8
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-01-28 14:56:25 -0800
+
+librdmacm: Define ucma_ib_init when IB_ACM is disabled
+
+ucma_ib_init is only defined if IB_ACM is enabled, which is
+determined by looking for the infiniband/acm.h header file.
+Define ucma_ib_init when IB_ACM is disabled.
+
+Problem reportedy by Suresh Shelvapille <suri@baymicrosystems.com>
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
