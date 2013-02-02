@@ -1,5 +1,5 @@
 Bottom: b6004c656a03f1cecd7bb483178086496ae46a69
-Top:    2d88ca3b07f24a696f5994464e99cb7e9a12204d
+Top:    0a57e06aa09adc623b225bf5ee3e82b2bab97b2d
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-02-01 17:17:34 -0800
 
@@ -26,7 +26,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/cma.c b/src/cma.c
-index ff9b426..eb59ea8 100755
+index ff9b426..863bbc4 100755
 --- a/src/cma.c
 +++ b/src/cma.c
 @@ -50,6 +50,7 @@
@@ -88,7 +88,7 @@ index ff9b426..eb59ea8 100755
  	VALGRIND_MAKE_MEM_DEFINED(&resp, sizeof resp);
  
  	id_priv->handle = resp.id;
-+	ucma_insert_id(id_priv, resp.id);
++	ucma_insert_id(id_priv);
  	*id = &id_priv->id;
  	return 0;
  
@@ -96,7 +96,7 @@ index ff9b426..eb59ea8 100755
  	evt->event.listen_id = &evt->id_priv->id;
  	evt->event.id = &id_priv->id;
  	id_priv->handle = handle;
-+	ucma_insert_id(id_priv, handle);
++	ucma_insert_id(id_priv);
  	id_priv->initiator_depth = evt->event.param.conn.initiator_depth;
  	id_priv->responder_resources = evt->event.param.conn.responder_resources;
  
