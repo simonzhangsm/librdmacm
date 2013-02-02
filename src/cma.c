@@ -480,7 +480,7 @@ static int rdma_create_id2(struct rdma_event_channel *channel,
 	VALGRIND_MAKE_MEM_DEFINED(&resp, sizeof resp);
 
 	id_priv->handle = resp.id;
-	ucma_insert_id(id_priv, resp.id);
+	ucma_insert_id(id_priv);
 	*id = &id_priv->id;
 	return 0;
 
@@ -1811,7 +1811,7 @@ static int ucma_process_conn_req(struct cma_event *evt,
 	evt->event.listen_id = &evt->id_priv->id;
 	evt->event.id = &id_priv->id;
 	id_priv->handle = handle;
-	ucma_insert_id(id_priv, handle);
+	ucma_insert_id(id_priv);
 	id_priv->initiator_depth = evt->event.param.conn.initiator_depth;
 	id_priv->responder_resources = evt->event.param.conn.responder_resources;
 
