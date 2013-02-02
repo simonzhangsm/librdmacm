@@ -124,7 +124,7 @@ static int cma_dev_cnt;
 static pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
 static int abi_ver = RDMA_USER_CM_MAX_ABI_VERSION;
 int af_ib_support;
-static struct index_map id_idm;
+static struct index_map ucma_idm;
 
 static void ucma_cleanup(void)
 {
@@ -384,19 +384,19 @@ static void ucma_insert_id(struct cma_id_private *id_priv)
 		return;
 
 	pthread_mutex_lock(&mut);
-	idm_set(&idm, id_priv->handle, rs);
+	idm_set(&ucma_idm, id_priv->handle, rs);
 	pthread_mutex_unlock(&mut);
 }
 
 static void ucma_remove_id(struct cma_id_private *id_priv)
 {
 	if (id_priv->handle <= IDX_MAX_INDEX)
-		idm_clear(&idm, id_priv->handle);
+		idm_clear(&ucma_idm, id_priv->handle);
 }
 
 static struct cma_id_private *ucma_lookup_id(int handle)
 {
-	return idm_lookup(&idm, handle);
+	return idm_lookup(&ucma_idm, handle);
 }
 
 static void ucma_free_id(struct cma_id_private *id_priv)
@@ -1954,7 +1954,7 @@ retry:
 	if (resp.uid) {
 		evt->id_priv = (void *) (uintptr_t) resp.uid;
 	} else {
-		evt->id_priv = ucma_lookup_id(&idm, resp.id);
+		evt->id_priv = ucma_lookup_id(resp.id);
 		if (!evt->id_priv) {
 			fprintf(stderr, PFX "Warning: discarding unmatched "
 				"event - rdma_destroy_id may hang.\n");
