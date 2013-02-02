@@ -1,5 +1,5 @@
 Bottom: b6004c656a03f1cecd7bb483178086496ae46a69
-Top:    6ff4c3fef859b775522c27db8de4a8fcfcf792c3
+Top:    1ab9fd04718504b5cc665dea14e9fa9df0298d6c
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-02-01 17:17:34 -0800
 
@@ -26,7 +26,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/cma.c b/src/cma.c
-index ff9b426..547781e 100755
+index ff9b426..06bea44 100755
 --- a/src/cma.c
 +++ b/src/cma.c
 @@ -50,6 +50,7 @@
@@ -100,7 +100,7 @@ index ff9b426..547781e 100755
  	id_priv->initiator_depth = evt->event.param.conn.initiator_depth;
  	id_priv->responder_resources = evt->event.param.conn.responder_resources;
  
-@@ -1916,7 +1943,28 @@ retry:
+@@ -1916,7 +1943,29 @@ retry:
  	VALGRIND_MAKE_MEM_DEFINED(&resp, sizeof resp);
  
  	evt->event.event = resp.event;
@@ -116,6 +116,7 @@ index ff9b426..547781e 100755
 +	if (resp.uid) {
 +		evt->id_priv = (void *) (uintptr_t) resp.uid;
 +	} else {
++printf("no uid event %s\n", rdma_event_str(resp.event));
 +		evt->id_priv = ucma_lookup_id(resp.id);
 +		if (!evt->id_priv) {
 +			fprintf(stderr, PFX "Warning: discarding unmatched "
