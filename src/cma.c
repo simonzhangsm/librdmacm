@@ -384,7 +384,7 @@ static void ucma_insert_id(struct cma_id_private *id_priv)
 		return;
 
 	pthread_mutex_lock(&mut);
-	idm_set(&ucma_idm, id_priv->handle, rs);
+	idm_set(&ucma_idm, id_priv->handle, id_priv);
 	pthread_mutex_unlock(&mut);
 }
 
