@@ -50,6 +50,7 @@
 #include <netdb.h>
 
 #include "cma.h"
+#include "indexer.h"
 #include <infiniband/driver.h>
 #include <infiniband/marshall.h>
 #include <rdma/rdma_cma.h>
@@ -123,6 +124,8 @@ static int cma_dev_cnt;
 static pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
 static int abi_ver = RDMA_USER_CM_MAX_ABI_VERSION;
 int af_ib_support;
+static struct index_map ucma_idm;
+static fastlock_t idm_lock;
 
 static void ucma_cleanup(void)
 {
@@ -214,6 +217,7 @@ int ucma_init(void)
 		return 0;
 	}
 
+	fastlock_init(&idm_lock);
 	ret = check_abi_version();
 	if (ret)
 		goto err1;
@@ -376,8 +380,27 @@ static void ucma_put_device(struct cma_device *cma_dev)
 	pthread_mutex_unlock(&mut);
 }
 
+static void ucma_insert_id(struct cma_id_private *id_priv)
+{
+	fastlock_acquire(&idm_lock);
+	idm_set(&ucma_idm, id_priv->handle, id_priv);
+	fastlock_release(&idm_lock);
+}
+
+static void ucma_remove_id(struct cma_id_private *id_priv)
+{
+	if (id_priv->handle <= IDX_MAX_INDEX)
+		idm_clear(&ucma_idm, id_priv->handle);
+}
+
+static struct cma_id_private *ucma_lookup_id(int handle)
+{
+	return idm_lookup(&ucma_idm, handle);
+}
+
 static void ucma_free_id(struct cma_id_private *id_priv)
 {
+	ucma_remove_id(id_priv);
 	if (id_priv->cma_dev)
 		ucma_put_device(id_priv->cma_dev);
 	pthread_cond_destroy(&id_priv->cond);
@@ -406,6 +429,7 @@ static struct cma_id_private *ucma_alloc_id(struct rdma_event_channel *channel,
 	id_priv->id.context = context;
 	id_priv->id.ps = ps;
 	id_priv->id.qp_type = qp_type;
+	id_priv->handle = 0xFFFFFFFF;
 
 	if (!channel) {
 		id_priv->id.channel = rdma_create_event_channel();
@@ -455,6 +479,7 @@ static int rdma_create_id2(struct rdma_event_channel *channel,
 	VALGRIND_MAKE_MEM_DEFINED(&resp, sizeof resp);
 
 	id_priv->handle = resp.id;
+	ucma_insert_id(id_priv);
 	*id = &id_priv->id;
 	return 0;
 
@@ -1785,6 +1810,7 @@ static int ucma_process_conn_req(struct cma_event *evt,
 	evt->event.listen_id = &evt->id_priv->id;
 	evt->event.id = &id_priv->id;
 	id_priv->handle = handle;
+	ucma_insert_id(id_priv);
 	id_priv->initiator_depth = evt->event.param.conn.initiator_depth;
 	id_priv->responder_resources = evt->event.param.conn.responder_resources;
 
@@ -1916,7 +1942,28 @@ retry:
 	VALGRIND_MAKE_MEM_DEFINED(&resp, sizeof resp);
 
 	evt->event.event = resp.event;
-	evt->id_priv = (void *) (uintptr_t) resp.uid;
+	/*
+	 * We should have a non-zero uid, except for connection requests.
+	 * But a bug in older kernels can report a uid 0.  Work-around this
+	 * issue by looking up the cma_id based on the kernel's id when the
+	 * uid is 0 and we're processing a connection established event.
+	 * In all other cases, if the uid is 0, we discard the event, like
+	 * the kernel should have done.
+	 */
+	if (resp.uid) {
+		evt->id_priv = (void *) (uintptr_t) resp.uid;
+	} else {
+		evt->id_priv = ucma_lookup_id(resp.id);
+		if (!evt->id_priv) {
+			fprintf(stderr, PFX "Warning: discarding unmatched "
+				"event - rdma_destroy_id may hang.\n");
+			goto retry;
+		}
+		if (resp.event != RDMA_CM_EVENT_ESTABLISHED) {
+			ucma_complete_event(evt->id_priv);
+			goto retry;
+		}
+	}
 	evt->event.id = &evt->id_priv->id;
 	evt->event.status = resp.status;
 
