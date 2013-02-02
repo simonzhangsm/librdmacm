@@ -1,0 +1,28 @@
+Bottom: b6004c656a03f1cecd7bb483178086496ae46a69
+Top:    b6004c656a03f1cecd7bb483178086496ae46a69
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-02-01 17:17:34 -0800
+
+librdmacm: Work-around kernel bug returning uid = 0
+
+Older kernels have a bug where it can report an event with the
+uid set to 0.  The librdmacm crashes when casting the uid to
+an rdma_cm_id and dereferencing the NULL pointer.
+
+There are a limited number of events where this can occur and
+in most cases it's safe to simply discard the event.  (This is
+what the kernel does anyway.)  However, it's possible for us
+to process an RDMA_CM_EVENT_ESTABLISHED event with the uid
+set to 0.  (See kernel commit 418edaaba96e58112b15c82b4907084e2a9caf42.)
+
+Although it's rare for this to occur, it does in fact happen
+in practice.  To work-around the kernel bug, when the uid of an
+established event is set to 0, we first try to locate the correct
+user space id based on related data before discarding the event.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
