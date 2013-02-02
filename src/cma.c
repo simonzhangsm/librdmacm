@@ -1954,6 +1954,7 @@ retry:
 	if (resp.uid) {
 		evt->id_priv = (void *) (uintptr_t) resp.uid;
 	} else {
+printf("no uid event %s\n", rdma_event_str(resp.event));
 		evt->id_priv = ucma_lookup_id(resp.id);
 		if (!evt->id_priv) {
 			fprintf(stderr, PFX "Warning: discarding unmatched "
