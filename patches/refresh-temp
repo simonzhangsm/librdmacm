@@ -1,0 +1,52 @@
+Bottom: 1ab9fd04718504b5cc665dea14e9fa9df0298d6c
+Top:    3a5e1771417c34940355c5d56136e2c805bc2e4f
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-02-01 23:08:28 -0800
+
+Refresh of kern-bug
+
+---
+
+diff --git a/src/cma.c b/src/cma.c
+index 06bea44..7a9f6dc 100755
+--- a/src/cma.c
++++ b/src/cma.c
+@@ -125,6 +125,7 @@ static pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
+ static int abi_ver = RDMA_USER_CM_MAX_ABI_VERSION;
+ int af_ib_support;
+ static struct index_map ucma_idm;
++static fastlock_t idm_lock;
+ 
+ static void ucma_cleanup(void)
+ {
+@@ -216,6 +217,7 @@ int ucma_init(void)
+ 		return 0;
+ 	}
+ 
++	fastlock_init(&idm_lock);
+ 	ret = check_abi_version();
+ 	if (ret)
+ 		goto err1;
+@@ -380,12 +382,9 @@ static void ucma_put_device(struct cma_device *cma_dev)
+ 
+ static void ucma_insert_id(struct cma_id_private *id_priv)
+ {
+-	if (id_priv->handle > IDX_MAX_INDEX)
+-		return;
+-
+-	pthread_mutex_lock(&mut);
++	fastlock_acquire(&idm_lock);
+ 	idm_set(&ucma_idm, id_priv->handle, id_priv);
+-	pthread_mutex_unlock(&mut);
++	fastlock_release(&idm_lock);
+ }
+ 
+ static void ucma_remove_id(struct cma_id_private *id_priv)
+@@ -1954,7 +1953,6 @@ retry:
+ 	if (resp.uid) {
+ 		evt->id_priv = (void *) (uintptr_t) resp.uid;
+ 	} else {
+-printf("no uid event %s\n", rdma_event_str(resp.event));
+ 		evt->id_priv = ucma_lookup_id(resp.id);
+ 		if (!evt->id_priv) {
+ 			fprintf(stderr, PFX "Warning: discarding unmatched "
