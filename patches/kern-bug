@@ -1,5 +1,5 @@
 Bottom: b6004c656a03f1cecd7bb483178086496ae46a69
-Top:    cfa0e77e75c5916658adb6db2edde6e75c0adac2
+Top:    6ff4c3fef859b775522c27db8de4a8fcfcf792c3
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-02-01 17:17:34 -0800
 
@@ -26,7 +26,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/cma.c b/src/cma.c
-index ff9b426..0220f1f 100755
+index ff9b426..547781e 100755
 --- a/src/cma.c
 +++ b/src/cma.c
 @@ -50,6 +50,7 @@
@@ -55,7 +55,7 @@ index ff9b426..0220f1f 100755
 +		return;
 +
 +	pthread_mutex_lock(&mut);
-+	idm_set(&ucma_idm, id_priv->handle, rs);
++	idm_set(&ucma_idm, id_priv->handle, id_priv);
 +	pthread_mutex_unlock(&mut);
 +}
 +
