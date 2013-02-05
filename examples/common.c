@@ -123,10 +123,8 @@ int size_to_count(int size)
 		return 1000;
 	else if (size >= 10000)
 		return 10000;
-	else if (size >= 1000)
+	else (size >= 1000)
 		return 100000;
-	else
-		return 1000000;
 }
 
 void format_buf(void *buf, int size)
