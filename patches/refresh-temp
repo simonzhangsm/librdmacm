@@ -1,0 +1,21 @@
+Bottom: b0e12e6e959fe7f8602534721beb9071fdac33aa
+Top:    e2c0014c734beb600d34d764ea62c999ea687c38
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-02-04 16:55:30 -0800
+
+Refresh of rstream-cnt
+
+---
+
+diff --git a/examples/common.c b/examples/common.c
+index 8be27d6..294dba1 100644
+--- a/examples/common.c
++++ b/examples/common.c
+@@ -123,7 +123,7 @@ int size_to_count(int size)
+ 		return 1000;
+ 	else if (size >= 10000)
+ 		return 10000;
+-	else (size >= 1000)
++	else
+ 		return 100000;
+ }
