@@ -1,5 +1,5 @@
 Bottom: b6004c656a03f1cecd7bb483178086496ae46a69
-Top:    1f293108ce283eca535112af13051a53881e8db9
+Top:    63d9ee86b7812695228cc4f4018bf998f3eaaa39
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-02-01 17:17:34 -0800
 
@@ -26,18 +26,21 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/cma.c b/src/cma.c
-index ff9b426..918592a 100755
+index ff9b426..2fb9913 100755
 --- a/src/cma.c
 +++ b/src/cma.c
-@@ -50,6 +50,7 @@
+@@ -48,8 +48,10 @@
+ #include <byteswap.h>
+ #include <stddef.h>
  #include <netdb.h>
++#include <syslog.h>
  
  #include "cma.h"
 +#include "indexer.h"
  #include <infiniband/driver.h>
  #include <infiniband/marshall.h>
  #include <rdma/rdma_cma.h>
-@@ -123,6 +124,8 @@ static int cma_dev_cnt;
+@@ -123,6 +125,8 @@ static int cma_dev_cnt;
  static pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
  static int abi_ver = RDMA_USER_CM_MAX_ABI_VERSION;
  int af_ib_support;
@@ -46,7 +49,7 @@ index ff9b426..918592a 100755
  
  static void ucma_cleanup(void)
  {
-@@ -135,6 +138,7 @@ static void ucma_cleanup(void)
+@@ -135,6 +139,7 @@ static void ucma_cleanup(void)
  			ibv_close_device(cma_dev_array[cma_dev_cnt].verbs);
  		}
  
@@ -54,7 +57,7 @@ index ff9b426..918592a 100755
  		free(cma_dev_array);
  		cma_dev_cnt = 0;
  	}
-@@ -214,6 +218,7 @@ int ucma_init(void)
+@@ -214,6 +219,7 @@ int ucma_init(void)
  		return 0;
  	}
  
@@ -62,7 +65,7 @@ index ff9b426..918592a 100755
  	ret = check_abi_version();
  	if (ret)
  		goto err1;
-@@ -275,6 +280,7 @@ err3:
+@@ -275,6 +281,7 @@ err3:
  err2:
  	ibv_free_device_list(dev_list);
  err1:
@@ -70,7 +73,7 @@ index ff9b426..918592a 100755
  	pthread_mutex_unlock(&mut);
  	return ret;
  }
-@@ -376,8 +382,27 @@ static void ucma_put_device(struct cma_device *cma_dev)
+@@ -376,8 +383,27 @@ static void ucma_put_device(struct cma_device *cma_dev)
  	pthread_mutex_unlock(&mut);
  }
  
@@ -98,7 +101,7 @@ index ff9b426..918592a 100755
  	if (id_priv->cma_dev)
  		ucma_put_device(id_priv->cma_dev);
  	pthread_cond_destroy(&id_priv->cond);
-@@ -406,6 +431,7 @@ static struct cma_id_private *ucma_alloc_id(struct rdma_event_channel *channel,
+@@ -406,6 +432,7 @@ static struct cma_id_private *ucma_alloc_id(struct rdma_event_channel *channel,
  	id_priv->id.context = context;
  	id_priv->id.ps = ps;
  	id_priv->id.qp_type = qp_type;
@@ -106,7 +109,7 @@ index ff9b426..918592a 100755
  
  	if (!channel) {
  		id_priv->id.channel = rdma_create_event_channel();
-@@ -455,6 +481,7 @@ static int rdma_create_id2(struct rdma_event_channel *channel,
+@@ -455,6 +482,7 @@ static int rdma_create_id2(struct rdma_event_channel *channel,
  	VALGRIND_MAKE_MEM_DEFINED(&resp, sizeof resp);
  
  	id_priv->handle = resp.id;
@@ -114,7 +117,7 @@ index ff9b426..918592a 100755
  	*id = &id_priv->id;
  	return 0;
  
-@@ -1785,6 +1812,7 @@ static int ucma_process_conn_req(struct cma_event *evt,
+@@ -1785,6 +1813,7 @@ static int ucma_process_conn_req(struct cma_event *evt,
  	evt->event.listen_id = &evt->id_priv->id;
  	evt->event.id = &id_priv->id;
  	id_priv->handle = handle;
@@ -122,7 +125,7 @@ index ff9b426..918592a 100755
  	id_priv->initiator_depth = evt->event.param.conn.initiator_depth;
  	id_priv->responder_resources = evt->event.param.conn.responder_resources;
  
-@@ -1916,7 +1944,28 @@ retry:
+@@ -1916,7 +1945,28 @@ retry:
  	VALGRIND_MAKE_MEM_DEFINED(&resp, sizeof resp);
  
  	evt->event.event = resp.event;

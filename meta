@@ -1,9 +1,8 @@
 Version: 1
-Previous: c07515fb27ac76eee559abf93a24f88c22da2177
-Head: f92378c81bfbd9977a5e505488ee4483542a4b1f
+Previous: 08a23d4adb2008c76c323b503aca2e2e652f7c71
+Head: 69fadb50636d98de57c9069b83adf6d2c5c77fc6
 Applied:
-  kern-bug: e9d902d6e0b1da78a2bea53e7e3b537630034ad5
-  refresh-temp: f92378c81bfbd9977a5e505488ee4483542a4b1f
+  kern-bug: 69fadb50636d98de57c9069b83adf6d2c5c77fc6
 Unapplied:
   af-ib-conn: cf7b9e73d471477d4c7dff2592e5b0d3a7dea8ae
   addrtype: 23a84fed89ba3f6b0eb63e5f8b37c0df504d0d3e
