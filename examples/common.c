@@ -123,7 +123,7 @@ int size_to_count(int size)
 		return 1000;
 	else if (size >= 10000)
 		return 10000;
-	else (size >= 1000)
+	else
 		return 100000;
 }
 
