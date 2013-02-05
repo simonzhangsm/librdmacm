@@ -1,5 +1,5 @@
 Bottom: 63d9ee86b7812695228cc4f4018bf998f3eaaa39
-Top:    e2c0014c734beb600d34d764ea62c999ea687c38
+Top:    a53de8f238f7910f979bb53f53f025f799110f93
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-02-04 16:52:18 -0800
 
@@ -17,12 +17,21 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/common.c b/examples/common.c
-index 939f50c..294dba1 100644
+index 939f50c..28c0fb6 100644
 --- a/examples/common.c
 +++ b/examples/common.c
-@@ -123,10 +123,8 @@ int size_to_count(int size)
+@@ -117,16 +117,14 @@ void cnt_str(char *str, size_t ssize, long long cnt)
+ 
+ int size_to_count(int size)
+ {
+-	if (size >= 1000000)
++	if (size >= (1 << 20))
+ 		return 100;
+-	else if (size >= 100000)
++	else if (size >= (1 << 16))
  		return 1000;
- 	else if (size >= 10000)
+-	else if (size >= 10000)
++	else if (size >= (1 << 11))
  		return 10000;
 -	else if (size >= 1000)
 -		return 100000;
