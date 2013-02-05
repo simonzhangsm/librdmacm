@@ -1,5 +1,5 @@
 Bottom: 63d9ee86b7812695228cc4f4018bf998f3eaaa39
-Top:    63d9ee86b7812695228cc4f4018bf998f3eaaa39
+Top:    b0e12e6e959fe7f8602534721beb9071fdac33aa
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-02-04 16:52:18 -0800
 
@@ -16,4 +16,19 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 ---
 
-
+diff --git a/examples/common.c b/examples/common.c
+index 939f50c..8be27d6 100644
+--- a/examples/common.c
++++ b/examples/common.c
+@@ -123,10 +123,8 @@ int size_to_count(int size)
+ 		return 1000;
+ 	else if (size >= 10000)
+ 		return 10000;
+-	else if (size >= 1000)
++	else (size >= 1000)
+ 		return 100000;
+-	else
+-		return 1000000;
+ }
+ 
+ void format_buf(void *buf, int size)
