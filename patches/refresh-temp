@@ -1,0 +1,38 @@
+Bottom: 3a5e1771417c34940355c5d56136e2c805bc2e4f
+Top:    1f293108ce283eca535112af13051a53881e8db9
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-02-04 16:49:26 -0800
+
+Refresh of kern-bug
+
+---
+
+diff --git a/src/cma.c b/src/cma.c
+index 7a9f6dc..918592a 100755
+--- a/src/cma.c
++++ b/src/cma.c
+@@ -138,6 +138,7 @@ static void ucma_cleanup(void)
+ 			ibv_close_device(cma_dev_array[cma_dev_cnt].verbs);
+ 		}
+ 
++		fastlock_destroy(&idm_lock);
+ 		free(cma_dev_array);
+ 		cma_dev_cnt = 0;
+ 	}
+@@ -279,6 +280,7 @@ err3:
+ err2:
+ 	ibv_free_device_list(dev_list);
+ err1:
++	fastlock_destroy(&idm_lock);
+ 	pthread_mutex_unlock(&mut);
+ 	return ret;
+ }
+@@ -1955,7 +1957,7 @@ retry:
+ 	} else {
+ 		evt->id_priv = ucma_lookup_id(resp.id);
+ 		if (!evt->id_priv) {
+-			fprintf(stderr, PFX "Warning: discarding unmatched "
++			syslog(LOG_WARNING, PFX "Warning: discarding unmatched "
+ 				"event - rdma_destroy_id may hang.\n");
+ 			goto retry;
+ 		}
