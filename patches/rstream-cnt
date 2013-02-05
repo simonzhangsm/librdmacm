@@ -1,0 +1,19 @@
+Bottom: 63d9ee86b7812695228cc4f4018bf998f3eaaa39
+Top:    63d9ee86b7812695228cc4f4018bf998f3eaaa39
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-02-04 16:52:18 -0800
+
+librdmacm/rstream: Reduce default transfer count
+
+1 million ping-pong transfers takes over 3 seconds to
+complete, and I'm impatient.  Reduce the default number of
+transfers for small messsages to speed up running
+performance tests, especially when running over slower
+connections, like TCP sockets or over a WAN.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
