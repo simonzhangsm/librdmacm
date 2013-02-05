@@ -1,8 +1,7 @@
 Version: 1
-Previous: 2160b0204c3671966a5a3574c6f858a3afe9fd99
+Previous: 4553dd0421de4ccd7a5a85bb9a44da317136bab6
 Head: 69fadb50636d98de57c9069b83adf6d2c5c77fc6
 Applied:
-  kern-bug: 69fadb50636d98de57c9069b83adf6d2c5c77fc6
 Unapplied:
   rstream-cnt: be2a2a44663282cda1a60e05c3b85275c732acc6
   af-ib-conn: cf7b9e73d471477d4c7dff2592e5b0d3a7dea8ae
