@@ -48,6 +48,7 @@
 #include <byteswap.h>
 #include <stddef.h>
 #include <netdb.h>
+#include <syslog.h>
 
 #include "cma.h"
 #include "indexer.h"
