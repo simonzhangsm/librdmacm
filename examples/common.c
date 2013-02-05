@@ -121,7 +121,7 @@ int size_to_count(int size)
 		return 100;
 	else if (size >= (1 << 16))
 		return 1000;
-	else if (size >= (1 << 11))
+	else if (size >= (1 << 10))
 		return 10000;
 	else
 		return 100000;
