@@ -3,7 +3,7 @@ Top:    2737e70c64c9617bb741fff20192947019c4f7d9
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-02-19 20:03:58 -0800
 
-rsocket: Fix resetting O_NONBLOCK after calling shutdown
+librdmacm/rsocket: Fix resetting O_NONBLOCK after calling shutdown
 
 Shutdown switches an rsocket from nonblocking to blocking to
 ensure that all data has been sent.  After completing all
