@@ -1,0 +1,29 @@
+Bottom: 2737e70c64c9617bb741fff20192947019c4f7d9
+Top:    dbca0743a67790bab7d4bf125af3e5e1f56afacb
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-03-05 13:39:42 -0800
+
+Refresh of xfer-cnt
+
+---
+
+diff --git a/examples/common.c b/examples/common.c
+index 4eb5bbe..54339d5 100644
+--- a/examples/common.c
++++ b/examples/common.c
+@@ -118,13 +118,13 @@ void cnt_str(char *str, size_t ssize, long long cnt)
+ int size_to_count(int size)
+ {
+ 	if (size >= (1 << 20))
+-		return 100;
++		return 250;
+ 	else if (size >= (1 << 16))
+ 		return 1000;
+ 	else if (size >= (1 << 10))
+ 		return 10000;
+ 	else
+-		return 100000;
++		return 25000;
+ }
+ 
+ void format_buf(void *buf, int size)
