@@ -1,9 +1,8 @@
 Version: 1
-Previous: e91fcec6ad9434a49ecbf303423d7564bf5cf4db
-Head: 4a95082051018df2651eb390c7d85c5fb308951d
+Previous: 062ef9c7c8cc3c24d3b3e4accd9ba8a280b073bf
+Head: 7fa63896fff04f973f4b9059b5b0b4ae760715b1
 Applied:
-  xfer-cnt: ec95b68d2f42848875e552c256a61a635ecd62b9
-  refresh-temp: 4a95082051018df2651eb390c7d85c5fb308951d
+  xfer-cnt: 7fa63896fff04f973f4b9059b5b0b4ae760715b1
 Unapplied:
   af-ib-conn: cf7b9e73d471477d4c7dff2592e5b0d3a7dea8ae
   addrtype: 23a84fed89ba3f6b0eb63e5f8b37c0df504d0d3e
