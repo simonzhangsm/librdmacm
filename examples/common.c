@@ -118,7 +118,7 @@ void cnt_str(char *str, size_t ssize, long long cnt)
 int size_to_count(int size)
 {
 	if (size >= (1 << 20))
-		return 250;
+		return 300;
 	else if (size >= (1 << 16))
 		return 1000;
 	else if (size >= (1 << 10))
