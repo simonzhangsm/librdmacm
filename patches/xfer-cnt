@@ -1,0 +1,18 @@
+Bottom: 2737e70c64c9617bb741fff20192947019c4f7d9
+Top:    2737e70c64c9617bb741fff20192947019c4f7d9
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-03-05 13:39:00 -0800
+
+librdmacm/rstream: Adjust transfer counts
+
+A customer has reported that 100 transfers for large sizes
+is insufficient to achieve the top bandwidth over a high
+latency link.  Contrary, 100,000 transfers is too high for
+small latency ping-pong over a slow connection.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
