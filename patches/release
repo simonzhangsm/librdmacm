@@ -1,5 +1,5 @@
 Bottom: 2737e70c64c9617bb741fff20192947019c4f7d9
-Top:    cd61bfbc2c99b1f91308eee9fbeff14699c5ada4
+Top:    03e0d857be2abeca4aaf50a1c372dc983b1332dc
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-03-05 17:18:11 -0800
 
@@ -9,7 +9,7 @@ librdmacm: Release 1.0.17
 ---
 
 diff --git a/configure.in b/configure.in
-index d4434c2..b72d0aa 100644
+index d4434c2..35d79dd 100644
 --- a/configure.in
 +++ b/configure.in
 @@ -1,12 +1,12 @@
@@ -21,8 +21,9 @@ index d4434c2..b72d0aa 100644
  AC_CONFIG_SRCDIR([src/cma.c])
  AC_CONFIG_AUX_DIR(config)
  AC_CONFIG_MACRO_DIR(config)
- AM_CONFIG_HEADER(config.h)
+-AM_CONFIG_HEADER(config.h)
 -AM_INIT_AUTOMAKE(librdmacm, 1.0.16)
++AC_CONFIG_HEADERS(config.h)
 +AM_INIT_AUTOMAKE(librdmacm, 1.0.17)
  m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
  

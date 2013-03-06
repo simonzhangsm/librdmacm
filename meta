@@ -1,9 +1,8 @@
 Version: 1
-Previous: 8c6e948e7570e7fc2e8f9c8bbf9f458b0e5c8cab
-Head: 697ca0683ed24a50e199c5cd31b79f3c665b7ce3
+Previous: 1f4eb8278c0a443769a47f43560964b8e22b9397
+Head: e57928b701ded6c5417b5ac0c153a239bf947612
 Applied:
-  release: 58acfe93c5bc122672e67d168dd031562f3e0fd8
-  refresh-temp: 697ca0683ed24a50e199c5cd31b79f3c665b7ce3
+  release: e57928b701ded6c5417b5ac0c153a239bf947612
 Unapplied:
   xfer-cnt: 52a03dfbd23c1f257303d05c489041eb75ce76eb
   af-ib-conn: cf7b9e73d471477d4c7dff2592e5b0d3a7dea8ae
