@@ -1,5 +1,5 @@
 Bottom: 2737e70c64c9617bb741fff20192947019c4f7d9
-Top:    d7fffdc40073d95d98b9d5c01c5c865b7caa0c69
+Top:    cd61bfbc2c99b1f91308eee9fbeff14699c5ada4
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-03-05 17:18:11 -0800
 
@@ -27,3 +27,15 @@ index d4434c2..b72d0aa 100644
  m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
  
  AM_PROG_LIBTOOL
+diff --git a/librdmacm.spec.in b/librdmacm.spec.in
+index 575ce84..7ad6c0c 100644
+--- a/librdmacm.spec.in
++++ b/librdmacm.spec.in
+@@ -1,7 +1,7 @@
+ %define ver @VERSION@
+ 
+ Name: librdmacm
+-Version: 1.0.16
++Version: 1.0.17
+ Release: 1%{?dist}
+ Summary: Userspace RDMA Connection Manager
