@@ -1,0 +1,22 @@
+Bottom: d184a07b1c2d046ae5d4ab7f18c255cd11dbaf47
+Top:    9e4d4d5be5d43c36c3a83ea2b8cb84c37e0312f3
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-03-05 17:17:49 -0800
+
+Refresh of xfer-cnt
+
+---
+
+diff --git a/examples/common.c b/examples/common.c
+index aac679e..34f3af5 100644
+--- a/examples/common.c
++++ b/examples/common.c
+@@ -124,7 +124,7 @@ int size_to_count(int size)
+ 	else if (size >= (1 << 10))
+ 		return 10000;
+ 	else
+-		return 25000;
++		return 30000;
+ }
+ 
+ void format_buf(void *buf, int size)
