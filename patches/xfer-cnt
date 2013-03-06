@@ -1,5 +1,5 @@
 Bottom: 2737e70c64c9617bb741fff20192947019c4f7d9
-Top:    d184a07b1c2d046ae5d4ab7f18c255cd11dbaf47
+Top:    9e4d4d5be5d43c36c3a83ea2b8cb84c37e0312f3
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-03-05 13:39:00 -0800
 
@@ -16,7 +16,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/common.c b/examples/common.c
-index 4eb5bbe..aac679e 100644
+index 4eb5bbe..34f3af5 100644
 --- a/examples/common.c
 +++ b/examples/common.c
 @@ -118,13 +118,13 @@ void cnt_str(char *str, size_t ssize, long long cnt)
@@ -31,7 +31,7 @@ index 4eb5bbe..aac679e 100644
  		return 10000;
  	else
 -		return 100000;
-+		return 25000;
++		return 30000;
  }
  
  void format_buf(void *buf, int size)
