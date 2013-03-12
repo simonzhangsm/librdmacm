@@ -1,8 +1,7 @@
 Version: 1
-Previous: 1f4eb8278c0a443769a47f43560964b8e22b9397
+Previous: 73dd7cd9f799f30cebcae982db512b7de6ae0563
 Head: e57928b701ded6c5417b5ac0c153a239bf947612
 Applied:
-  release: e57928b701ded6c5417b5ac0c153a239bf947612
 Unapplied:
   xfer-cnt: 52a03dfbd23c1f257303d05c489041eb75ce76eb
   af-ib-conn: cf7b9e73d471477d4c7dff2592e5b0d3a7dea8ae
