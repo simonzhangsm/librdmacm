@@ -12,6 +12,9 @@ other pieces of the code do not.  The result is that
 ibacm ends up being disabled unless rsockets has been
 used.  Fix this by calling ucma_ib_init() where needed.
 
+This problem was reported by Jens Domke
+<domke.j.aa@m.titech.ac.jp>
+
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
