@@ -1,0 +1,20 @@
+Bottom: 03e0d857be2abeca4aaf50a1c372dc983b1332dc
+Top:    03e0d857be2abeca4aaf50a1c372dc983b1332dc
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-03-25 14:20:33 -0700
+
+Call ucma_ib_init() during startup
+
+ucma_ib_init() was removed from ucma_init() to avoid
+recursive callback issues when using the librspreload
+library over rsockets.  Although rsockets calls ucma_ib_init,
+other pieces of the code do not.  The result is that
+ibacm ends up being disabled unless rsockets has been
+used.  Fix this by calling ucma_ib_init() where needed.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
