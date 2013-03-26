@@ -5,12 +5,11 @@ Date:   2013-03-25 14:20:33 -0700
 
 Call ucma_ib_init() during startup
 
-ucma_ib_init() was removed from ucma_init() to avoid
-recursive callback issues when using the librspreload
-library over rsockets.  Although rsockets calls ucma_ib_init,
-other pieces of the code do not.  The result is that
-ibacm ends up being disabled unless rsockets has been
-used.  Fix this by calling ucma_ib_init() where needed.
+Commit 272c3cc024d0e5854cbafa6c2f1e8560398a68d7 removed
+automatic calls to ucma_ib_init().  It was added back for
+rsocket calls, but not for the older rdma_cm calls.  The
+result is that ibacm support ends up being disabled.  Fix
+this by calling ucma_ib_init() where needed.
 
 This problem was reported by Jens Domke
 <domke.j.aa@m.titech.ac.jp>
