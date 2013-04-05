@@ -49,6 +49,7 @@
 #include <stddef.h>
 #include <netdb.h>
 #include <syslog.h>
+#include <arpa/inet.h>
 
 #include "cma.h"
 #include "indexer.h"
@@ -127,6 +128,13 @@ static int abi_ver = RDMA_USER_CM_MAX_ABI_VERSION;
 int af_ib_support;
 static struct index_map ucma_idm;
 static fastlock_t idm_lock;
+
+static char *ucma_addr_str(struct sockaddr *addr)
+{
+	static char buf[32];
+
+	return inet_ntop(addr->sa_family, &((struct sockaddr_in *) addr)->sin_addr, buf, sizeof buf);
+}
 
 static void ucma_cleanup(void)
 {
@@ -835,6 +843,37 @@ static int rdma_resolve_addr2(struct rdma_cm_id *id, struct sockaddr *src_addr,
 	return ucma_complete(id);
 }
 
+static int ucma_get_ib_route(struct cma_id_private *id_priv,
+			     struct sockaddr *src_addr, struct sockaddr *dst_addr)
+{
+	struct rdma_addrinfo hint, *rai;
+	int ret;
+
+	memset(&hint, 0, sizeof hint);
+	hint.ai_flags = RAI_ROUTEONLY;
+	hint.ai_family = dst_addr->sa_family;
+	hint.ai_src_len = ucma_addrlen(src_addr);
+	hint.ai_src_addr = src_addr;
+	hint.ai_dst_len = ucma_addrlen(dst_addr);
+	hint.ai_dst_addr = dst_addr;
+
+	ret = rdma_getaddrinfo(NULL, NULL, &hint, &rai);
+	if (ret)
+		return ret;
+
+	if (rai->ai_route_len) {
+		id_priv->connect = rai->ai_route;
+		id_priv->connect_len = rai->ai_route_len;
+		rai->ai_route = NULL;
+		rai->ai_route_len = 0;
+	} else {
+		ret = -1;
+	}
+
+	rdma_freeaddrinfo(rai);
+	return ret;
+}
+
 int rdma_resolve_addr(struct rdma_cm_id *id, struct sockaddr *src_addr,
 		      struct sockaddr *dst_addr, int timeout_ms)
 {
@@ -842,6 +881,7 @@ int rdma_resolve_addr(struct rdma_cm_id *id, struct sockaddr *src_addr,
 	struct cma_id_private *id_priv;
 	int ret, dst_len, src_len;
 	
+printf("rdma_resolve_addr init dest %s\n", ucma_addr_str(dst_addr));
 	dst_len = ucma_addrlen(dst_addr);
 	if (!dst_len)
 		return ERR(EINVAL);
@@ -862,6 +902,14 @@ int rdma_resolve_addr(struct rdma_cm_id *id, struct sockaddr *src_addr,
 	memcpy(&cmd.dst_addr, dst_addr, dst_len);
 	cmd.timeout_ms = timeout_ms;
 
+	ret = ucma_get_ib_route(id_priv, src_addr, dst_addr);
+	if (!ret) {
+		((struct sockaddr_in *) &cmd.dst_addr)->sin_addr.s_addr = 0;
+		printf("rdma_resolve_addr dest %s\n", ucma_addr_str(&cmd.dst_addr));
+	}
+
+if (src_addr)
+   printf("rdma_resolve_addr src %s\n", ucma_addr_str(src_addr));
 	ret = write(id->channel->fd, &cmd, sizeof cmd);
 	if (ret != sizeof cmd)
 		return (ret >= 0) ? ERR(ENODATA) : -1;
@@ -874,6 +922,16 @@ static int ucma_set_ib_route(struct rdma_cm_id *id)
 {
 	struct rdma_addrinfo hint, *rai;
 	int ret;
+	struct cma_id_private *id_priv;
+
+	id_priv = container_of(id, struct cma_id_private, id);
+	if (id_priv->connect_len) {
+		ret = rdma_set_option(id, RDMA_OPTION_IB, RDMA_OPTION_IB_PATH,
+				      id_priv->connect, id_priv->connect_len);
+		free(id_priv->connect);
+		id_priv->connect_len = 0;
+		return ret;
+	}
 
 	memset(&hint, 0, sizeof hint);
 	hint.ai_flags = RAI_ROUTEONLY;
