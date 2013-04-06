@@ -205,7 +205,7 @@ static void ucma_resolve_af_ib(struct rdma_addrinfo **rai)
 		return;
 
 	ib_rai->ai_flags = (*rai)->ai_flags;
-	ib_rai->ai_family = (*rai)->ai_family;//AF_IB;
+	ib_rai->ai_family = AF_IB;
 	ib_rai->ai_qp_type = (*rai)->ai_qp_type;
 	ib_rai->ai_port_space = (*rai)->ai_port_space;
 
