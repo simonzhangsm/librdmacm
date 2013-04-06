@@ -1,5 +1,5 @@
 Bottom: 03e0d857be2abeca4aaf50a1c372dc983b1332dc
-Top:    d5e6f0c6bab52b22695d783fa562d3e4c1919bf3
+Top:    d271705eb3aa3950309213c07dc0c269052d624f
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-04-05 10:36:59 -0700
 
@@ -9,19 +9,6 @@ destination when we know the remote GID.
 
 ---
 
-diff --git a/src/acm.c b/src/acm.c
-index c9ca5b5..a96e49f 100755
---- a/src/acm.c
-+++ b/src/acm.c
-@@ -205,7 +205,7 @@ static void ucma_resolve_af_ib(struct rdma_addrinfo **rai)
- 		return;
- 
- 	ib_rai->ai_flags = (*rai)->ai_flags;
--	ib_rai->ai_family = AF_IB;
-+	ib_rai->ai_family = (*rai)->ai_family;//AF_IB;
- 	ib_rai->ai_qp_type = (*rai)->ai_qp_type;
- 	ib_rai->ai_port_space = (*rai)->ai_port_space;
- 
 diff --git a/src/cma.c b/src/cma.c
 index 2fb9913..2b3cd4d 100755
 --- a/src/cma.c
