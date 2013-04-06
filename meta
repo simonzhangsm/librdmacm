@@ -1,9 +1,8 @@
 Version: 1
-Previous: f708709cde72f54e5c9aaf36dacae5ae1fb35b98
-Head: 04cf886f5d20ce6ce7f662c2058a858ab560b29e
+Previous: c80a9a984fc2dd11458cd18d02d55ca12431ba04
+Head: 6c04647a1e1fff5765b3ee17e6a6ce5da4fa4224
 Applied:
-  af_ib: caf38826b9c3d08cd437c9131e03b7c1a9016537
-  refresh-temp: 04cf886f5d20ce6ce7f662c2058a858ab560b29e
+  af_ib: 6c04647a1e1fff5765b3ee17e6a6ce5da4fa4224
 Unapplied:
   ib-init: 47c8914009e8854b89d015de99eca7b102b9ea69
   xfer-cnt: 52a03dfbd23c1f257303d05c489041eb75ce76eb
