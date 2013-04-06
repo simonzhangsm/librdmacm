@@ -129,41 +129,38 @@ void ucma_ib_cleanup(void)
 static int ucma_ib_set_addr(struct rdma_addrinfo *ib_rai,
 			    struct rdma_addrinfo *rai)
 {
-	struct sockaddr/*_ib*/ *src, *dst;
-//	struct ibv_path_record *path;
+	struct sockaddr_ib *src, *dst;
+	struct ibv_path_record *path;
 
-	src = calloc(1, rai->ai_src_len);//sizeof *src);
+	src = calloc(1, sizeof *src);
 	if (!src)
 		return ERR(ENOMEM);
 
-	dst = calloc(1, rai->ai_dst_len);//sizeof *dst);
+	dst = calloc(1, sizeof *dst);
 	if (!dst) {
 		free(src);
 		return ERR(ENOMEM);
 	}
 
-	memcpy(src, rai->ai_src_addr, rai->ai_src_len);
-	memcpy(dst, rai->ai_dst_addr, rai->ai_dst_len);
-	((struct sockaddr_in *) dst)->sin_addr.s_addr = htonl(0x7f000001);
-//	path = &((struct ibv_path_data *) ib_rai->ai_route)->path;
+	path = &((struct ibv_path_data *) ib_rai->ai_route)->path;
 
-//	src->sib_family = AF_IB;
-//	src->sib_pkey = path->pkey;
-//	src->sib_flowinfo = htonl(ntohl(path->flowlabel_hoplimit) >> 8);
-//	memcpy(&src->sib_addr, &path->sgid, 16);
-//	ucma_set_sid(ib_rai->ai_port_space, rai->ai_src_addr, src);
+	src->sib_family = AF_IB;
+	src->sib_pkey = path->pkey;
+	src->sib_flowinfo = htonl(ntohl(path->flowlabel_hoplimit) >> 8);
+	memcpy(&src->sib_addr, &path->sgid, 16);
+	ucma_set_sid(ib_rai->ai_port_space, rai->ai_src_addr, src);
 
-//	dst->sib_family = AF_IB;
-//	dst->sib_pkey = path->pkey;
-//	dst->sib_flowinfo = htonl(ntohl(path->flowlabel_hoplimit) >> 8);
-//	memcpy(&dst->sib_addr, &path->dgid, 16);
-//	ucma_set_sid(ib_rai->ai_port_space, rai->ai_dst_addr, dst);
+	dst->sib_family = AF_IB;
+	dst->sib_pkey = path->pkey;
+	dst->sib_flowinfo = htonl(ntohl(path->flowlabel_hoplimit) >> 8);
+	memcpy(&dst->sib_addr, &path->dgid, 16);
+	ucma_set_sid(ib_rai->ai_port_space, rai->ai_dst_addr, dst);
 
 	ib_rai->ai_src_addr = (struct sockaddr *) src;
-	ib_rai->ai_src_len = rai->ai_src_len;//sizeof(*src);
+	ib_rai->ai_src_len = sizeof(*src);
 
 	ib_rai->ai_dst_addr = (struct sockaddr *) dst;
-	ib_rai->ai_dst_len = rai->ai_dst_len;//sizeof(*dst);
+	ib_rai->ai_dst_len = sizeof(*dst);
 
 	return 0;
 }
@@ -231,8 +228,8 @@ static void ucma_resolve_af_ib(struct rdma_addrinfo **rai)
 			goto err;
 	}
 
-//	if (ucma_ib_set_connect(ib_rai, *rai))
-//		goto err;
+	if (ucma_ib_set_connect(ib_rai, *rai))
+		goto err;
 
 	if (ucma_ib_set_addr(ib_rai, *rai))
 		goto err;
@@ -401,7 +398,7 @@ void ucma_ib_resolve(struct rdma_addrinfo **rai, struct rdma_addrinfo *hints)
 
 	ucma_ib_save_resp(*rai, &msg);
 
-	if (/*af_ib_support &&*/ !(hints->ai_flags & RAI_ROUTEONLY) && (*rai)->ai_route_len)
+	if (af_ib_support && !(hints->ai_flags & RAI_ROUTEONLY) && (*rai)->ai_route_len)
 		ucma_resolve_af_ib(rai);
 }
 
