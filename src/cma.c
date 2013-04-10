@@ -207,7 +207,6 @@ static void ucma_set_af_ib_support(void)
 	ret = rdma_bind_addr(id, (struct sockaddr *) &sib);
 	af_ib_support = !ret;
 
-printf("af_ib support %d", af_ib_support);
 	rdma_destroy_id(id);
 }
 
@@ -905,7 +904,7 @@ printf("rdma_resolve_addr init dest %s\n", ucma_addr_str(dst_addr));
 
 	ret = ucma_get_ib_route(id_priv, src_addr, dst_addr);
 	if (!ret) {
-		((struct sockaddr_in *) &cmd.dst_addr)->sin_addr.s_addr = htonl(0x7f000001);
+		((struct sockaddr_in *) &cmd.dst_addr)->sin_addr.s_addr = 0;
 		printf("rdma_resolve_addr dest %s\n", ucma_addr_str(&cmd.dst_addr));
 	}
 
