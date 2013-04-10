@@ -1,5 +1,5 @@
 Bottom: 03e0d857be2abeca4aaf50a1c372dc983b1332dc
-Top:    d271705eb3aa3950309213c07dc0c269052d624f
+Top:    68f3badb82fe0b5ae6c9289d7eb0c8a6d7313e6b
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-04-05 10:36:59 -0700
 
@@ -10,7 +10,7 @@ destination when we know the remote GID.
 ---
 
 diff --git a/src/cma.c b/src/cma.c
-index 2fb9913..2b3cd4d 100755
+index 2fb9913..cb60422 100755
 --- a/src/cma.c
 +++ b/src/cma.c
 @@ -49,6 +49,7 @@
@@ -35,15 +35,7 @@ index 2fb9913..2b3cd4d 100755
  static void ucma_cleanup(void)
  {
  	ucma_ib_cleanup();
-@@ -199,6 +207,7 @@ static void ucma_set_af_ib_support(void)
- 	ret = rdma_bind_addr(id, (struct sockaddr *) &sib);
- 	af_ib_support = !ret;
- 
-+printf("af_ib support %d", af_ib_support);
- 	rdma_destroy_id(id);
- }
- 
-@@ -835,6 +844,37 @@ static int rdma_resolve_addr2(struct rdma_cm_id *id, struct sockaddr *src_addr,
+@@ -835,6 +843,37 @@ static int rdma_resolve_addr2(struct rdma_cm_id *id, struct sockaddr *src_addr,
  	return ucma_complete(id);
  }
  
@@ -81,7 +73,7 @@ index 2fb9913..2b3cd4d 100755
  int rdma_resolve_addr(struct rdma_cm_id *id, struct sockaddr *src_addr,
  		      struct sockaddr *dst_addr, int timeout_ms)
  {
-@@ -842,6 +882,7 @@ int rdma_resolve_addr(struct rdma_cm_id *id, struct sockaddr *src_addr,
+@@ -842,6 +881,7 @@ int rdma_resolve_addr(struct rdma_cm_id *id, struct sockaddr *src_addr,
  	struct cma_id_private *id_priv;
  	int ret, dst_len, src_len;
  	
@@ -89,13 +81,13 @@ index 2fb9913..2b3cd4d 100755
  	dst_len = ucma_addrlen(dst_addr);
  	if (!dst_len)
  		return ERR(EINVAL);
-@@ -862,6 +903,14 @@ int rdma_resolve_addr(struct rdma_cm_id *id, struct sockaddr *src_addr,
+@@ -862,6 +902,14 @@ int rdma_resolve_addr(struct rdma_cm_id *id, struct sockaddr *src_addr,
  	memcpy(&cmd.dst_addr, dst_addr, dst_len);
  	cmd.timeout_ms = timeout_ms;
  
 +	ret = ucma_get_ib_route(id_priv, src_addr, dst_addr);
 +	if (!ret) {
-+		((struct sockaddr_in *) &cmd.dst_addr)->sin_addr.s_addr = htonl(0x7f000001);
++		((struct sockaddr_in *) &cmd.dst_addr)->sin_addr.s_addr = 0;
 +		printf("rdma_resolve_addr dest %s\n", ucma_addr_str(&cmd.dst_addr));
 +	}
 +
@@ -104,7 +96,7 @@ index 2fb9913..2b3cd4d 100755
  	ret = write(id->channel->fd, &cmd, sizeof cmd);
  	if (ret != sizeof cmd)
  		return (ret >= 0) ? ERR(ENODATA) : -1;
-@@ -874,6 +923,16 @@ static int ucma_set_ib_route(struct rdma_cm_id *id)
+@@ -874,6 +922,16 @@ static int ucma_set_ib_route(struct rdma_cm_id *id)
  {
  	struct rdma_addrinfo hint, *rai;
  	int ret;
