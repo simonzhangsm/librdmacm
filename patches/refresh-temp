@@ -1,0 +1,203 @@
+Bottom: 03e0d857be2abeca4aaf50a1c372dc983b1332dc
+Top:    1ec039b0a7bf31e7ffc12c218c78585edb590194
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-04-10 16:38:13 -0700
+
+Refresh of clisvr
+
+---
+
+diff --git a/Makefile.am b/Makefile.am
+index 3198165..a908008 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -29,7 +29,7 @@ src_librspreload_la_LIBADD = $(top_builddir)/src/librdmacm.la
+ bin_PROGRAMS = examples/ucmatose examples/rping examples/udaddy examples/mckey \
+ 	       examples/rdma_client examples/rdma_server examples/rdma_xclient \
+ 	       examples/rdma_xserver examples/rstream examples/rcopy \
+-	       examples/riostream examples/udpong
++	       examples/riostream examples/udpong examples/rcli examples/rsvr
+ examples_ucmatose_SOURCES = examples/cmatose.c examples/common.c
+ examples_ucmatose_LDADD = $(top_builddir)/src/librdmacm.la
+ examples_rping_SOURCES = examples/rping.c
+@@ -54,6 +54,10 @@ examples_rcopy_SOURCES = examples/rcopy.c
+ examples_rcopy_LDADD = $(top_builddir)/src/librdmacm.la
+ examples_udpong_SOURCES = examples/udpong.c examples/common.c
+ examples_udpong_LDADD = $(top_builddir)/src/librdmacm.la
++examples_rcli_SOURCES = examples/rcli.c
++examples_rcli_LDADD = $(top_builddir)/src/librdmacm.la
++examples_rsvr_SOURCES = examples/rsvr.c
++examples_rsvr_LDADD = $(top_builddir)/src/librdmacm.la
+ 
+ librdmacmincludedir = $(includedir)/rdma
+ infinibandincludedir = $(includedir)/infiniband
+diff --git a/examples/rcli.c b/examples/rcli.c
+new file mode 100755
+index 0000000..ed3c474
+--- /dev/null
++++ b/examples/rcli.c
+@@ -0,0 +1,88 @@
++#include <rdma/rsocket.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <sys/types.h>
++#include <netinet/in.h>
++#include <arpa/inet.h>
++
++
++int main(int argc, char *argv[])
++{
++   char rbuf[80];
++   int n, s;
++   int optval;
++   socklen_t optlen = sizeof(optval);
++   struct sockaddr_in srvaddr;
++  
++   if (argc != 2) {
++      printf("Usage: %s ipaddr\n", argv[0]);
++      exit(EXIT_FAILURE);
++   }
++
++   /* Create the socket */
++   if ((s = rsocket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
++      perror("rsocket()");
++      exit(EXIT_FAILURE);
++   }
++ 
++   /* Check the status for the keepalive option */
++   if (rgetsockopt(s, SOL_SOCKET, SO_KEEPALIVE, &optval, &optlen) < 0) {
++      perror("rgetsockopt()");
++      close(s);
++      exit(EXIT_FAILURE);
++   }
++   printf("SO_KEEPALIVE is %s\n", (optval ? "ON" : "OFF"));
++
++   memset(&srvaddr, '0', sizeof(srvaddr));
++
++   if (inet_pton(AF_INET, argv[1], &srvaddr.sin_addr) < 0) {
++      printf("IP Conversion failed\n");
++      exit(EXIT_FAILURE);
++   }
++
++   srvaddr.sin_family = AF_INET;
++   srvaddr.sin_port = htons(7777);
++
++   /* Connect */
++   if (rconnect(s,(struct sockaddr*)&srvaddr,sizeof(srvaddr)) < 0) {
++      perror("rconnect()");
++      close(s);
++      exit(EXIT_FAILURE);
++
++   }
++
++   /* Set the option active */
++   optval = 1;
++   optlen = sizeof(optval);
++   if (rsetsockopt(s, SOL_SOCKET, SO_KEEPALIVE, &optval, optlen) < 0) {
++      perror("rsetsockopt()");
++      close(s);
++      exit(EXIT_FAILURE);
++   }
++   printf("SO_KEEPALIVE set on socket\n");
++
++   /* Check the status again */
++   if (rgetsockopt(s, SOL_SOCKET, SO_KEEPALIVE, &optval, &optlen) < 0) {
++      perror("rgetsockopt()");
++      close(s);
++      exit(EXIT_FAILURE);
++   }
++   printf("SO_KEEPALIVE is %s\n", (optval ? "ON" : "OFF"));
++
++   memset(rbuf, '0', sizeof(rbuf));
++
++   while ((n=rread(s,rbuf,sizeof(rbuf)-1)) > 0) {
++      rbuf[n] = 0;
++      if (fputs(rbuf, stdout) == EOF)
++         printf("Error writing receive buffer stdout\n");
++   }
++
++   if (n<0) printf("No data\n");         
++
++   return 0;
++
++   exit(EXIT_SUCCESS);
++}
++
+diff --git a/examples/rsvr.c b/examples/rsvr.c
+new file mode 100755
+index 0000000..a630048
+--- /dev/null
++++ b/examples/rsvr.c
+@@ -0,0 +1,70 @@
++#include <rdma/rsocket.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <time.h>
++#include <unistd.h>
++#include <sys/types.h>
++#include <netinet/in.h>
++
++#define MAX_CLIENTS 2
++
++int main()
++{
++   char sbuf[80];
++   int limit, num_clients, s, sc;
++   int clients[MAX_CLIENTS];
++   struct sockaddr_in srvaddr;
++   time_t t;
++  
++   /* Create the socket */
++   if ((s = rsocket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
++      perror("rsocket()");
++      exit(EXIT_FAILURE);
++   }
++
++   /* Bind */
++   memset(&srvaddr, '0', sizeof(srvaddr));
++   srvaddr.sin_family = AF_INET;
++   srvaddr.sin_addr.s_addr = htonl(INADDR_ANY);
++   srvaddr.sin_port = htons(7777);
++
++   if (rbind(s,(struct sockaddr*)&srvaddr,sizeof(srvaddr)) < 0) {
++      perror("rbind()");
++      close(s);
++      exit(EXIT_FAILURE);
++   }
++
++   if (rlisten(s,MAX_CLIENTS) < 0) {
++     perror("listen()");
++     exit(EXIT_FAILURE);
++   }
++
++   num_clients=0;
++   while(1) {
++
++      limit=1;
++      while(limit) {
++         if (num_clients < MAX_CLIENTS) {
++            sc = raccept(s, (struct sockaddr*)NULL, NULL); 
++            clients[num_clients] = sc;
++            num_clients++;
++            t = time(NULL);
++            snprintf(sbuf, sizeof(sbuf), "%.24s\r\n", ctime(&t));
++            rwrite(sc, sbuf, strlen(sbuf)); 
++         } else {
++            limit=0;
++         }
++
++         sleep(1);
++      }
++      
++      if (limit == 0 && num_clients == MAX_CLIENTS) {
++         printf("Max number of clients, %i, has been reached\n", MAX_CLIENTS);
++         num_clients = 9999;
++      }
++      sleep(1);
++   }
++
++}
++
