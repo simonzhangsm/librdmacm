@@ -1854,7 +1854,7 @@ static int ds_valid_recv(struct ds_qp *qp, struct ibv_wc *wc)
 {
 	struct ds_header *hdr;
 
-	hdr = (struct ds_header *) (qp->rbuf + rs_wr_data(wc.wr_id));
+	hdr = (struct ds_header *) (qp->rbuf + rs_wr_data(wc->wr_id));
 	return ((wc->byte_len >= sizeof(struct ibv_grh) + DS_IPV4_HDR_LEN) &&
 		((hdr->version == 4 && hdr->length == DS_IPV4_HDR_LEN) ||
 		 (hdr->version == 6 && hdr->length == DS_IPV6_HDR_LEN)));
