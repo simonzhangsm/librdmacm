@@ -1,0 +1,22 @@
+Bottom: 157cf14d11c66c9ae4bd1edb757f7931443e5d16
+Top:    e8c026d3862906d30200710fcc27654d4fb2d580
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-04-12 15:56:57 -0700
+
+Refresh of rs_wrid
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index dbbe245..ca77116 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -1854,7 +1854,7 @@ static int ds_valid_recv(struct ds_qp *qp, struct ibv_wc *wc)
+ {
+ 	struct ds_header *hdr;
+ 
+-	hdr = (struct ds_header *) (qp->rbuf + rs_wr_data(wc.wr_id));
++	hdr = (struct ds_header *) (qp->rbuf + rs_wr_data(wc->wr_id));
+ 	return ((wc->byte_len >= sizeof(struct ibv_grh) + DS_IPV4_HDR_LEN) &&
+ 		((hdr->version == 4 && hdr->length == DS_IPV4_HDR_LEN) ||
+ 		 (hdr->version == 6 && hdr->length == DS_IPV6_HDR_LEN)));
