@@ -207,7 +207,12 @@ enum rs_state {
 	rs_error	   =		    0x2000,
 };
 
-#define RS_OPT_SWAP_SGL 1
+#define RS_OPT_SWAP_SGL	(1 << 0)
+/*
+ * iWarp does not support RDMA write with immediate data.  For iWarp, we
+ * transfer rsocket messages as inline sends.
+ */
+#define RS_OPT_MSG_SEND	(1 << 1)
 
 union socket_addr {
 	struct sockaddr		sa;
@@ -284,6 +289,7 @@ struct rsocket {
 			volatile struct rs_sge	  *target_sgl;
 			struct rs_iomap   *target_iomap;
 
+			int		  rbuf_msg_index;
 			int		  rbuf_bytes_avail;
 			int		  rbuf_free_offset;
 			int		  rbuf_offset;
@@ -635,6 +641,7 @@ static void ds_set_qp_size(struct rsocket *rs)
 
 static int rs_init_bufs(struct rsocket *rs)
 {
+	uint32_t rbuf_msg_size;
 	size_t len;
 
 	rs->rmsg = calloc(rs->rq_size + 1, sizeof(*rs->rmsg));
@@ -664,11 +671,14 @@ static int rs_init_bufs(struct rsocket *rs)
 	if (rs->target_iomap_size)
 		rs->target_iomap = (struct rs_iomap *) (rs->target_sgl + RS_SGL_SIZE);
 
-	rs->rbuf = calloc(rs->rbuf_size, sizeof(*rs->rbuf));
+	rbuf_msg_size = rs->rbuf_size;
+	if (rs->opts & RS_OPT_MSG_SEND)
+		rbuf_msg_size += rs->rq_size * RS_MSG_SIZE;
+	rs->rbuf = calloc(rbuf_msg_size, 1);
 	if (!rs->rbuf)
 		return ERR(ENOMEM);
 
-	rs->rmr = rdma_reg_write(rs->cm_id, rs->rbuf, rs->rbuf_size);
+	rs->rmr = rdma_reg_write(rs->cm_id, rs->rbuf, rbuf_msg_size);
 	if (!rs->rmr)
 		return -1;
 
@@ -685,8 +695,7 @@ static int rs_init_bufs(struct rsocket *rs)
 
 static int ds_init_bufs(struct ds_qp *qp)
 {
-	qp->rbuf = calloc(qp->rs->rbuf_size + sizeof(struct ibv_grh),
-			  sizeof(*qp->rbuf));
+	qp->rbuf = calloc(qp->rs->rbuf_size + sizeof(struct ibv_grh), 1);
 	if (!qp->rbuf)
 		return ERR(ENOMEM);
 
@@ -740,11 +749,27 @@ err1:
 static inline int rs_post_recv(struct rsocket *rs)
 {
 	struct ibv_recv_wr wr, *bad;
+	struct ibv_sge sge;
 
 	wr.wr_id = rs_recv_wr_id(0);
 	wr.next = NULL;
-	wr.sg_list = NULL;
-	wr.num_sge = 0;
+	if (!(rs->opts & RS_OPT_MSG_SEND)) {
+		wr.sg_list = NULL;
+		wr.num_sge = 0;
+	} else {
+		sge.addr = (uintptr_t) rs->rbuf + rs->rbuf_size +
+			   (rs->rbuf_msg_index * RS_MSG_SIZE);
+		sge.length = sizeof(uint32_t);
+		sge.lkey = rs->rmr->lkey;
+
+		wr.sg_list = &sge;
+		wr.num_sge = 1;
+		if(++rs->rbuf_msg_index == rs->rq_size)
+			rs->rbuf_msg_index = 0;
+		/* TODO we need wr_id to reference back to receive buffer, so we can
+		 * retrieve the incoming message from the buffer
+		 */
+	}
 
 	return rdma_seterrno(ibv_post_recv(rs->cm_id->qp, &wr, &bad));
 }
@@ -775,6 +800,8 @@ static int rs_create_ep(struct rsocket *rs)
 	int i, ret;
 
 	rs_set_qp_size(rs);
+	if (rs->cm_id->context->device->transport_type == IBV_TRANSPORT_IWARP)
+		rs->opts |= RS_OPT_MSG_SEND;
 	ret = rs_init_bufs(rs);
 	if (ret)
 		return ret;
