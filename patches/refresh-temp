@@ -1,0 +1,172 @@
+Bottom: a44edddc396d1994c73398a43b9fef91c0a5125f
+Top:    3612aa65b26b315fdd6f5107e52c41cda33fe4ae
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-04-13 13:14:23 -0700
+
+Refresh of rs-iwarp
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 4b3505a..f9c31cd 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -607,15 +607,15 @@ static void rs_set_qp_size(struct rsocket *rs)
+ 
+ 	if (rs->sq_size > max_size)
+ 		rs->sq_size = max_size;
+-	else if (rs->sq_size < 2)
+-		rs->sq_size = 2;
++	else if (rs->sq_size < 4)
++		rs->sq_size = 4;
+ 	if (rs->sq_size <= (RS_QP_CTRL_SIZE << 2))
+-		rs->ctrl_avail = 1;
++		rs->ctrl_avail = 2;
+ 
+ 	if (rs->rq_size > max_size)
+ 		rs->rq_size = max_size;
+-	else if (rs->rq_size < 2)
+-		rs->rq_size = 2;
++	else if (rs->rq_size < 4)
++		rs->rq_size = 4;
+ }
+ 
+ static void ds_set_qp_size(struct rsocket *rs)
+@@ -1534,41 +1534,6 @@ int rconnect(int socket, const struct sockaddr *addr, socklen_t addrlen)
+ 	return ret;
+ }
+ 
+-/*
+-TODO:
+-if MSG_SEND opt is set
+-	if !sgl
+-		post send with imm_data inline
+-	else
+-		post rdma write
+-		pst send with imm_data inline
+-else
+-	existing code flow - rdma write with immediate
+-
+-post_write - rdma write only
+-post msg - immediate data or send only
+-post write msg - rdma write with msg (imm or send after)
+-*/
+-static int rs_post_write_msg(struct rsocket *rs,
+-			 struct ibv_sge *sgl, int nsge,
+-			 uint32_t imm_data, int flags,
+-			 uint64_t addr, uint32_t rkey)
+-{
+-	struct ibv_send_wr wr, *bad;
+-
+-	wr.wr_id = rs_send_wr_id(imm_data);
+-	wr.next = NULL;
+-	wr.sg_list = sgl;
+-	wr.num_sge = nsge;
+-	wr.opcode = IBV_WR_RDMA_WRITE_WITH_IMM;
+-	wr.send_flags = flags;
+-	wr.imm_data = htonl(imm_data);
+-	wr.wr.rdma.remote_addr = addr;
+-	wr.wr.rdma.rkey = rkey;
+-
+-	return rdma_seterrno(ibv_post_send(rs->cm_id->qp, &wr, &bad));
+-}
+-
+ static int rs_post_msg(struct rsocket *rs, uint32_t msg)
+ {
+ 	struct ibv_send_wr wr, *bad;
+@@ -1576,7 +1541,7 @@ static int rs_post_msg(struct rsocket *rs, uint32_t msg)
+ 
+ 	wr.wr_id = rs_send_wr_id(msg);
+ 	wr.next = NULL;
+-	if (rs->opts & RS_OPT_MSG_SEND) {
++	if (!(rs->opts & RS_OPT_MSG_SEND)) {
+ 		wr.sg_list = &sge;
+ 		wr.num_sge = 1;
+ 		wr.opcode = IBV_WR_SEND;
+@@ -1585,8 +1550,8 @@ static int rs_post_msg(struct rsocket *rs, uint32_t msg)
+ 		wr.sg_list = NULL;
+ 		wr.num_sge = 0;
+ 		wr.opcode = IBV_WR_RDMA_WRITE_WITH_IMM;
+-		wr.send_flags = flags;
+-		wr.imm_data = htonl(imm_data);
++		wr.send_flags = 0;
++		wr.imm_data = htonl(msg);
+ 	}
+ 
+ 	return rdma_seterrno(ibv_post_send(rs->cm_id->qp, &wr, &bad));
+@@ -1611,6 +1576,35 @@ static int rs_post_write(struct rsocket *rs,
+ 	return rdma_seterrno(ibv_post_send(rs->cm_id->qp, &wr, &bad));
+ }
+ 
++static int rs_post_write_msg(struct rsocket *rs,
++			 struct ibv_sge *sgl, int nsge,
++			 uint32_t msg, int flags,
++			 uint64_t addr, uint32_t rkey)
++{
++	struct ibv_send_wr wr, *bad;
++	int ret;
++
++	if (!(rs->opts & RS_OPT_MSG_SEND)) {
++		wr.wr_id = rs_send_wr_id(msg);
++		wr.next = NULL;
++		wr.sg_list = sgl;
++		wr.num_sge = nsge;
++		wr.opcode = IBV_WR_RDMA_WRITE_WITH_IMM;
++		wr.send_flags = flags;
++		wr.imm_data = htonl(msg);
++		wr.wr.rdma.remote_addr = addr;
++		wr.wr.rdma.rkey = rkey;
++
++		return rdma_seterrno(ibv_post_send(rs->cm_id->qp, &wr, &bad));
++	} else {
++		/* TODO: adjust sqe_avail and ctrl_avail for extra post */
++		ret = rs_post_write(rs, sgl, nsge, msg, flags, addr, rkey);
++		if (!ret)
++			ret = rs_post_msg(rs, msg);
++		return ret;
++	}
++}
++
+ static int ds_post_send(struct rsocket *rs, struct ibv_sge *sge,
+ 			uint32_t wr_data)
+ {
+@@ -1728,9 +1722,7 @@ static void rs_send_credits(struct rsocket *rs)
+ 		if (++rs->remote_sge == rs->remote_sgl.length)
+ 			rs->remote_sge = 0;
+ 	} else {
+-		rs_post_write_msg(rs, NULL, 0,
+-				  rs_msg_set(RS_OP_SGL, rs->rseq_no + rs->rq_size),
+-				  0, 0, 0);
++		rs_post_msg(rs, rs_msg_set(RS_OP_SGL, rs->rseq_no + rs->rq_size));
+ 	}
+ }
+ 
+@@ -2107,14 +2099,15 @@ static int rs_poll_all(struct rsocket *rs)
+  */
+ static int rs_can_send(struct rsocket *rs)
+ {
+-	if (rs->opts & RS_OPT_MSG_SEND) {
++	if (!(rs->opts & RS_OPT_MSG_SEND)) {
++		return rs->sqe_avail && (rs->sbuf_bytes_avail >= RS_SNDLOWAT) &&
++		       (rs->sseq_no != rs->sseq_comp) &&
++		       (rs->target_sgl[rs->target_sge].length != 0);
++	} else {
+ 		return (rs->sqe_avail >= 2) && (rs->sbuf_bytes_avail >= RS_SNDLOWAT) &&
+ 		       (rs->sseq_no != rs->sseq_comp) &&
+ 		       (rs->target_sgl[rs->target_sge].length != 0);
+ 	}
+-	return rs->sqe_avail && (rs->sbuf_bytes_avail >= RS_SNDLOWAT) &&
+-	       (rs->sseq_no != rs->sseq_comp) &&
+-	       (rs->target_sgl[rs->target_sge].length != 0);
+ }
+ 
+ static int ds_can_send(struct rsocket *rs)
+@@ -3086,8 +3079,7 @@ int rshutdown(int socket, int how)
+ 
+ 		if ((rs->state & rs_connected) && rs->ctrl_avail) {
+ 			rs->ctrl_avail--;
+-			ret = rs_post_write_msg(rs, NULL, 0,
+-						rs_msg_set(RS_OP_CTRL, ctrl), 0, 0, 0);
++			ret = rs_post_msg(rs, rs_msg_set(RS_OP_CTRL, ctrl));
+ 		}
+ 	}
