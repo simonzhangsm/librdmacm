@@ -1,5 +1,5 @@
 Bottom: e8c026d3862906d30200710fcc27654d4fb2d580
-Top:    a44edddc396d1994c73398a43b9fef91c0a5125f
+Top:    3612aa65b26b315fdd6f5107e52c41cda33fe4ae
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-04-11 10:05:29 -0700
 
@@ -15,7 +15,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index ca77116..4b3505a 100644
+index ca77116..f9c31cd 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -123,6 +123,7 @@ enum {
@@ -48,6 +48,27 @@ index ca77116..4b3505a 100644
  			int		  rbuf_bytes_avail;
  			int		  rbuf_free_offset;
  			int		  rbuf_offset;
+@@ -600,15 +607,15 @@ static void rs_set_qp_size(struct rsocket *rs)
+ 
+ 	if (rs->sq_size > max_size)
+ 		rs->sq_size = max_size;
+-	else if (rs->sq_size < 2)
+-		rs->sq_size = 2;
++	else if (rs->sq_size < 4)
++		rs->sq_size = 4;
+ 	if (rs->sq_size <= (RS_QP_CTRL_SIZE << 2))
+-		rs->ctrl_avail = 1;
++		rs->ctrl_avail = 2;
+ 
+ 	if (rs->rq_size > max_size)
+ 		rs->rq_size = max_size;
+-	else if (rs->rq_size < 2)
+-		rs->rq_size = 2;
++	else if (rs->rq_size < 4)
++		rs->rq_size = 4;
+ }
+ 
+ static void ds_set_qp_size(struct rsocket *rs)
 @@ -635,6 +642,7 @@ static void ds_set_qp_size(struct rsocket *rs)
  
  static int rs_init_bufs(struct rsocket *rs)
@@ -121,40 +142,30 @@ index ca77116..4b3505a 100644
  	ret = rs_init_bufs(rs);
  	if (ret)
  		return ret;
-@@ -1508,6 +1534,21 @@ int rconnect(int socket, const struct sockaddr *addr, socklen_t addrlen)
+@@ -1508,22 +1534,25 @@ int rconnect(int socket, const struct sockaddr *addr, socklen_t addrlen)
  	return ret;
  }
  
-+/*
-+TODO:
-+if MSG_SEND opt is set
-+	if !sgl
-+		post send with imm_data inline
-+	else
-+		post rdma write
-+		pst send with imm_data inline
-+else
-+	existing code flow - rdma write with immediate
-+
-+post_write - rdma write only
-+post msg - immediate data or send only
-+post write msg - rdma write with msg (imm or send after)
-+*/
- static int rs_post_write_msg(struct rsocket *rs,
- 			 struct ibv_sge *sgl, int nsge,
- 			 uint32_t imm_data, int flags,
-@@ -1528,6 +1569,29 @@ static int rs_post_write_msg(struct rsocket *rs,
- 	return rdma_seterrno(ibv_post_send(rs->cm_id->qp, &wr, &bad));
- }
- 
+-static int rs_post_write_msg(struct rsocket *rs,
+-			 struct ibv_sge *sgl, int nsge,
+-			 uint32_t imm_data, int flags,
+-			 uint64_t addr, uint32_t rkey)
 +static int rs_post_msg(struct rsocket *rs, uint32_t msg)
-+{
-+	struct ibv_send_wr wr, *bad;
+ {
+ 	struct ibv_send_wr wr, *bad;
 +	struct ibv_sge sge;
-+
+ 
+-	wr.wr_id = rs_send_wr_id(imm_data);
 +	wr.wr_id = rs_send_wr_id(msg);
-+	wr.next = NULL;
-+	if (rs->opts & RS_OPT_MSG_SEND) {
+ 	wr.next = NULL;
+-	wr.sg_list = sgl;
+-	wr.num_sge = nsge;
+-	wr.opcode = IBV_WR_RDMA_WRITE_WITH_IMM;
+-	wr.send_flags = flags;
+-	wr.imm_data = htonl(imm_data);
+-	wr.wr.rdma.remote_addr = addr;
+-	wr.wr.rdma.rkey = rkey;
++	if (!(rs->opts & RS_OPT_MSG_SEND)) {
 +		wr.sg_list = &sge;
 +		wr.num_sge = 1;
 +		wr.opcode = IBV_WR_SEND;
@@ -163,17 +174,60 @@ index ca77116..4b3505a 100644
 +		wr.sg_list = NULL;
 +		wr.num_sge = 0;
 +		wr.opcode = IBV_WR_RDMA_WRITE_WITH_IMM;
-+		wr.send_flags = flags;
-+		wr.imm_data = htonl(imm_data);
++		wr.send_flags = 0;
++		wr.imm_data = htonl(msg);
 +	}
+ 
+ 	return rdma_seterrno(ibv_post_send(rs->cm_id->qp, &wr, &bad));
+ }
+@@ -1547,6 +1576,35 @@ static int rs_post_write(struct rsocket *rs,
+ 	return rdma_seterrno(ibv_post_send(rs->cm_id->qp, &wr, &bad));
+ }
+ 
++static int rs_post_write_msg(struct rsocket *rs,
++			 struct ibv_sge *sgl, int nsge,
++			 uint32_t msg, int flags,
++			 uint64_t addr, uint32_t rkey)
++{
++	struct ibv_send_wr wr, *bad;
++	int ret;
 +
-+	return rdma_seterrno(ibv_post_send(rs->cm_id->qp, &wr, &bad));
++	if (!(rs->opts & RS_OPT_MSG_SEND)) {
++		wr.wr_id = rs_send_wr_id(msg);
++		wr.next = NULL;
++		wr.sg_list = sgl;
++		wr.num_sge = nsge;
++		wr.opcode = IBV_WR_RDMA_WRITE_WITH_IMM;
++		wr.send_flags = flags;
++		wr.imm_data = htonl(msg);
++		wr.wr.rdma.remote_addr = addr;
++		wr.wr.rdma.rkey = rkey;
++
++		return rdma_seterrno(ibv_post_send(rs->cm_id->qp, &wr, &bad));
++	} else {
++		/* TODO: adjust sqe_avail and ctrl_avail for extra post */
++		ret = rs_post_write(rs, sgl, nsge, msg, flags, addr, rkey);
++		if (!ret)
++			ret = rs_post_msg(rs, msg);
++		return ret;
++	}
 +}
 +
- static int rs_post_write(struct rsocket *rs,
- 			 struct ibv_sge *sgl, int nsge,
- 			 uint32_t wr_data, int flags,
-@@ -1686,7 +1750,7 @@ static void rs_update_credits(struct rsocket *rs)
+ static int ds_post_send(struct rsocket *rs, struct ibv_sge *sge,
+ 			uint32_t wr_data)
+ {
+@@ -1664,9 +1722,7 @@ static void rs_send_credits(struct rsocket *rs)
+ 		if (++rs->remote_sge == rs->remote_sgl.length)
+ 			rs->remote_sge = 0;
+ 	} else {
+-		rs_post_write_msg(rs, NULL, 0,
+-				  rs_msg_set(RS_OP_SGL, rs->rseq_no + rs->rq_size),
+-				  0, 0, 0);
++		rs_post_msg(rs, rs_msg_set(RS_OP_SGL, rs->rseq_no + rs->rq_size));
+ 	}
+ }
+ 
+@@ -1686,7 +1742,7 @@ static void rs_update_credits(struct rsocket *rs)
  static int rs_poll_cq(struct rsocket *rs)
  {
  	struct ibv_wc wc;
@@ -182,7 +236,7 @@ index ca77116..4b3505a 100644
  	int ret, rcnt = 0;
  
  	while ((ret = ibv_poll_cq(rs->cm_id->recv_cq, 1, &wc)) > 0) {
-@@ -1695,19 +1759,25 @@ static int rs_poll_cq(struct rsocket *rs)
+@@ -1695,19 +1751,25 @@ static int rs_poll_cq(struct rsocket *rs)
  				continue;
  			rcnt++;
  
@@ -213,7 +267,7 @@ index ca77116..4b3505a 100644
  					rs->state &= ~rs_readable;
  				}
  				break;
-@@ -1715,8 +1785,8 @@ static int rs_poll_cq(struct rsocket *rs)
+@@ -1715,8 +1777,8 @@ static int rs_poll_cq(struct rsocket *rs)
  				/* We really shouldn't be here. */
  				break;
  			default:
@@ -224,15 +278,31 @@ index ca77116..4b3505a 100644
  				if (++rs->rmsg_tail == rs->rq_size + 1)
  					rs->rmsg_tail = 0;
  				break;
-@@ -2037,6 +2107,11 @@ static int rs_poll_all(struct rsocket *rs)
+@@ -2037,9 +2099,15 @@ static int rs_poll_all(struct rsocket *rs)
   */
  static int rs_can_send(struct rsocket *rs)
  {
-+	if (rs->opts & RS_OPT_MSG_SEND) {
+-	return rs->sqe_avail && (rs->sbuf_bytes_avail >= RS_SNDLOWAT) &&
+-	       (rs->sseq_no != rs->sseq_comp) &&
+-	       (rs->target_sgl[rs->target_sge].length != 0);
++	if (!(rs->opts & RS_OPT_MSG_SEND)) {
++		return rs->sqe_avail && (rs->sbuf_bytes_avail >= RS_SNDLOWAT) &&
++		       (rs->sseq_no != rs->sseq_comp) &&
++		       (rs->target_sgl[rs->target_sge].length != 0);
++	} else {
 +		return (rs->sqe_avail >= 2) && (rs->sbuf_bytes_avail >= RS_SNDLOWAT) &&
 +		       (rs->sseq_no != rs->sseq_comp) &&
 +		       (rs->target_sgl[rs->target_sge].length != 0);
 +	}
- 	return rs->sqe_avail && (rs->sbuf_bytes_avail >= RS_SNDLOWAT) &&
- 	       (rs->sseq_no != rs->sseq_comp) &&
- 	       (rs->target_sgl[rs->target_sge].length != 0);
+ }
+ 
+ static int ds_can_send(struct rsocket *rs)
+@@ -3011,8 +3079,7 @@ int rshutdown(int socket, int how)
+ 
+ 		if ((rs->state & rs_connected) && rs->ctrl_avail) {
+ 			rs->ctrl_avail--;
+-			ret = rs_post_write_msg(rs, NULL, 0,
+-						rs_msg_set(RS_OP_CTRL, ctrl), 0, 0, 0);
++			ret = rs_post_msg(rs, rs_msg_set(RS_OP_CTRL, ctrl));
+ 		}
+ 	}
