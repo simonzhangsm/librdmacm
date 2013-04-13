@@ -1,0 +1,20 @@
+Bottom: 03e0d857be2abeca4aaf50a1c372dc983b1332dc
+Top:    03e0d857be2abeca4aaf50a1c372dc983b1332dc
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-04-13 13:18:07 -0700
+
+rdma_cm: Detect recursive calls to rdma_seterrno()
+
+If rdma_seterrno() is called in a recursive fashion, the
+result is that errno ends up set to -1.  Fix the original
+occurrence of where this occurs and update rdma_seterrno()
+to avoid it modifying errno incorrectly.
+
+Problem reported by hookenz@gmail.com.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+

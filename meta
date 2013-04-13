@@ -1,7 +1,8 @@
 Version: 1
-Previous: c4ce73228e58ed73af116fb48a81178824fe2439
-Head: e57928b701ded6c5417b5ac0c153a239bf947612
+Previous: 9699c988c65ab0a2e72679067f9d452da74c4d9b
+Head: d5241e70cdc99093a932a43dfceb6a52b94ce5c0
 Applied:
+  seterr: d5241e70cdc99093a932a43dfceb6a52b94ce5c0
 Unapplied:
   rs_wrid: 0d6ca1300d88377ae7f9162457e64c541a4630eb
   rs-iwarp: 21a157ca83b54ae7a61861c8eb87c39d3f31dd3e
