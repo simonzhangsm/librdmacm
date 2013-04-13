@@ -1,14 +1,13 @@
 Bottom: 03e0d857be2abeca4aaf50a1c372dc983b1332dc
-Top:    03e0d857be2abeca4aaf50a1c372dc983b1332dc
+Top:    4f3a388da1a77b8f0e2ff2459b2b2b48f8c3aa0e
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-04-13 13:18:07 -0700
 
 rdma_cm: Detect recursive calls to rdma_seterrno()
 
 If rdma_seterrno() is called in a recursive fashion, the
-result is that errno ends up set to -1.  Fix the original
-occurrence of where this occurs and update rdma_seterrno()
-to avoid it modifying errno incorrectly.
+result is that errno ends up set to -1.  We can avoid this
+by only setting errno if the return value is > 0.
 
 Problem reported by hookenz@gmail.com.
 
@@ -17,4 +16,16 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 ---
 
-
+diff --git a/include/rdma/rdma_verbs.h b/include/rdma/rdma_verbs.h
+index 198c6a5..8314fe7 100644
+--- a/include/rdma/rdma_verbs.h
++++ b/include/rdma/rdma_verbs.h
+@@ -44,7 +44,7 @@ extern "C" {
+ 
+ static inline int rdma_seterrno(int ret)
+ {
+-	if (ret) {
++	if (ret > 0) {
+ 		errno = ret;
+ 		ret = -1;
+ 	}
