@@ -44,7 +44,7 @@ extern "C" {
 
 static inline int rdma_seterrno(int ret)
 {
-	if (ret) {
+	if (ret > 0) {
 		errno = ret;
 		ret = -1;
 	}
