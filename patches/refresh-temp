@@ -1,0 +1,68 @@
+Bottom: 3612aa65b26b315fdd6f5107e52c41cda33fe4ae
+Top:    65636beb13b8ae7b28da070da7c6de6af4e4ef9b
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-04-14 09:52:05 -0700
+
+Refresh of rs-iwarp
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index f9c31cd..79aa53b 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -1597,7 +1597,6 @@ static int rs_post_write_msg(struct rsocket *rs,
+ 
+ 		return rdma_seterrno(ibv_post_send(rs->cm_id->qp, &wr, &bad));
+ 	} else {
+-		/* TODO: adjust sqe_avail and ctrl_avail for extra post */
+ 		ret = rs_post_write(rs, sgl, nsge, msg, flags, addr, rkey);
+ 		if (!ret)
+ 			ret = rs_post_msg(rs, msg);
+@@ -1636,6 +1635,8 @@ static int rs_write_data(struct rsocket *rs,
+ 
+ 	rs->sseq_no++;
+ 	rs->sqe_avail--;
++	if (rs->opts & RS_OPT_MSG_SEND)
++		rs->sqe_avail--;
+ 	rs->sbuf_bytes_avail -= length;
+ 
+ 	addr = rs->target_sgl[rs->target_sge].addr;
+@@ -1673,6 +1674,8 @@ static int rs_write_iomap(struct rsocket *rs, struct rs_iomap_mr *iomr,
+ 
+ 	rs->sseq_no++;
+ 	rs->sqe_avail--;
++	if (rs->opts & RS_OPT_MSG_SEND)
++		rs->sqe_avail--;
+ 	rs->sbuf_bytes_avail -= sizeof(struct rs_iomap);
+ 
+ 	addr = rs->remote_iomap.addr + iomr->index * sizeof(struct rs_iomap);
+@@ -1694,6 +1697,9 @@ static void rs_send_credits(struct rsocket *rs)
+ 	rs->ctrl_avail--;
+ 	rs->rseq_comp = rs->rseq_no + (rs->rq_size >> 1);
+ 	if (rs->rbuf_bytes_avail >= (rs->rbuf_size >> 1)) {
++		if (rs->opts & RS_OPT_MSG_SEND)
++			rs->ctrl_avail--;
++
+ 		if (!(rs->opts & RS_OPT_SWAP_SGL)) {
+ 			sge.addr = (uintptr_t) &rs->rbuf[rs->rbuf_free_offset];
+ 			sge.key = rs->rmr->rkey;
+@@ -1728,9 +1734,15 @@ static void rs_send_credits(struct rsocket *rs)
+ 
+ static int rs_give_credits(struct rsocket *rs)
+ {
+-	return ((rs->rbuf_bytes_avail >= (rs->rbuf_size >> 1)) ||
+-	        ((short) ((short) rs->rseq_no - (short) rs->rseq_comp) >= 0)) &&
+-	       rs->ctrl_avail && (rs->state & rs_connected);
++	if (!(rs->opts & RS_OPT_MSG_SEND)) {
++		return ((rs->rbuf_bytes_avail >= (rs->rbuf_size >> 1)) ||
++			((short) ((short) rs->rseq_no - (short) rs->rseq_comp) >= 0)) &&
++		       rs->ctrl_avail && (rs->state & rs_connected);
++	} else {
++		return ((rs->rbuf_bytes_avail >= (rs->rbuf_size >> 1)) ||
++			((short) ((short) rs->rseq_no - (short) rs->rseq_comp) >= 0)) &&
++		       (rs->ctrl_avail > 1) && (rs->state & rs_connected);
++	}
+ }
+ 
+ static void rs_update_credits(struct rsocket *rs)
