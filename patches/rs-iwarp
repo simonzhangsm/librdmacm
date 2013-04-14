@@ -1,5 +1,5 @@
 Bottom: e8c026d3862906d30200710fcc27654d4fb2d580
-Top:    65636beb13b8ae7b28da070da7c6de6af4e4ef9b
+Top:    bff779db354e313c0743548a5ef661a763005024
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-04-11 10:05:29 -0700
 
@@ -15,7 +15,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index ca77116..79aa53b 100644
+index ca77116..4caa93a 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -123,6 +123,7 @@ enum {
@@ -166,16 +166,16 @@ index ca77116..79aa53b 100644
 -	wr.wr.rdma.remote_addr = addr;
 -	wr.wr.rdma.rkey = rkey;
 +	if (!(rs->opts & RS_OPT_MSG_SEND)) {
-+		wr.sg_list = &sge;
-+		wr.num_sge = 1;
-+		wr.opcode = IBV_WR_SEND;
-+		wr.send_flags = IBV_SEND_INLINE;
-+	} else {
 +		wr.sg_list = NULL;
 +		wr.num_sge = 0;
 +		wr.opcode = IBV_WR_RDMA_WRITE_WITH_IMM;
 +		wr.send_flags = 0;
 +		wr.imm_data = htonl(msg);
++	} else {
++		wr.sg_list = &sge;
++		wr.num_sge = 1;
++		wr.opcode = IBV_WR_SEND;
++		wr.send_flags = IBV_SEND_INLINE;
 +	}
  
  	return rdma_seterrno(ibv_post_send(rs->cm_id->qp, &wr, &bad));
