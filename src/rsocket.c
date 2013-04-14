@@ -1548,6 +1548,9 @@ static int rs_post_msg(struct rsocket *rs, uint32_t msg)
 		wr.send_flags = 0;
 		wr.imm_data = htonl(msg);
 	} else {
+		sge.addr = (uintptr_t) &msg;
+		sge.lkey = 0;
+		sge.length = sizeof msg;
 		wr.sg_list = &sge;
 		wr.num_sge = 1;
 		wr.opcode = IBV_WR_SEND;
