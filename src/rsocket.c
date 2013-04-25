@@ -1769,7 +1769,7 @@ static int rs_poll_cq(struct rsocket *rs)
 			if (wc.wc_flags & IBV_WC_WITH_IMM) {
 				msg = ntohl(wc.imm_data);
 			} else {
-				msg = ((uint32_t *) rs->rbuf + rs->rbuf_size)
+				msg = ((uint32_t *) (rs->rbuf + rs->rbuf_size))
 					[rs_wr_data(wc.wr_id)];
 
 			}
