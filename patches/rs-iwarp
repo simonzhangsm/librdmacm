@@ -1,5 +1,5 @@
 Bottom: e8c026d3862906d30200710fcc27654d4fb2d580
-Top:    c5c0a8d77b30dce5118ede52a82222293855e48c
+Top:    ada72972ae703c69e7f04146245c4890486e2a3b
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-04-11 10:05:29 -0700
 
@@ -15,7 +15,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index ca77116..f529a3c 100644
+index ca77116..0d84d02 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -123,6 +123,7 @@ enum {
@@ -292,7 +292,7 @@ index ca77116..f529a3c 100644
 +			if (wc.wc_flags & IBV_WC_WITH_IMM) {
 +				msg = ntohl(wc.imm_data);
 +			} else {
-+				msg = ((uint32_t *) rs->rbuf + rs->rbuf_size)
++				msg = ((uint32_t *) (rs->rbuf + rs->rbuf_size))
 +					[rs_wr_data(wc.wr_id)];
 +
 +			}
