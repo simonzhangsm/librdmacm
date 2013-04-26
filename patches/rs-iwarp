@@ -1,5 +1,5 @@
 Bottom: e8c026d3862906d30200710fcc27654d4fb2d580
-Top:    ada72972ae703c69e7f04146245c4890486e2a3b
+Top:    de87f5a87dd536025f4ce22a3bad2600d4350081
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-04-11 10:05:29 -0700
 
@@ -15,7 +15,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index ca77116..0d84d02 100644
+index ca77116..abdd392 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -123,6 +123,7 @@ enum {
@@ -142,7 +142,17 @@ index ca77116..0d84d02 100644
  	ret = rs_init_bufs(rs);
  	if (ret)
  		return ret;
-@@ -1508,22 +1534,28 @@ int rconnect(int socket, const struct sockaddr *addr, socklen_t addrlen)
+@@ -1224,6 +1250,9 @@ do_connect:
+ 		param.flow_control = 1;
+ 		param.retry_count = 7;
+ 		param.rnr_retry_count = 7;
++		/* work-around: iWarp issues RDMA read during connection */
++		if (rs->opts & RS_OPT_MSG_SEND)
++			param.initiator_depth = 1;
+ 		rs->retries = 0;
+ 
+ 		ret = rdma_connect(rs->cm_id, &param);
+@@ -1508,22 +1537,28 @@ int rconnect(int socket, const struct sockaddr *addr, socklen_t addrlen)
  	return ret;
  }
  
@@ -183,7 +193,7 @@ index ca77116..0d84d02 100644
  
  	return rdma_seterrno(ibv_post_send(rs->cm_id->qp, &wr, &bad));
  }
-@@ -1547,6 +1579,34 @@ static int rs_post_write(struct rsocket *rs,
+@@ -1547,6 +1582,34 @@ static int rs_post_write(struct rsocket *rs,
  	return rdma_seterrno(ibv_post_send(rs->cm_id->qp, &wr, &bad));
  }
  
@@ -218,7 +228,7 @@ index ca77116..0d84d02 100644
  static int ds_post_send(struct rsocket *rs, struct ibv_sge *sge,
  			uint32_t wr_data)
  {
-@@ -1578,6 +1638,8 @@ static int rs_write_data(struct rsocket *rs,
+@@ -1578,6 +1641,8 @@ static int rs_write_data(struct rsocket *rs,
  
  	rs->sseq_no++;
  	rs->sqe_avail--;
@@ -227,7 +237,7 @@ index ca77116..0d84d02 100644
  	rs->sbuf_bytes_avail -= length;
  
  	addr = rs->target_sgl[rs->target_sge].addr;
-@@ -1615,6 +1677,8 @@ static int rs_write_iomap(struct rsocket *rs, struct rs_iomap_mr *iomr,
+@@ -1615,6 +1680,8 @@ static int rs_write_iomap(struct rsocket *rs, struct rs_iomap_mr *iomr,
  
  	rs->sseq_no++;
  	rs->sqe_avail--;
@@ -236,7 +246,7 @@ index ca77116..0d84d02 100644
  	rs->sbuf_bytes_avail -= sizeof(struct rs_iomap);
  
  	addr = rs->remote_iomap.addr + iomr->index * sizeof(struct rs_iomap);
-@@ -1636,6 +1700,9 @@ static void rs_send_credits(struct rsocket *rs)
+@@ -1636,6 +1703,9 @@ static void rs_send_credits(struct rsocket *rs)
  	rs->ctrl_avail--;
  	rs->rseq_comp = rs->rseq_no + (rs->rq_size >> 1);
  	if (rs->rbuf_bytes_avail >= (rs->rbuf_size >> 1)) {
@@ -246,7 +256,7 @@ index ca77116..0d84d02 100644
  		if (!(rs->opts & RS_OPT_SWAP_SGL)) {
  			sge.addr = (uintptr_t) &rs->rbuf[rs->rbuf_free_offset];
  			sge.key = rs->rmr->rkey;
-@@ -1664,17 +1731,21 @@ static void rs_send_credits(struct rsocket *rs)
+@@ -1664,17 +1734,21 @@ static void rs_send_credits(struct rsocket *rs)
  		if (++rs->remote_sge == rs->remote_sgl.length)
  			rs->remote_sge = 0;
  	} else {
@@ -274,7 +284,7 @@ index ca77116..0d84d02 100644
  }
  
  static void rs_update_credits(struct rsocket *rs)
-@@ -1686,7 +1757,7 @@ static void rs_update_credits(struct rsocket *rs)
+@@ -1686,7 +1760,7 @@ static void rs_update_credits(struct rsocket *rs)
  static int rs_poll_cq(struct rsocket *rs)
  {
  	struct ibv_wc wc;
@@ -283,7 +293,7 @@ index ca77116..0d84d02 100644
  	int ret, rcnt = 0;
  
  	while ((ret = ibv_poll_cq(rs->cm_id->recv_cq, 1, &wc)) > 0) {
-@@ -1695,19 +1766,25 @@ static int rs_poll_cq(struct rsocket *rs)
+@@ -1695,19 +1769,25 @@ static int rs_poll_cq(struct rsocket *rs)
  				continue;
  			rcnt++;
  
@@ -314,7 +324,7 @@ index ca77116..0d84d02 100644
  					rs->state &= ~rs_readable;
  				}
  				break;
-@@ -1715,8 +1792,8 @@ static int rs_poll_cq(struct rsocket *rs)
+@@ -1715,8 +1795,8 @@ static int rs_poll_cq(struct rsocket *rs)
  				/* We really shouldn't be here. */
  				break;
  			default:
@@ -325,7 +335,7 @@ index ca77116..0d84d02 100644
  				if (++rs->rmsg_tail == rs->rq_size + 1)
  					rs->rmsg_tail = 0;
  				break;
-@@ -2037,9 +2114,15 @@ static int rs_poll_all(struct rsocket *rs)
+@@ -2037,9 +2117,15 @@ static int rs_poll_all(struct rsocket *rs)
   */
  static int rs_can_send(struct rsocket *rs)
  {
@@ -344,7 +354,7 @@ index ca77116..0d84d02 100644
  }
  
  static int ds_can_send(struct rsocket *rs)
-@@ -3011,8 +3094,7 @@ int rshutdown(int socket, int how)
+@@ -3011,8 +3097,7 @@ int rshutdown(int socket, int how)
  
  		if ((rs->state & rs_connected) && rs->ctrl_avail) {
  			rs->ctrl_avail--;
