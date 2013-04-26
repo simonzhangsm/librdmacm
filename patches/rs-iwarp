@@ -9,6 +9,10 @@ iWarp does not support RDMA writes with immediate data.
 Instead of sending messages using immediate data, allow
 the rsocket protocol to exchange messages using sends.
 
+The rsocket protocol remains the same.  RDMA writes are
+used for data transfers, with send messages used to transfer
+rsocket protocol messages.
+
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
