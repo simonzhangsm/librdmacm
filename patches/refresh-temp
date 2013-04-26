@@ -1,0 +1,23 @@
+Bottom: ada72972ae703c69e7f04146245c4890486e2a3b
+Top:    de87f5a87dd536025f4ce22a3bad2600d4350081
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-04-26 12:25:56 -0700
+
+Refresh of rs-iwarp
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 0d84d02..abdd392 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -1250,6 +1250,9 @@ do_connect:
+ 		param.flow_control = 1;
+ 		param.retry_count = 7;
+ 		param.rnr_retry_count = 7;
++		/* work-around: iWarp issues RDMA read during connection */
++		if (rs->opts & RS_OPT_MSG_SEND)
++			param.initiator_depth = 1;
+ 		rs->retries = 0;
+ 
+ 		ret = rdma_connect(rs->cm_id, &param);
