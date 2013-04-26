@@ -1250,6 +1250,9 @@ do_connect:
 		param.flow_control = 1;
 		param.retry_count = 7;
 		param.rnr_retry_count = 7;
+		/* work-around: iWarp issues RDMA read during connection */
+		if (rs->opts & RS_OPT_MSG_SEND)
+			param.initiator_depth = 1;
 		rs->retries = 0;
 
 		ret = rdma_connect(rs->cm_id, &param);
