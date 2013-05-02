@@ -1,0 +1,22 @@
+Bottom: de87f5a87dd536025f4ce22a3bad2600d4350081
+Top:    8a390d252308cd09643f72cd833cd7c7c8db9ff7
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-05-02 13:40:51 -0700
+
+Refresh of afib
+
+---
+
+diff --git a/include/infiniband/ib.h b/include/infiniband/ib.h
+index 2e5029a..e9d0a53 100644
+--- a/include/infiniband/ib.h
++++ b/include/infiniband/ib.h
+@@ -37,7 +37,7 @@
+ #include <string.h>
+ 
+ #ifndef AF_IB
+-#define AF_IB 27
++#define AF_IB 129
+ #endif
+ #ifndef PF_IB
+ #define PF_IB AF_IB
