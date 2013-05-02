@@ -1,0 +1,15 @@
+Bottom: 8a390d252308cd09643f72cd833cd7c7c8db9ff7
+Top:    8a390d252308cd09643f72cd833cd7c7c8db9ff7
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-05-02 13:47:51 -0700
+
+lib: Rename autoconf.in to autoconf.ac
+
+Update to latest autotools naming.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
