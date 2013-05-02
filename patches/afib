@@ -1,0 +1,13 @@
+Bottom: de87f5a87dd536025f4ce22a3bad2600d4350081
+Top:    de87f5a87dd536025f4ce22a3bad2600d4350081
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-05-02 13:38:37 -0700
+
+rdmacm: Update AF_IB to match latest value in kernel patches
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
