@@ -1,0 +1,13 @@
+Bottom: 8a390d252308cd09643f72cd833cd7c7c8db9ff7
+Top:    7ece3fa6dd47b12e7c5ef5862880d3c9b1f93576
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-05-02 13:48:10 -0700
+
+Refresh of autog
+
+---
+
+diff --git a/configure.in b/configure.ac
+similarity index 100%
+rename from configure.in
+rename to configure.ac
