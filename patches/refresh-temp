@@ -1,0 +1,20 @@
+Bottom: bd3dc75f7f730ca898630a615ebb0359ffcf66e4
+Top:    fdd78452d7e02d706c88b4821b9ff48bc33218cb
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-05-03 15:03:15 -0700
+
+Refresh of test
+
+---
+
+diff --git a/src/cma.c b/src/cma.c
+index 923e611..2fb9913 100755
+--- a/src/cma.c
++++ b/src/cma.c
+@@ -584,7 +584,6 @@ static int ucma_query_addr(struct rdma_cm_id *id)
+ 		if (ret)
+ 			return ret;
+ 		id->port_num = resp.port_num;
+-printf("port num %d\n", id->port_num);
+ 		id->route.addr.addr.ibaddr.pkey = resp.pkey;
+ 	}
