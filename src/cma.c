@@ -584,7 +584,6 @@ static int ucma_query_addr(struct rdma_cm_id *id)
 		if (ret)
 			return ret;
 		id->port_num = resp.port_num;
-printf("port num %d\n", id->port_num);
 		id->route.addr.addr.ibaddr.pkey = resp.pkey;
 	}
 
