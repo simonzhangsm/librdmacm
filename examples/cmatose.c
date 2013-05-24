@@ -81,6 +81,7 @@ static uint8_t tos;
 static uint8_t migrate = 0;
 static char *dst_addr;
 static char *src_addr;
+static char addr_type = 'u';
 
 static int create_message(struct cmatest_node *node)
 {
@@ -508,7 +509,11 @@ static int run_server(void)
 	}
 
 	memset(&hints, 0, sizeof hints);
-	hints.ai_flags = RAI_PASSIVE;
+	if (addr_type == 'g') {
+		hints.ai_flags = RAI_FAMILY;
+		hints.ai_family = AF_IB;
+	}
+	hints.ai_flags |= RAI_PASSIVE;
 	hints.ai_port_space = RDMA_PS_TCP;
 	ret = get_rdma_addr(src_addr, dst_addr, port, &hints, &test.rai);
 	if (ret) {
@@ -585,6 +590,10 @@ static int run_client(void)
 	printf("cmatose: starting client\n");
 
 	memset(&hints, 0, sizeof hints);
+	if (addr_type == 'g') {
+		hints.ai_flags = RAI_FAMILY;
+		hints.ai_family = AF_IB;
+	}
 	hints.ai_port_space = RDMA_PS_TCP;
 	ret = get_rdma_addr(src_addr, dst_addr, port, &hints, &test.rai);
 	if (ret) {
@@ -679,6 +688,8 @@ int main(int argc, char **argv)
 			printf("\t[-t type_of_service]\n");
 			printf("\t[-p port_number]\n");
 			printf("\t[-m(igrate)]\n");
+			printf("\t[-f addr_format] - i(p), n(ame), l(id), g(gid), or u(nspecified)\n");
+			printf("\t                   address format for -s and -b options, default: 'u'\n");
 			exit(1);
 		}
 	}
