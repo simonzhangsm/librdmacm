@@ -1,0 +1,17 @@
+Bottom: fdd78452d7e02d706c88b4821b9ff48bc33218cb
+Top:    fdd78452d7e02d706c88b4821b9ff48bc33218cb
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-05-23 17:49:57 -0700
+
+examples: Support GID addresses
+
+Allow a user to specify a GID address as input to the example
+programs.  This allows the examples to use native IB addresses
+via AF_IB support.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
