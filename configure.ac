@@ -70,14 +70,6 @@ AC_CHECK_HEADER(valgrind/memcheck.h, [],
 fi
 fi
 
-AC_CHECK_HEADER(infiniband/acm.h, 
-	AC_DEFINE([USE_IB_ACM], 1, [setting IBACM support]), [])
-
-AC_CHECK_HEADER(infiniband/acm.h,
-	AC_CHECK_MEMBER(struct acm_msg.resolve_data, [],
-		AC_DEFINE(DEFINE_ACM_MSG, 1, [adding ACM message definition]),
-			[#include <infiniband/acm.h>]), [])
-
 dnl Checks close on exec support
 AC_CHECK_HEADERS([fcntl.h sys/socket.h])
 
