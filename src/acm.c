@@ -45,6 +45,7 @@
 #include <infiniband/ib.h>
 #include <infiniband/sa.h>
 
+#ifdef USE_IB_ACM
 #include <infiniband/acm.h>
 
 #if DEFINE_ACM_MSG
@@ -400,3 +401,5 @@ void ucma_ib_resolve(struct rdma_addrinfo **rai, struct rdma_addrinfo *hints)
 	if (af_ib_support && !(hints->ai_flags & RAI_ROUTEONLY) && (*rai)->ai_route_len)
 		ucma_resolve_af_ib(rai);
 }
+
+#endif /* USE_IB_ACM */
