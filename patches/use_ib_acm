@@ -1,5 +1,5 @@
 Bottom: dea28249bab2900df7671c13af22955206666c9e
-Top:    dea28249bab2900df7671c13af22955206666c9e
+Top:    08cdb9a8cfd429d8b0018d91813c88ace4431342
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-06-10 10:52:29 -0700
 
@@ -16,4 +16,104 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 ---
 
-
+diff --git a/configure.ac b/configure.ac
+index 35d79dd..3ce7a6e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -70,9 +70,6 @@ AC_CHECK_HEADER(valgrind/memcheck.h, [],
+ fi
+ fi
+ 
+-AC_CHECK_HEADER(infiniband/acm.h, 
+-	AC_DEFINE([USE_IB_ACM], 1, [setting IBACM support]), [])
+-
+ AC_CHECK_HEADER(infiniband/acm.h,
+ 	AC_CHECK_MEMBER(struct acm_msg.resolve_data, [],
+ 		AC_DEFINE(DEFINE_ACM_MSG, 1, [adding ACM message definition]),
+diff --git a/examples/cmatose.c b/examples/cmatose.c
+index ca92f11..2971ed1 100644
+--- a/examples/cmatose.c
++++ b/examples/cmatose.c
+@@ -44,6 +44,7 @@
+ #include <getopt.h>
+ 
+ #include <rdma/rdma_cma.h>
++#include <infiniband/ib.h>
+ #include "common.h"
+ 
+ struct cmatest_node {
+@@ -510,7 +511,7 @@ static int run_server(void)
+ 
+ 	memset(&hints, 0, sizeof hints);
+ 	if (addr_type == 'g') {
+-		hints.ai_flags = RAI_FAMILY;
++		hints.ai_flags = RAI_FAMILY | RAI_NUMERICHOST;
+ 		hints.ai_family = AF_IB;
+ 	}
+ 	hints.ai_flags |= RAI_PASSIVE;
+@@ -591,7 +592,7 @@ static int run_client(void)
+ 
+ 	memset(&hints, 0, sizeof hints);
+ 	if (addr_type == 'g') {
+-		hints.ai_flags = RAI_FAMILY;
++		hints.ai_flags = RAI_FAMILY | RAI_NUMERICHOST;
+ 		hints.ai_family = AF_IB;
+ 	}
+ 	hints.ai_port_space = RDMA_PS_TCP;
+@@ -651,7 +652,7 @@ int main(int argc, char **argv)
+ {
+ 	int op, ret;
+ 
+-	while ((op = getopt(argc, argv, "s:b:c:C:S:t:p:m")) != -1) {
++	while ((op = getopt(argc, argv, "s:b:c:C:S:t:p:mf:")) != -1) {
+ 		switch (op) {
+ 		case 's':
+ 			dst_addr = optarg;
+@@ -678,6 +679,9 @@ int main(int argc, char **argv)
+ 		case 'm':
+ 			migrate = 1;
+ 			break;
++		case 'f':
++			addr_type = optarg[0];
++			break;
+ 		default:
+ 			printf("usage: %s\n", argv[0]);
+ 			printf("\t[-s server_address]\n");
+diff --git a/src/acm.c b/src/acm.c
+index c9ca5b5..c423bb7 100755
+--- a/src/acm.c
++++ b/src/acm.c
+@@ -45,7 +45,6 @@
+ #include <infiniband/ib.h>
+ #include <infiniband/sa.h>
+ 
+-#ifdef USE_IB_ACM
+ #include <infiniband/acm.h>
+ 
+ #if DEFINE_ACM_MSG
+@@ -401,5 +400,3 @@ void ucma_ib_resolve(struct rdma_addrinfo **rai, struct rdma_addrinfo *hints)
+ 	if (af_ib_support && !(hints->ai_flags & RAI_ROUTEONLY) && (*rai)->ai_route_len)
+ 		ucma_resolve_af_ib(rai);
+ }
+-
+-#endif /* USE_IB_ACM */
+diff --git a/src/cma.h b/src/cma.h
+index b575b9b..e6fba8b 100644
+--- a/src/cma.h
++++ b/src/cma.h
+@@ -162,15 +162,9 @@ extern int af_ib_support;
+ 
+ #define RAI_ROUTEONLY		0x01000000
+ 
+-#ifdef USE_IB_ACM
+ void ucma_ib_init();
+ void ucma_ib_cleanup();
+ void ucma_ib_resolve(struct rdma_addrinfo **rai, struct rdma_addrinfo *hints);
+-#else
+-#define ucma_ib_init()
+-#define ucma_ib_cleanup()
+-#define ucma_ib_resolve(x, y)
+-#endif
+ 
+ /* Define path record definition if using older version of libibverbs */
+ #ifdef DEFINE_PATH_RECORD
