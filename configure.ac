@@ -70,11 +70,6 @@ AC_CHECK_HEADER(valgrind/memcheck.h, [],
 fi
 fi
 
-AC_CHECK_HEADER(infiniband/acm.h,
-	AC_CHECK_MEMBER(struct acm_msg.resolve_data, [],
-		AC_DEFINE(DEFINE_ACM_MSG, 1, [adding ACM message definition]),
-			[#include <infiniband/acm.h>]), [])
-
 AC_CACHE_CHECK(whether ld accepts --version-script, ac_cv_version_script,
     if test -n "`$LD --help < /dev/null 2>/dev/null | grep version-script`"; then
         ac_cv_version_script=yes
