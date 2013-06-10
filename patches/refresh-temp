@@ -1,0 +1,23 @@
+Bottom: c27d867ad4aa3272562653403c7f0f0398a62b7c
+Top:    49b5a742e5d5c31be9e2294cd15d8cbb6948eb3b
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-06-10 10:59:03 -0700
+
+Refresh of ex-ib
+
+---
+
+diff --git a/configure.ac b/configure.ac
+index 3ce7a6e..f3bccfe 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -70,6 +70,9 @@ AC_CHECK_HEADER(valgrind/memcheck.h, [],
+ fi
+ fi
+ 
++AC_CHECK_HEADER(infiniband/acm.h, 
++       AC_DEFINE([USE_IB_ACM], 1, [setting IBACM support]), [])
++
+ AC_CHECK_HEADER(infiniband/acm.h,
+ 	AC_CHECK_MEMBER(struct acm_msg.resolve_data, [],
+ 		AC_DEFINE(DEFINE_ACM_MSG, 1, [adding ACM message definition]),
