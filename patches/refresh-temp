@@ -1,0 +1,22 @@
+Bottom: 49b5a742e5d5c31be9e2294cd15d8cbb6948eb3b
+Top:    0f30ed22a8e534bf84ea0c70fd9650cb6cebd864
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-06-10 10:59:29 -0700
+
+Refresh of ex-ib
+
+---
+
+diff --git a/configure.ac b/configure.ac
+index f3bccfe..35d79dd 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -71,7 +71,7 @@ fi
+ fi
+ 
+ AC_CHECK_HEADER(infiniband/acm.h, 
+-       AC_DEFINE([USE_IB_ACM], 1, [setting IBACM support]), [])
++	AC_DEFINE([USE_IB_ACM], 1, [setting IBACM support]), [])
+ 
+ AC_CHECK_HEADER(infiniband/acm.h,
+ 	AC_CHECK_MEMBER(struct acm_msg.resolve_data, [],
