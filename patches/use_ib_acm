@@ -1,0 +1,19 @@
+Bottom: dea28249bab2900df7671c13af22955206666c9e
+Top:    dea28249bab2900df7671c13af22955206666c9e
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-06-10 10:52:29 -0700
+
+init: Remove USE_IB_ACM configuration option
+
+When the librdmacm is configured, it sets the USE_IB_ACM option
+if infininband/acm.h is found.  We can remove this option with
+very little overhead, which would allow a user to install
+ACM after installing the librdmacm, and the librdmacm would be
+able to make use of ACM.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
