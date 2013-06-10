@@ -1,0 +1,15 @@
+Bottom: bc6153f2f25296a1bb53d2aebfc1f6494d365986
+Top:    bc6153f2f25296a1bb53d2aebfc1f6494d365986
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-06-10 12:33:20 -0700
+
+rsockets: Add support for AF_IB
+
+Allow users to specify native IB addresses.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
