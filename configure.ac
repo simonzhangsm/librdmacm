@@ -71,7 +71,7 @@ fi
 fi
 
 AC_CHECK_HEADER(infiniband/acm.h, 
-       AC_DEFINE([USE_IB_ACM], 1, [setting IBACM support]), [])
+	AC_DEFINE([USE_IB_ACM], 1, [setting IBACM support]), [])
 
 AC_CHECK_HEADER(infiniband/acm.h,
 	AC_CHECK_MEMBER(struct acm_msg.resolve_data, [],
