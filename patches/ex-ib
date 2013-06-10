@@ -1,5 +1,5 @@
 Bottom: fdd78452d7e02d706c88b4821b9ff48bc33218cb
-Top:    49b5a742e5d5c31be9e2294cd15d8cbb6948eb3b
+Top:    0f30ed22a8e534bf84ea0c70fd9650cb6cebd864
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-06-10 10:56:57 -0700
 
@@ -12,19 +12,6 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 ---
 
-diff --git a/configure.ac b/configure.ac
-index 35d79dd..f3bccfe 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -71,7 +71,7 @@ fi
- fi
- 
- AC_CHECK_HEADER(infiniband/acm.h, 
--	AC_DEFINE([USE_IB_ACM], 1, [setting IBACM support]), [])
-+       AC_DEFINE([USE_IB_ACM], 1, [setting IBACM support]), [])
- 
- AC_CHECK_HEADER(infiniband/acm.h,
- 	AC_CHECK_MEMBER(struct acm_msg.resolve_data, [],
 diff --git a/examples/cmatose.c b/examples/cmatose.c
 index 2b6b2b1..2971ed1 100644
 --- a/examples/cmatose.c
