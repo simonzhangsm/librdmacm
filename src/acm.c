@@ -48,29 +48,24 @@
 #define ACM_VERSION             1
 
 #define ACM_OP_RESOLVE          0x01
-//#define ACM_OP_ACK              0x80
+#define ACM_OP_ACK              0x80
 
-//#define ACM_STATUS_SUCCESS      0
-//#define ACM_STATUS_ENOMEM       1
-//#define ACM_STATUS_EINVAL       2
-//#define ACM_STATUS_ENODATA      3
-//#define ACM_STATUS_ENOTCONN     5
-//#define ACM_STATUS_ETIMEDOUT    6
-//#define ACM_STATUS_ESRCADDR     7
-//#define ACM_STATUS_ESRCTYPE     8
-//#define ACM_STATUS_EDESTADDR    9
-//#define ACM_STATUS_EDESTTYPE    10
+#define ACM_STATUS_SUCCESS      0
+#define ACM_STATUS_ENOMEM       1
+#define ACM_STATUS_EINVAL       2
+#define ACM_STATUS_ENODATA      3
+#define ACM_STATUS_ENOTCONN     5
+#define ACM_STATUS_ETIMEDOUT    6
+#define ACM_STATUS_ESRCADDR     7
+#define ACM_STATUS_ESRCTYPE     8
+#define ACM_STATUS_EDESTADDR    9
+#define ACM_STATUS_EDESTTYPE    10
 
-//#define ACM_FLAGS_QUERY_SA      (1<<31)
 #define ACM_FLAGS_NODELAY	(1<<30)
 
 #define ACM_MSG_HDR_LENGTH      16
 #define ACM_MAX_ADDRESS         64
 #define ACM_MSG_EP_LENGTH       72
-/*
- * Support up to 6 path records (primary and alternate CM paths,
- * inbound and outbound primary and alternate data paths), plus CM data.
- */
 #define ACM_MSG_DATA_LENGTH     (ACM_MSG_EP_LENGTH * 8)
 
 struct acm_hdr {
@@ -82,7 +77,7 @@ struct acm_hdr {
 	uint64_t                tid;
 };
 
-//#define ACM_EP_INFO_NAME        0x0001
+#define ACM_EP_INFO_NAME        0x0001
 #define ACM_EP_INFO_ADDRESS_IP  0x0002
 #define ACM_EP_INFO_ADDRESS_IP6 0x0003
 #define ACM_EP_INFO_PATH        0x0010
@@ -103,12 +98,6 @@ struct acm_ep_addr_data {
 	union acm_ep_info       info;
 };
 
-/*
- * Resolve messages with the opcode set to ACM_OP_RESOLVE are only
- * used to communicate with the local ib_acm service.  Message fields
- * in this case are not byte swapped, but note that the acm_ep_info
- * data is in network order.
- */
 struct acm_resolve_msg {
 	struct acm_hdr          hdr;
 	struct acm_ep_addr_data data[0];
@@ -121,9 +110,6 @@ struct acm_msg {
 		struct acm_ep_addr_data resolve_data[0];
 	};
 };
-
-
-
 
 static pthread_mutex_t acm_lock = PTHREAD_MUTEX_INITIALIZER;
 static int sock = -1;
