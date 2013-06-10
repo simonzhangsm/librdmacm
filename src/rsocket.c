@@ -329,6 +329,8 @@ struct rsocket {
 	long		  fd_flags;
 	uint64_t	  so_opts;
 	uint64_t	  ipv6_opts;
+	void		  *optval;
+	size_t		  optlen;
 	int		  state;
 	int		  cq_armed;
 	int		  retries;
@@ -1243,7 +1245,15 @@ resolve_addr:
 		rs->retries = 0;
 resolve_route:
 		to = 1000 << rs->retries++;
-		ret = rdma_resolve_route(rs->cm_id, to);
+		if (rs->optval) {
+			ret = rdma_set_option(rs->cm_id,  RDMA_OPTION_IB,
+					      RDMA_OPTION_IB_PATH, rs->optval,
+					      rs->optlen);
+			free(rs->optval);
+			rs->optval = NULL;
+		} else {
+			ret = rdma_resolve_route(rs->cm_id, to);
+		}
 		if (!ret)
 			goto do_connect;
 		if (errno == EAGAIN || errno == EWOULDBLOCK)
@@ -3311,6 +3321,15 @@ int rsetsockopt(int socket, int level, int optname,
 		case RDMA_IOMAPSIZE:
 			rs->target_iomap_size = (uint16_t) rs_scale_to_value(
 				(uint8_t) rs_value_to_scale(*(int *) optval, 8), 8);
+			break;
+		case RDMA_ROUTE:
+			if ((rs->optval = calloc(optlen, 1))) {
+				memcpy(rs->optval, optval, optlen);
+				rs->optlen = optlen;
+				ret = 0;
+			} else {
+				ret = ERR(ENOMEM);
+			}
 			break;
 		default:
 			break;
