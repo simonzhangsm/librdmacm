@@ -44,6 +44,7 @@
 #include <getopt.h>
 
 #include <rdma/rdma_cma.h>
+#include <infiniband/ib.h>
 #include "common.h"
 
 struct cmatest_node {
@@ -510,7 +511,7 @@ static int run_server(void)
 
 	memset(&hints, 0, sizeof hints);
 	if (addr_type == 'g') {
-		hints.ai_flags = RAI_FAMILY;
+		hints.ai_flags = RAI_FAMILY | RAI_NUMERICHOST;
 		hints.ai_family = AF_IB;
 	}
 	hints.ai_flags |= RAI_PASSIVE;
@@ -591,7 +592,7 @@ static int run_client(void)
 
 	memset(&hints, 0, sizeof hints);
 	if (addr_type == 'g') {
-		hints.ai_flags = RAI_FAMILY;
+		hints.ai_flags = RAI_FAMILY | RAI_NUMERICHOST;
 		hints.ai_family = AF_IB;
 	}
 	hints.ai_port_space = RDMA_PS_TCP;
@@ -651,7 +652,7 @@ int main(int argc, char **argv)
 {
 	int op, ret;
 
-	while ((op = getopt(argc, argv, "s:b:c:C:S:t:p:m")) != -1) {
+	while ((op = getopt(argc, argv, "s:b:c:C:S:t:p:mf:")) != -1) {
 		switch (op) {
 		case 's':
 			dst_addr = optarg;
@@ -677,6 +678,9 @@ int main(int argc, char **argv)
 			break;
 		case 'm':
 			migrate = 1;
+			break;
+		case 'f':
+			addr_type = optarg[0];
 			break;
 		default:
 			printf("usage: %s\n", argv[0]);
