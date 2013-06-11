@@ -3,9 +3,12 @@ Top:    bc6153f2f25296a1bb53d2aebfc1f6494d365986
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-06-10 12:33:20 -0700
 
-rsockets: Add support for AF_IB
+rsockets: Add ability to set the IB route directly
 
-Allow users to specify native IB addresses.
+Add an RDMA specific rsocket option that allows the user
+to program the RDMA route directly.  This is useful
+for apps that have path record data available, either
+through the ibacm or SSA.
 
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
