@@ -1,5 +1,5 @@
 Bottom: 339f42f99074732d6646a2c98d4674ae2e4b0df3
-Top:    339f42f99074732d6646a2c98d4674ae2e4b0df3
+Top:    eaad6b3aa44a8994aded4e4b5a0366ed8a2c1db1
 Author: Yann Droneaud <ydroneaud@opteya.com>
 Date:   2013-07-16 16:03:42 -0700
 
@@ -13,4 +13,33 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 ---
 
-
+diff --git a/include/rdma/rdma_cma.h b/include/rdma/rdma_cma.h
+old mode 100755
+new mode 100644
+diff --git a/man/rdma_accept.3 b/man/rdma_accept.3
+old mode 100755
+new mode 100644
+diff --git a/man/rdma_connect.3 b/man/rdma_connect.3
+old mode 100755
+new mode 100644
+diff --git a/man/rdma_create_qp.3 b/man/rdma_create_qp.3
+old mode 100755
+new mode 100644
+diff --git a/man/rdma_getaddrinfo.3 b/man/rdma_getaddrinfo.3
+old mode 100755
+new mode 100644
+diff --git a/man/rdma_join_multicast.3 b/man/rdma_join_multicast.3
+old mode 100755
+new mode 100644
+diff --git a/man/rdma_notify.3 b/man/rdma_notify.3
+old mode 100755
+new mode 100644
+diff --git a/src/acm.c b/src/acm.c
+old mode 100755
+new mode 100644
+diff --git a/src/addrinfo.c b/src/addrinfo.c
+old mode 100755
+new mode 100644
+diff --git a/src/cma.c b/src/cma.c
+old mode 100755
+new mode 100644
