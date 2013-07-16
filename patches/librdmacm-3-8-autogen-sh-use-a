@@ -3,7 +3,7 @@ Top:    49392529800f64a7bbfa39709046349777c78c1f
 Author: Jeff Squyres <jsquyres@cisco.com>
 Date:   2013-07-16 23:59:47 +0200
 
-[librdmacm,3/8] autogen.sh: Use autoreconf in autogen.sh
+autogen.sh: Use autoreconf in autogen.sh
 
 The old sequence of Autotools commands listed in autogen.sh is no
 longer correct.  Instead, just use the single "autoreconf" command,
