@@ -1,6 +1,6 @@
 Bottom: 339f42f99074732d6646a2c98d4674ae2e4b0df3
 Top:    339f42f99074732d6646a2c98d4674ae2e4b0df3
-Author: Sean Hefty <sean.hefty@intel.com>
+Author: Yann Droneaud <ydroneaud@opteya.com>
 Date:   2013-07-16 16:03:42 -0700
 
 Source code and man page should not be executable.
