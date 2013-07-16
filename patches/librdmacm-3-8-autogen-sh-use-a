@@ -1,0 +1,34 @@
+Bottom: 163b2f7cf50d25c19bb7a3191c3455a16694208f
+Top:    49392529800f64a7bbfa39709046349777c78c1f
+Author: Jeff Squyres <jsquyres@cisco.com>
+Date:   2013-07-16 23:59:47 +0200
+
+[librdmacm,3/8] autogen.sh: Use autoreconf in autogen.sh
+
+The old sequence of Autotools commands listed in autogen.sh is no
+longer correct.  Instead, just use the single "autoreconf" command,
+which will invoke all the Right Autotools commands in the correct
+order.
+
+Signed-off-by: Jeff Squyres <jsquyres@cisco.com>
+Signed-off-by: Yann Droneaud <ydroneaud@opteya.com>
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+diff --git a/autogen.sh b/autogen.sh
+index f433312..6c9233e 100755
+--- a/autogen.sh
++++ b/autogen.sh
+@@ -1,9 +1,4 @@
+ #! /bin/sh
+ 
+ set -x
+-test -d ./config || mkdir ./config
+-aclocal -I config
+-libtoolize --force --copy
+-autoheader
+-automake --foreign --add-missing --copy
+-autoconf
++autoreconf -ifv -I config

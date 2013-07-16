@@ -1,0 +1,35 @@
+Bottom: fdd30dbbdc59d8b005e99a296f15d45163ffc810
+Top:    75ed99f148ae5b99a29c244e6ffa4669a1043228
+Author: Yann Droneaud <ydroneaud@opteya.com>
+Date:   2013-07-16 23:59:49 +0200
+
+[librdmacm,5/8] configure: Use automake's option "subdir-objects"
+
+Following advice in "Autotool Mythbuster" [1], option subdir-objects
+can be used to have Makefiles create object files in the same
+directory than theirs source files.
+
+It reduces clobbering in the build directory.
+
+[1] "Autotool Mythbuster", by Diego Elio "Flameeyes" Petten`o
+http://www.flameeyes.eu/autotools-mythbuster/automake/nonrecursive.html
+
+Signed-off-by: Yann Droneaud <ydroneaud@opteya.com>
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+diff --git a/configure.ac b/configure.ac
+index a85ce49..9fd9e9e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -6,7 +6,7 @@ AC_CONFIG_SRCDIR([src/cma.c])
+ AC_CONFIG_AUX_DIR(config)
+ AC_CONFIG_MACRO_DIR(config)
+ AC_CONFIG_HEADERS([config.h])
+-AM_INIT_AUTOMAKE([foreign])
++AM_INIT_AUTOMAKE([foreign subdir-objects])
+ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+ 
+ LT_INIT
