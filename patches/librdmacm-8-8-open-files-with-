@@ -3,7 +3,7 @@ Top:    339f42f99074732d6646a2c98d4674ae2e4b0df3
 Author: Yann Droneaud <ydroneaud@opteya.com>
 Date:   2013-07-16 23:59:52 +0200
 
-[librdmacm,8/8] Open files with "close on exec" flag
+Open files with "close on exec" flag
 
 File opened by librdmacm are not supposed to be inherited across
 exec*(), most of the files are of no use for another program, and
