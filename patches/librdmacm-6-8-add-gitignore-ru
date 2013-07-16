@@ -3,7 +3,7 @@ Top:    c9ebc6b5562a7d1133b72a28b9370623dd93ac65
 Author: Yann Droneaud <ydroneaud@opteya.com>
 Date:   2013-07-16 23:59:50 +0200
 
-[librdmacm,6/8] Add .gitignore rules
+Add .gitignore rules
 
 Add the list of files/patterns to be exclueded from git status output.
 Additionally it will prevent such files/patterns to be added and committed.
