@@ -3,6 +3,8 @@ Top:    339f42f99074732d6646a2c98d4674ae2e4b0df3
 Author: Yann Droneaud <ydroneaud@opteya.com>
 Date:   2013-07-16 16:03:42 -0700
 
+Remove executable mode bit on text files
+
 Source code and man page should not be executable.
 
 Signed-off-by: Yann Droneaud <ydroneaud@opteya.com>
