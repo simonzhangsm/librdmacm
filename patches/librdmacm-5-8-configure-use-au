@@ -3,7 +3,7 @@ Top:    75ed99f148ae5b99a29c244e6ffa4669a1043228
 Author: Yann Droneaud <ydroneaud@opteya.com>
 Date:   2013-07-16 23:59:49 +0200
 
-[librdmacm,5/8] configure: Use automake's option "subdir-objects"
+configure: Use automake's option "subdir-objects"
 
 Following advice in "Autotool Mythbuster" [1], option subdir-objects
 can be used to have Makefiles create object files in the same
