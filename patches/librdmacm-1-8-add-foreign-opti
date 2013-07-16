@@ -3,7 +3,7 @@ Top:    5a36253721b69b3c3a21fd73d491dfb208d3ce20
 Author: Bart Van Assche <bvanassche@acm.org>
 Date:   2013-07-16 23:59:45 +0200
 
-[librdmacm,1/8] Add "foreign" option to AM_INIT_AUTOMAKE
+Add "foreign" option to AM_INIT_AUTOMAKE
 
 Switch to the modern form of the AM_INIT_AUTOMAKE macro and tell
 automake that the librdmacm package does not follow the GNU
