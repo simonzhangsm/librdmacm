@@ -3,7 +3,7 @@ Top:    fdd30dbbdc59d8b005e99a296f15d45163ffc810
 Author: Yann Droneaud <ydroneaud@opteya.com>
 Date:   2013-07-16 23:59:48 +0200
 
-[librdmacm,4/8] configure: Apply updates proposed by autoupdate
+configure: Apply updates proposed by autoupdate
 
 'autoupdate' is a tool to help developer to update configure.ac.
 
