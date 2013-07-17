@@ -1,5 +1,5 @@
-Bottom: 0f30ed22a8e534bf84ea0c70fd9650cb6cebd864
-Top:    08cdb9a8cfd429d8b0018d91813c88ace4431342
+Bottom: 0f2efee48a61eb345a7f7dd4ebbf0df79e739ea9
+Top:    bc9105b8cf4060b87bc61c07dc49b43af079589c
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-06-10 10:57:56 -0700
 
@@ -18,7 +18,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/configure.ac b/configure.ac
-index 35d79dd..3ce7a6e 100644
+index 31b1a0e..6163f56 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -70,9 +70,6 @@ AC_CHECK_HEADER(valgrind/memcheck.h, [],
@@ -32,7 +32,7 @@ index 35d79dd..3ce7a6e 100644
  	AC_CHECK_MEMBER(struct acm_msg.resolve_data, [],
  		AC_DEFINE(DEFINE_ACM_MSG, 1, [adding ACM message definition]),
 diff --git a/src/acm.c b/src/acm.c
-index c9ca5b5..c423bb7 100755
+index 6e8e173..dfc4959 100644
 --- a/src/acm.c
 +++ b/src/acm.c
 @@ -45,7 +45,6 @@
