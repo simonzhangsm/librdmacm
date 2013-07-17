@@ -1,15 +1,7 @@
 Version: 1
-Previous: 77486c6ede973e0a301898f5b153321aa5a516ae
+Previous: be43ff1a493af0ae4c3b3cf7ce42cbe04812e944
 Head: c8173d50d1a8c2bbfb0c4459e05d3941175676b2
 Applied:
-  librdmacm-1-8-add-foreign-opti: 715965b7231cd97d302e24c9e8ac89b2a57a57ab
-  librdmacm-2-8-makefile-am-fix-: 9d2f1b068e6fcd62853fe013c7cc4316dcb3fc4b
-  librdmacm-3-8-autogen-sh-use-a: f49ac33aaab147e5b126a75565f57e596600f372
-  librdmacm-4-8-configure-apply-: 3edfff79d98f72b754278c854f871c4a22a7ce3c
-  librdmacm-5-8-configure-use-au: e9ef6c2e2d8141dd5c32472918b8c087f745524b
-  librdmacm-6-8-add-gitignore-ru: d53cd79c3bde6186bda6822a04708b9d2666f8ae
-  librdmacm-8-8-open-files-with-: 3eb1704b2e11413077933d6d3a963d81d508bdf8
-  filemode: 704f54358a1f74229cd9e982b530ca8327c7658e
   addrtype: c8173d50d1a8c2bbfb0c4459e05d3941175676b2
 Unapplied:
   ex-ib: d71ebf70cf74111cfd5f0982d9abe6ec68fb38e3
