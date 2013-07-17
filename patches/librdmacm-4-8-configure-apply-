@@ -1,5 +1,5 @@
-Bottom: 49392529800f64a7bbfa39709046349777c78c1f
-Top:    fdd30dbbdc59d8b005e99a296f15d45163ffc810
+Bottom: a4e302c3ad7b2bb0dc1cee5b1e508bc67165b949
+Top:    8c38c63a0e2f640c9ddb25b5bebc2934c907db18
 Author: Yann Droneaud <ydroneaud@opteya.com>
 Date:   2013-07-16 23:59:48 +0200
 
@@ -16,7 +16,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/configure.ac b/configure.ac
-index e2f3f69..a85ce49 100644
+index 20c2f94..a9e95c0 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -1,18 +1,18 @@
