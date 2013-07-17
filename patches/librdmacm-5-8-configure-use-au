@@ -1,5 +1,5 @@
-Bottom: fdd30dbbdc59d8b005e99a296f15d45163ffc810
-Top:    75ed99f148ae5b99a29c244e6ffa4669a1043228
+Bottom: 8c38c63a0e2f640c9ddb25b5bebc2934c907db18
+Top:    8b3e917b342f04315141dc9cff278de436f6888d
 Author: Yann Droneaud <ydroneaud@opteya.com>
 Date:   2013-07-16 23:59:49 +0200
 
@@ -21,7 +21,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/configure.ac b/configure.ac
-index a85ce49..9fd9e9e 100644
+index a9e95c0..807470f 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -6,7 +6,7 @@ AC_CONFIG_SRCDIR([src/cma.c])
