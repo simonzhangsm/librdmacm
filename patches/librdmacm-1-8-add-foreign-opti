@@ -1,5 +1,5 @@
-Bottom: 08cdb9a8cfd429d8b0018d91813c88ace4431342
-Top:    5a36253721b69b3c3a21fd73d491dfb208d3ce20
+Bottom: fdd78452d7e02d706c88b4821b9ff48bc33218cb
+Top:    c83d48e04218330fe3f5ceb88577e4bdec9b56c7
 Author: Bart Van Assche <bvanassche@acm.org>
 Date:   2013-07-16 23:59:45 +0200
 
@@ -18,7 +18,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/configure.ac b/configure.ac
-index 3ce7a6e..e2f3f69 100644
+index 35d79dd..20c2f94 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -6,7 +6,7 @@ AC_CONFIG_SRCDIR([src/cma.c])
