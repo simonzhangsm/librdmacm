@@ -1,5 +1,5 @@
 Bottom: 8c38c63a0e2f640c9ddb25b5bebc2934c907db18
-Top:    8b3e917b342f04315141dc9cff278de436f6888d
+Top:    73a7bdcd035349ed13f97d56fdb9448a2f694569
 Author: Yann Droneaud <ydroneaud@opteya.com>
 Date:   2013-07-16 23:59:49 +0200
 
@@ -20,6 +20,16 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 ---
 
+diff --git a/autogen.sh b/autogen.sh
+index 6c9233e..24c0a76 100755
+--- a/autogen.sh
++++ b/autogen.sh
+@@ -1,4 +1,5 @@
+ #! /bin/sh
+ 
+ set -x
++test -d ./config || mkdir ./config
+ autoreconf -ifv -I config
 diff --git a/configure.ac b/configure.ac
 index a9e95c0..807470f 100644
 --- a/configure.ac
