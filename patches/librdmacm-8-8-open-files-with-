@@ -1,5 +1,5 @@
-Bottom: c9ebc6b5562a7d1133b72a28b9370623dd93ac65
-Top:    339f42f99074732d6646a2c98d4674ae2e4b0df3
+Bottom: 37469bbc3efa4d1812bc642af83d056086f391e7
+Top:    e14708a457c3eac12d51c437d6b9f6fac401ea73
 Author: Yann Droneaud <ydroneaud@opteya.com>
 Date:   2013-07-16 23:59:52 +0200
 
@@ -36,10 +36,10 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/configure.ac b/configure.ac
-index 9fd9e9e..6163f56 100644
+index 807470f..31b1a0e 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -75,6 +75,30 @@ AC_CHECK_HEADER(infiniband/acm.h,
+@@ -78,6 +78,30 @@ AC_CHECK_HEADER(infiniband/acm.h,
  		AC_DEFINE(DEFINE_ACM_MSG, 1, [adding ACM message definition]),
  			[#include <infiniband/acm.h>]), [])
  
@@ -71,10 +71,10 @@ index 9fd9e9e..6163f56 100644
      if test -n "`$LD --help < /dev/null 2>/dev/null | grep version-script`"; then
          ac_cv_version_script=yes
 diff --git a/src/acm.c b/src/acm.c
-index c423bb7..dfc4959 100755
+index c9ca5b5..6e8e173 100755
 --- a/src/acm.c
 +++ b/src/acm.c
-@@ -79,7 +79,7 @@ static int ucma_set_server_port(void)
+@@ -80,7 +80,7 @@ static int ucma_set_server_port(void)
  {
  	FILE *f;
  
@@ -83,7 +83,7 @@ index c423bb7..dfc4959 100755
  		fscanf(f, "%hu", (unsigned short *) &server_port);
  		fclose(f);
  	}
-@@ -99,7 +99,7 @@ void ucma_ib_init(void)
+@@ -100,7 +100,7 @@ void ucma_ib_init(void)
  	if (!ucma_set_server_port())
  		goto out;
  
