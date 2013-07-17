@@ -1,5 +1,5 @@
 Bottom: 2f50de65e0d7153394370c367df423c7371dbcb7
-Top:    a4e302c3ad7b2bb0dc1cee5b1e508bc67165b949
+Top:    477303bbeccdf3cd3799b5729428253be585b44a
 Author: Jeff Squyres <jsquyres@cisco.com>
 Date:   2013-07-16 23:59:47 +0200
 
@@ -18,14 +18,13 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/autogen.sh b/autogen.sh
-index f433312..6c9233e 100755
+index f433312..24c0a76 100755
 --- a/autogen.sh
 +++ b/autogen.sh
-@@ -1,9 +1,4 @@
- #! /bin/sh
+@@ -2,8 +2,4 @@
  
  set -x
--test -d ./config || mkdir ./config
+ test -d ./config || mkdir ./config
 -aclocal -I config
 -libtoolize --force --copy
 -autoheader
