@@ -1,5 +1,5 @@
-Bottom: abf940a2b193bc88038fc0452b4a98b0edce1924
-Top:    afd1f170683674c99056258e1d735f9f4b55438a
+Bottom: d5960ce12fbbf29686c54212d2d4e6cc179ede2d
+Top:    0f2efee48a61eb345a7f7dd4ebbf0df79e739ea9
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2012-08-29 15:02:54 -0700
 
@@ -138,7 +138,7 @@ index 2b6b2b1..ab3e746 100644
  	printf("test complete\n");
  	destroy_nodes();
 diff --git a/examples/common.c b/examples/common.c
-index 939f50c..94057cb 100644
+index 4eb5bbe..0b6428c 100644
 --- a/examples/common.c
 +++ b/examples/common.c
 @@ -1,5 +1,5 @@
