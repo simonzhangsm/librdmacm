@@ -1063,7 +1063,7 @@ int rsocket(int domain, int type, int protocol)
 	struct rsocket *rs;
 	int index, ret;
 
-	if ((domain != PF_INET && domain != PF_INET6) ||
+	if ((domain != AF_INET && domain != AF_INET6 && domain != AF_IB) ||
 	    ((type != SOCK_STREAM) && (type != SOCK_DGRAM)) ||
 	    (type == SOCK_STREAM && protocol && protocol != IPPROTO_TCP) ||
 	    (type == SOCK_DGRAM && protocol && protocol != IPPROTO_UDP))
