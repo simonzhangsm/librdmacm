@@ -14,8 +14,8 @@ between the different SSA components.
 
 To resolve this issue, have the librdmacm define the message
 structures that it needs to communicate with ibacm.  The
-librdmacm already has this through configuration checks.  We
-just expand that capability, which isolates the librdmacm
+librdmacm already defines some ACM messages through configuration
+checks.  We just expand that capability, which isolates the librdmacm
 package from the ibacm package.
 
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
