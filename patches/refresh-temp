@@ -1,0 +1,22 @@
+Bottom: 2796d834b12d3a64f636fbdbb4f17c85b6541c51
+Top:    4389e5ccd819a6d0803f1527aeca1074994ff4ce
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-07-18 10:52:56 -0700
+
+Refresh of use-acm
+
+---
+
+diff --git a/configure.ac b/configure.ac
+index b4303c6..59c5eb1 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -70,9 +70,6 @@ AC_CHECK_HEADER(valgrind/memcheck.h, [],
+ fi
+ fi
+ 
+-AC_CHECK_HEADER(infiniband/acm.h, 
+-      AC_DEFINE([USE_IB_ACM], 1, [setting IBACM support]), [])
+-
+ dnl Checks close on exec support
+ AC_CHECK_HEADERS([fcntl.h sys/socket.h])
