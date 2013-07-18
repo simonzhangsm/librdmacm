@@ -1,5 +1,5 @@
 Bottom: 6be22fb12cd012007970e989a47c996ed8d0a55d
-Top:    6be22fb12cd012007970e989a47c996ed8d0a55d
+Top:    4389e5ccd819a6d0803f1527aeca1074994ff4ce
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-06-10 10:57:56 -0700
 
@@ -17,4 +17,41 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 ---
 
-
+diff --git a/src/acm.c b/src/acm.c
+index 09c5d4e..04cddee 100644
+--- a/src/acm.c
++++ b/src/acm.c
+@@ -45,7 +45,6 @@
+ #include <infiniband/ib.h>
+ #include <infiniband/sa.h>
+ 
+-#ifdef USE_IB_ACM
+ #define ACM_VERSION             1
+ 
+ #define ACM_OP_RESOLVE          0x01
+@@ -453,5 +452,3 @@ void ucma_ib_resolve(struct rdma_addrinfo **rai, struct rdma_addrinfo *hints)
+ 	if (af_ib_support && !(hints->ai_flags & RAI_ROUTEONLY) && (*rai)->ai_route_len)
+ 		ucma_resolve_af_ib(rai);
+ }
+-
+-#endif /* USE_IB_ACM */
+diff --git a/src/cma.h b/src/cma.h
+index b575b9b..e6fba8b 100644
+--- a/src/cma.h
++++ b/src/cma.h
+@@ -162,15 +162,9 @@ extern int af_ib_support;
+ 
+ #define RAI_ROUTEONLY		0x01000000
+ 
+-#ifdef USE_IB_ACM
+ void ucma_ib_init();
+ void ucma_ib_cleanup();
+ void ucma_ib_resolve(struct rdma_addrinfo **rai, struct rdma_addrinfo *hints);
+-#else
+-#define ucma_ib_init()
+-#define ucma_ib_cleanup()
+-#define ucma_ib_resolve(x, y)
+-#endif
+ 
+ /* Define path record definition if using older version of libibverbs */
+ #ifdef DEFINE_PATH_RECORD
