@@ -1,9 +1,8 @@
 Version: 1
-Previous: cf8297e86a852a9a7b32bd19ce56566166dd4c4f
-Head: e0e1cc36e045ebe520829a7b00f248eafb578276
+Previous: 8e0c60fc386a38ef21c2914f3bcf4072706e8ad9
+Head: 8c8076b8893f5967b3d23da0f7ee6c093902ef3d
 Applied:
-  rst-afib: 19de48ba8f711576af79e671f917afe38e5aec5f
-  refresh-temp: e0e1cc36e045ebe520829a7b00f248eafb578276
+  rst-afib: 8c8076b8893f5967b3d23da0f7ee6c093902ef3d
 Unapplied:
   old-af-ib: d71ebf70cf74111cfd5f0982d9abe6ec68fb38e3
   rs-setroute: 372986c005605c497bebd250b2d8e2bfe9608315
