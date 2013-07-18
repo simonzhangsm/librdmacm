@@ -1,0 +1,15 @@
+Bottom: 4389e5ccd819a6d0803f1527aeca1074994ff4ce
+Top:    4389e5ccd819a6d0803f1527aeca1074994ff4ce
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-07-18 13:26:15 -0700
+
+rsockets: Support native IB addressing
+
+Update rstream samples to handle GID addresses.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
