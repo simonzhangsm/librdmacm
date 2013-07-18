@@ -1,10 +1,9 @@
 Version: 1
-Previous: 20d7de53b64e433e3fb344b30670970606e052c8
-Head: ad39995b0c94357192d03bbff3b7ce4807072f26
+Previous: bdd0610a8d4459f726e6063747eb69c3022f9824
+Head: 6efb57780ca142ea4e3b0feebef554849047f79f
 Applied:
   addrtype: c8173d50d1a8c2bbfb0c4459e05d3941175676b2
-  acm_msg: cdb7d0ffecc1a7beba285762d08edef37beddd1b
-  refresh-temp: ad39995b0c94357192d03bbff3b7ce4807072f26
+  acm_msg: 6efb57780ca142ea4e3b0feebef554849047f79f
 Unapplied:
   use-acm: d302c42fad7ecf6990d39645e4c04c33892b3a47
   old-af-ib: d71ebf70cf74111cfd5f0982d9abe6ec68fb38e3

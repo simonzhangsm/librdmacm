@@ -1,5 +1,5 @@
 Bottom: 0f2efee48a61eb345a7f7dd4ebbf0df79e739ea9
-Top:    6be22fb12cd012007970e989a47c996ed8d0a55d
+Top:    db2511e6438de79d7b2a6fb337fce701ea367a1b
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-06-10 11:07:12 -0700
 
@@ -24,24 +24,23 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/configure.ac b/configure.ac
-index 31b1a0e..59c5eb1 100644
+index 31b1a0e..b4303c6 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -70,14 +70,6 @@ AC_CHECK_HEADER(valgrind/memcheck.h, [],
- fi
+@@ -71,12 +71,7 @@ fi
  fi
  
--AC_CHECK_HEADER(infiniband/acm.h, 
+ AC_CHECK_HEADER(infiniband/acm.h, 
 -	AC_DEFINE([USE_IB_ACM], 1, [setting IBACM support]), [])
 -
 -AC_CHECK_HEADER(infiniband/acm.h,
 -	AC_CHECK_MEMBER(struct acm_msg.resolve_data, [],
 -		AC_DEFINE(DEFINE_ACM_MSG, 1, [adding ACM message definition]),
 -			[#include <infiniband/acm.h>]), [])
--
++      AC_DEFINE([USE_IB_ACM], 1, [setting IBACM support]), [])
+ 
  dnl Checks close on exec support
  AC_CHECK_HEADERS([fcntl.h sys/socket.h])
- 
 diff --git a/src/acm.c b/src/acm.c
 index 6e8e173..09c5d4e 100644
 --- a/src/acm.c
