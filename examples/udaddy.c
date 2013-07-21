@@ -429,7 +429,7 @@ static int alloc_nodes(void)
 		if (dst_addr) {
 			ret = rdma_create_id(test.channel,
 					     &test.nodes[i].cma_id,
-					     &test.nodes[i], port_space);
+					     &test.nodes[i], hints.ai_port_space);
 			if (ret)
 				goto err;
 		}
@@ -644,7 +644,7 @@ int main(int argc, char **argv)
 		case 'P':
 			if (!strncasecmp("ib", optarg, 2)) {
 				hints.ai_port_space = RDMA_PS_IB;
-			} else if (!stncasecmp("ipoib", optarg, 5)) {
+			} else if (!strncasecmp("ipoib", optarg, 5)) {
 				hints.ai_port_space = RDMA_PS_IPOIB;
 			} else if (strncasecmp("udp", optarg, 3)) {
 				fprintf(stderr, "Warning: unknown port space format\n");
