@@ -5,8 +5,8 @@ Date:   2013-07-20 19:22:55 -0700
 
 examples: Add support for native IB addressing to samples
 
-Allow the user to specify GID addresses into udaddy, rstream,
-riostream examples.
+Allow the user to specify GID addresses (AF_IB) into
+udaddy and rstream.
 
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
