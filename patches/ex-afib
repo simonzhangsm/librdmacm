@@ -1,0 +1,16 @@
+Bottom: 648bd1c0052b59df8f46bc579b68d50715c5d83c
+Top:    648bd1c0052b59df8f46bc579b68d50715c5d83c
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-07-20 19:22:55 -0700
+
+examples: Add support for native IB addressing to samples
+
+Allow the user to specify GID addresses into udaddy, rstream,
+riostream examples.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
