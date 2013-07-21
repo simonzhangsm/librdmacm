@@ -303,7 +303,9 @@ static int server_listen(void)
 		return ret;
 	}
 
-	lrs = rs_socket(res->ai_family, SOCK_STREAM, 0);
+	lrs = rai_hints.ai_flags ?
+	      rs_socket(rai->ai_family, SOCK_STREAM, 0) :
+	      rs_socket(ai->ai_family, SOCK_STREAM, 0);
 	if (lrs < 0) {
 		perror("rsocket");
 		ret = lrs;
@@ -381,14 +383,16 @@ static int client_connect(void)
 	socklen_t len;
 
  	ret = rai_hints.ai_flags ?
- 	      rdma_getaddrinfo(dst_addr, port, &rai_hints, *rai) :
+ 	      rdma_getaddrinfo(dst_addr, port, &rai_hints, &rai) :
  	      getaddrinfo(dst_addr, port, &ai_hints, &ai);
 	if (ret) {
 		perror("getaddrinfo");
 		return ret;
 	}
 
-	rs = rs_socket(res->ai_family, SOCK_STREAM, 0);
+	rs = rai_hints.ai_flags ?
+	     rs_socket(rai->ai_family, SOCK_STREAM, 0) :
+	     rs_socket(ai->ai_family, SOCK_STREAM, 0);
 	if (rs < 0) {
 		perror("rsocket");
 		ret = rs;
@@ -431,7 +435,7 @@ free:
 	if (rai_hints.ai_flags)
 		rdma_freeaddrinfo(rai);
 	else
-		freeaddrinfo(res);
+		freeaddrinfo(ai);
 	return ret;
 }
 
@@ -556,7 +560,7 @@ int main(int argc, char **argv)
 
 	ai_hints.ai_socktype = SOCK_STREAM;
 	rai_hints.ai_port_space = RDMA_PS_TCP;
-	while ((op = getopt(argc, argv, "s:b:B:I:C:S:p:T:")) != -1) {
+	while ((op = getopt(argc, argv, "s:b:f:B:I:C:S:p:T:")) != -1) {
 		switch (op) {
 		case 's':
 			dst_addr = optarg;
