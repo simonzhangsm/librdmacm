@@ -1,9 +1,8 @@
 Version: 1
-Previous: 227f958fedc634fa09e6a47793a80094b1c705c2
-Head: 2c76a53f17e7f33c9065fcf14e703e5b39589549
+Previous: a4dd5aaa304048a3b793711b3acf4dc8ef6a0b47
+Head: 6917b7bd04dbb9abdd1bb9787f52863aa3d92b7f
 Applied:
   rst-afib: 6917b7bd04dbb9abdd1bb9787f52863aa3d92b7f
-  refresh-temp: 2c76a53f17e7f33c9065fcf14e703e5b39589549
 Unapplied:
   ex-afib: 5d01e9813050e901f880d4be67738a75e60ed41c
   rs-setroute: 70a6b0b2fce4adbe0ff7d7551074a87d43cac9a2
