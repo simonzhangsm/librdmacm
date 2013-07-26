@@ -402,6 +402,15 @@ static int client_connect(void)
 	set_options(rs);
 	/* TODO: bind client to src_addr */
 
+	if (rai_hints.ai_flags && rai_hints.ai_route) {
+		ret = rs_setsockopt(rs, SOL_RDMA, RDMA_ROUTE, rai_hints.ai_route,
+				    rai_hints.ai_route_len);
+		if (ret) {
+			perror("rsetsockopt RDMA_ROUTE");
+			goto close;
+		}
+	}
+
 	ret = rai_hints.ai_flags ?
 	      rs_connect(rs, rai->ai_dst_addr, rai->ai_dst_len) :
 	      rs_connect(rs, ai->ai_addr, ai->ai_addrlen);
