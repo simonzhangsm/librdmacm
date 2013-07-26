@@ -1,5 +1,5 @@
-Bottom: 3dc2d85df261635ce775f5736dbd30738699fc9a
-Top:    648bd1c0052b59df8f46bc579b68d50715c5d83c
+Bottom: 8c7c0f258e9ed4d76f3697dce95671e55d01c471
+Top:    1253e6f1a07a47539c61638099b373c07c4b5a9f
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-06-10 12:33:20 -0700
 
@@ -31,10 +31,10 @@ index f220c13..efd0db5 100644
  
  int rsetsockopt(int socket, int level, int optname,
 diff --git a/src/rsocket.c b/src/rsocket.c
-index 1a6d989..cfced22 100644
+index 6339c47..1851b3c 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
-@@ -319,6 +319,8 @@ struct rsocket {
+@@ -329,6 +329,8 @@ struct rsocket {
  	long		  fd_flags;
  	uint64_t	  so_opts;
  	uint64_t	  ipv6_opts;
@@ -43,7 +43,7 @@ index 1a6d989..cfced22 100644
  	int		  state;
  	int		  cq_armed;
  	int		  retries;
-@@ -1227,7 +1229,15 @@ resolve_addr:
+@@ -1243,7 +1245,15 @@ resolve_addr:
  		rs->retries = 0;
  resolve_route:
  		to = 1000 << rs->retries++;
@@ -60,7 +60,7 @@ index 1a6d989..cfced22 100644
  		if (!ret)
  			goto do_connect;
  		if (errno == EAGAIN || errno == EWOULDBLOCK)
-@@ -3293,6 +3303,14 @@ int rsetsockopt(int socket, int level, int optname,
+@@ -3312,6 +3322,14 @@ int rsetsockopt(int socket, int level, int optname,
  			rs->target_iomap_size = (uint16_t) rs_scale_to_value(
  				(uint8_t) rs_value_to_scale(*(int *) optval, 8), 8);
  			break;
