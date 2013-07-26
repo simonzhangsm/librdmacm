@@ -1,0 +1,13 @@
+Bottom: 1253e6f1a07a47539c61638099b373c07c4b5a9f
+Top:    1253e6f1a07a47539c61638099b373c07c4b5a9f
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-07-26 09:52:55 -0700
+
+rstream: Use rsocket option to set route directly
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
