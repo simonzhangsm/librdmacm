@@ -1,0 +1,29 @@
+Bottom: 1253e6f1a07a47539c61638099b373c07c4b5a9f
+Top:    171885460c71ed11039095f09c40e71864eb2689
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-07-26 10:43:46 -0700
+
+Refresh of stpath
+
+---
+
+diff --git a/examples/rstream.c b/examples/rstream.c
+index e27ddcd..fb03a36 100644
+--- a/examples/rstream.c
++++ b/examples/rstream.c
+@@ -402,6 +402,15 @@ static int client_connect(void)
+ 	set_options(rs);
+ 	/* TODO: bind client to src_addr */
+ 
++	if (rai_hints.ai_flags && rai_hints.ai_route) {
++		ret = rs_setsockopt(rs, SOL_RDMA, RDMA_ROUTE, rai_hints.ai_route,
++				    rai_hints.ai_route_len);
++		if (ret) {
++			perror("rsetsockopt RDMA_ROUTE");
++			goto close;
++		}
++	}
++
+ 	ret = rai_hints.ai_flags ?
+ 	      rs_connect(rs, rai->ai_dst_addr, rai->ai_dst_len) :
+ 	      rs_connect(rs, ai->ai_addr, ai->ai_addrlen);
