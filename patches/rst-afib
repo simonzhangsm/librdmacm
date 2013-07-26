@@ -1,5 +1,5 @@
 Bottom: 4389e5ccd819a6d0803f1527aeca1074994ff4ce
-Top:    7574733bce532f59e4774d9f673cce4b9f5451f9
+Top:    68e89cf1610b4f73ee5afa33d14d24e0ce412529
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-07-18 13:26:15 -0700
 
@@ -66,7 +66,7 @@ index e6fba8b..e944a9a 100644
  #define SYSCONFDIR "/etc"
  #endif
 diff --git a/src/rsocket.c b/src/rsocket.c
-index abdd392..3ff79d8 100644
+index abdd392..6339c47 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -187,6 +187,16 @@ struct rs_conn_data {
@@ -137,8 +137,8 @@ index abdd392..3ff79d8 100644
  	param = new_rs->cm_id->event->param.conn;
 -	rs_set_conn_data(new_rs, &param, &cresp);
 +	rs_format_conn_data(new_rs, &cresp);
-+	param->private_data = &cresp;
-+	param->private_data_len = sizeof cresp;
++	param.private_data = &cresp;
++	param.private_data_len = sizeof cresp;
  	ret = rdma_accept(new_rs->cm_id, &param);
  	if (!ret)
  		new_rs->state = rs_connect_rdwr;
@@ -159,8 +159,8 @@ index abdd392..3ff79d8 100644
 -		rs_set_conn_data(rs, &param, &creq);
 +		creq = (void *) &cdata + rs_conn_data_offset(rs);
 +		rs_format_conn_data(rs, creq);
-+		param->private_data = (void *) creq - rs_conn_data_offset(rs);
-+		param->private_data_len = sizeof(*creq) + rs_conn_data_offset(rs);
++		param.private_data = (void *) creq - rs_conn_data_offset(rs);
++		param.private_data_len = sizeof(*creq) + rs_conn_data_offset(rs);
  		param.flow_control = 1;
  		param.retry_count = 7;
  		param.rnr_retry_count = 7;
