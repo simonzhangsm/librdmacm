@@ -1194,8 +1194,8 @@ int raccept(int socket, struct sockaddr *addr, socklen_t *addrlen)
 	rs_save_conn_data(new_rs, creq);
 	param = new_rs->cm_id->event->param.conn;
 	rs_format_conn_data(new_rs, &cresp);
-	param->private_data = &cresp;
-	param->private_data_len = sizeof cresp;
+	param.private_data = &cresp;
+	param.private_data_len = sizeof cresp;
 	ret = rdma_accept(new_rs->cm_id, &param);
 	if (!ret)
 		new_rs->state = rs_connect_rdwr;
@@ -1264,8 +1264,8 @@ do_connect:
 		memset(&param, 0, sizeof param);
 		creq = (void *) &cdata + rs_conn_data_offset(rs);
 		rs_format_conn_data(rs, creq);
-		param->private_data = (void *) creq - rs_conn_data_offset(rs);
-		param->private_data_len = sizeof(*creq) + rs_conn_data_offset(rs);
+		param.private_data = (void *) creq - rs_conn_data_offset(rs);
+		param.private_data_len = sizeof(*creq) + rs_conn_data_offset(rs);
 		param.flow_control = 1;
 		param.retry_count = 7;
 		param.rnr_retry_count = 7;
