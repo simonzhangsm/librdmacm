@@ -75,6 +75,7 @@ static struct test_size_param test_size[] = {
 
 static int rs, lrs;
 static int use_async;
+static int use_getaddrinfo = 1;
 static int verify;
 static int flags = MSG_DONTWAIT;
 static int poll_timeout = 0;
@@ -382,15 +383,15 @@ static int client_connect(void)
 	int ret, err;
 	socklen_t len;
 
- 	ret = rai_hints.ai_flags ?
- 	      rdma_getaddrinfo(dst_addr, port, &rai_hints, &rai) :
- 	      getaddrinfo(dst_addr, port, &ai_hints, &ai);
+	ret = use_getaddrinfo ?
+	      getaddrinfo(dst_addr, port, &ai_hints, &ai) :
+	      rdma_getaddrinfo(dst_addr, port, &rai_hints, &rai);
 	if (ret) {
 		perror("getaddrinfo");
 		return ret;
 	}
 
-	rs = rai_hints.ai_flags ?
+	rs = rai->ai_family ?
 	     rs_socket(rai->ai_family, SOCK_STREAM, 0) :
 	     rs_socket(ai->ai_family, SOCK_STREAM, 0);
 	if (rs < 0) {
@@ -402,7 +403,16 @@ static int client_connect(void)
 	set_options(rs);
 	/* TODO: bind client to src_addr */
 
-	ret = rai_hints.ai_flags ?
+	if (rai_hints.ai_route) {
+		ret = rs_setsockopt(rs, SOL_RDMA, RDMA_ROUTE, rai_hints.ai_route,
+				    rai_hints.ai_route_len);
+		if (ret) {
+			perror("rsetsockopt RDMA_ROUTE");
+			goto close;
+		}
+	}
+
+	ret = rai->ai_dst_addr ?
 	      rs_connect(rs, rai->ai_dst_addr, rai->ai_dst_len) :
 	      rs_connect(rs, ai->ai_addr, ai->ai_addrlen);
 	if (ret && (errno != EINPROGRESS)) {
@@ -432,10 +442,10 @@ close:
 	if (ret)
 		rs_close(rs);
 free:
-	if (rai_hints.ai_flags)
-		rdma_freeaddrinfo(rai);
-	else
+	if (use_getaddrinfo)
 		freeaddrinfo(ai);
+	else
+		rdma_freeaddrinfo(rai);
 	return ret;
 }
 
@@ -527,6 +537,9 @@ static int set_test_opt(char *optarg)
 		case 'n':
 			flags |= MSG_DONTWAIT;
 			break;
+		case 'r':
+			use_getaddrinfo = 0;
+			break;
 		case 'v':
 			verify = 1;
 			break;
@@ -542,6 +555,8 @@ static int set_test_opt(char *optarg)
 			flags = (flags & ~MSG_DONTWAIT) | MSG_WAITALL;
 		} else if (!strncasecmp("nonblock", optarg, 8)) {
 			flags |= MSG_DONTWAIT;
+		} else if (strncasecmp("resolve", optarg, 7)) {
+			use_getaddrinfo = 0;
 		} else if (!strncasecmp("verify", optarg, 6)) {
 			verify = 1;
 		} else if (!strncasecmp("fork", optarg, 4)) {
@@ -574,6 +589,7 @@ int main(int argc, char **argv)
 			} else if (!strncasecmp("gid", optarg, 3)) {
 				rai_hints.ai_flags = RAI_NUMERICHOST | RAI_FAMILY;
 				rai_hints.ai_family = AF_IB;
+				use_getaddrinfo = 0;
 			}
 			break;
 		case 'B':
@@ -619,6 +635,7 @@ int main(int argc, char **argv)
 			printf("\t    b|blocking - use blocking calls\n");
 			printf("\t    f|fork - fork server processing\n");
 			printf("\t    n|nonblocking - use nonblocking calls\n");
+			printf("\t    r|resolve - use rdma cm to resolve address\n");
 			printf("\t    v|verify - verify data\n");
 			exit(1);
 		}
