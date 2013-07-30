@@ -1,0 +1,34 @@
+Bottom: 9a77d7d6e85ab3e9750f0182dac7261ac8158201
+Top:    c6cf65fe1374a256d053979c58505516d89fa6ce
+Author: Bart Van Assche <bvanassche@acm.org>
+Date:   2013-07-28 11:19:15 +0200
+
+[2/4] cma: Remove the unused variable 'id_priv'
+
+The variable 'id_priv' is assigned a value but is never used.
+This triggers the following compiler warning:
+
+src/cma.c:1178:25: warning: variable 'id_priv' set but not used [-Wunused-but-set-variable]
+
+Hence remove this variable.
+
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+
+
+---
+
+diff --git a/src/cma.c b/src/cma.c
+index baebecd..374844c 100644
+--- a/src/cma.c
++++ b/src/cma.c
+@@ -1175,11 +1175,9 @@ err:
+ int rdma_create_srq(struct rdma_cm_id *id, struct ibv_pd *pd,
+ 		    struct ibv_srq_init_attr *attr)
+ {
+-	struct cma_id_private *id_priv;
+ 	struct ibv_srq *srq;
+ 	int ret;
+ 
+-	id_priv = container_of(id, struct cma_id_private, id);
+ 	if (!pd)
+ 		pd = id->pd;
