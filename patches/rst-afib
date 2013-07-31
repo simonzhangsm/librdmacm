@@ -1,5 +1,5 @@
-Bottom: 4389e5ccd819a6d0803f1527aeca1074994ff4ce
-Top:    68e89cf1610b4f73ee5afa33d14d24e0ce412529
+Bottom: 41e944da9e3a2e6f7aecde72a095aee914508844
+Top:    636749985960caf7dcd1f4533ce0afe96c6b360a
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-07-18 13:26:15 -0700
 
@@ -20,12 +20,12 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/acm.c b/src/acm.c
-index 04cddee..bba1093 100644
+index 33379cf..45bcb81 100644
 --- a/src/acm.c
 +++ b/src/acm.c
-@@ -115,18 +115,6 @@ static pthread_mutex_t acm_lock = PTHREAD_MUTEX_INITIALIZER;
+@@ -116,18 +116,6 @@ static pthread_mutex_t acm_lock = PTHREAD_MUTEX_INITIALIZER;
  static int sock = -1;
- static short server_port;
+ static uint16_t server_port;
  
 -struct ib_connect_hdr {
 -	uint8_t  cma_version;
@@ -66,7 +66,7 @@ index e6fba8b..e944a9a 100644
  #define SYSCONFDIR "/etc"
  #endif
 diff --git a/src/rsocket.c b/src/rsocket.c
-index abdd392..6339c47 100644
+index ef24dfb..e2b1cc7 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -187,6 +187,16 @@ struct rs_conn_data {
