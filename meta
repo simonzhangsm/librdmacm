@@ -1,10 +1,7 @@
 Version: 1
-Previous: 2d76e59f41aa493d5a38fcda2fdfcd759f1a2bff
+Previous: 8c5f101edbe1701def550cdea299af06d2cdab3b
 Head: eee05e6604a60b007249f97613d3bb513c07c20d
 Applied:
-  1-4-acm-remove-the-unused-vari: 2a31c855fc95d04370db56de5b35d8271e577f6f
-  2-4-cma-remove-the-unused-vari: 9e758e0655242bb02aea5ec28fe4eeac2ec655f7
-  3-4-rsocket-remove-the-unused-: eee05e6604a60b007249f97613d3bb513c07c20d
 Unapplied:
   4-4-declare-server_port-as-an-: a8becf33bbbb363cb2e0f2b45456bc82b345c453
   rst-afib: 83c2c70b91d4a93bbdd9bbec501de3a23e77a3bd
