@@ -288,25 +288,24 @@ static void set_options(int rs)
 
 static int server_listen(void)
 {
-	struct rdma_addrinfo *rai;
+	struct rdma_addrinfo *rai = NULL;
 	struct addrinfo *ai;
 	int val, ret;
 
-	if (use_getaddrinfo) {
-		ai_hints.ai_flags |= AI_PASSIVE;
-		ret = getaddrinfo(src_addr, port, &ai_hints, &ai);
-	} else {
+	if (use_rgai) {
 		rai_hints.ai_flags |= RAI_PASSIVE;
 		ret = rdma_getaddrinfo(src_addr, port, &rai_hints, &rai);
+	} else {
+		ai_hints.ai_flags |= AI_PASSIVE;
+		ret = getaddrinfo(src_addr, port, &ai_hints, &ai);
 	}
 	if (ret) {
 		perror("getaddrinfo");
 		return ret;
 	}
 
-	lrs = rai->ai_family ?
-	      rs_socket(rai->ai_family, SOCK_STREAM, 0) :
-	      rs_socket(ai->ai_family, SOCK_STREAM, 0);
+	lrs = rai ? rs_socket(rai->ai_family, SOCK_STREAM, 0) :
+		    rs_socket(ai->ai_family, SOCK_STREAM, 0);
 	if (lrs < 0) {
 		perror("rsocket");
 		ret = lrs;
@@ -320,9 +319,8 @@ static int server_listen(void)
 		goto close;
 	}
 
-	ret = rai_hints.ai_flags ?
-	      rs_bind(lrs, rai->ai_src_addr, rai->ai_src_len) :
-	      rs_bind(lrs, ai->ai_addr, ai->ai_addrlen);
+	ret = rai ? rs_bind(lrs, rai->ai_src_addr, rai->ai_src_len) :
+		    rs_bind(lrs, ai->ai_addr, ai->ai_addrlen);
 	if (ret) {
 		perror("rbind");
 		goto close;
@@ -336,7 +334,7 @@ close:
 	if (ret)
 		rs_close(lrs);
 free:
-	if (rai_hints.ai_flags)
+	if (rai)
 		rdma_freeaddrinfo(rai);
 	else
 		freeaddrinfo(ai);
