@@ -1,5 +1,5 @@
 Bottom: 69bf5ca32ecd53b5d4e71ae3c190fb165b0b729e
-Top:    4fa2d2eb3eeeff4c1dc33c67228929fcfd37b5cf
+Top:    437b957f9b9b33615925d25b01225db9c40789c0
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-06-10 12:33:20 -0700
 
@@ -31,7 +31,7 @@ index f220c13..efd0db5 100644
  
  int rsetsockopt(int socket, int level, int optname,
 diff --git a/src/rsocket.c b/src/rsocket.c
-index e2b1cc7..d64c3bb 100644
+index e2b1cc7..57df290 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -329,6 +329,8 @@ struct rsocket {
@@ -43,24 +43,37 @@ index e2b1cc7..d64c3bb 100644
  	int		  state;
  	int		  cq_armed;
  	int		  retries;
-@@ -1243,7 +1245,15 @@ resolve_addr:
+@@ -1243,13 +1245,26 @@ resolve_addr:
  		rs->retries = 0;
  resolve_route:
  		to = 1000 << rs->retries++;
 -		ret = rdma_resolve_route(rs->cm_id, to);
+-		if (!ret)
+-			goto do_connect;
 +		if (rs->optval) {
 +			ret = rdma_set_option(rs->cm_id,  RDMA_OPTION_IB,
 +					      RDMA_OPTION_IB_PATH, rs->optval,
 +					      rs->optlen);
 +			free(rs->optval);
 +			rs->optval = NULL;
++			if (!ret) {
++				rs->state = rs_resolving_route;
++				goto resolving_route;
++			}
 +		} else {
 +			ret = rdma_resolve_route(rs->cm_id, to);
++			if (!ret)
++				goto do_connect;
 +		}
- 		if (!ret)
- 			goto do_connect;
  		if (errno == EAGAIN || errno == EWOULDBLOCK)
-@@ -3312,6 +3322,15 @@ int rsetsockopt(int socket, int level, int optname,
+ 			rs->state = rs_resolving_route;
+ 		break;
+ 	case rs_resolving_route:
++resolving_route:
+ 		ret = ucma_complete(rs->cm_id);
+ 		if (ret) {
+ 			if (errno == ETIMEDOUT && rs->retries <= RS_CONN_RETRIES)
+@@ -3312,6 +3327,15 @@ int rsetsockopt(int socket, int level, int optname,
  			rs->target_iomap_size = (uint16_t) rs_scale_to_value(
  				(uint8_t) rs_value_to_scale(*(int *) optval, 8), 8);
  			break;
