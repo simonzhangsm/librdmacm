@@ -3326,6 +3326,7 @@ int rsetsockopt(int socket, int level, int optname,
 			if ((rs->optval = calloc(optlen, 1))) {
 				memcpy(rs->optval, optval, optlen);
 				rs->optlen = optlen;
+				ret = 0;
 			} else {
 				ret = ERR(ENOMEM);
 			}
