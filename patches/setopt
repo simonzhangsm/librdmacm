@@ -1,0 +1,16 @@
+Bottom: 739a68b4f57f0f0eb2ed2dff067ebc5d7d38c39d
+Top:    739a68b4f57f0f0eb2ed2dff067ebc5d7d38c39d
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-08-02 14:18:06 -0700
+
+rsocket: Return 0 on success for SOL_RDMA options
+
+The processing of SOL_RDMA does not set the return value in
+the case of successfully handled options.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
