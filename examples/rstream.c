@@ -75,7 +75,7 @@ static struct test_size_param test_size[] = {
 
 static int rs, lrs;
 static int use_async;
-static int use_getaddrinfo = 1;
+static int use_rgai;
 static int verify;
 static int flags = MSG_DONTWAIT;
 static int poll_timeout = 0;
@@ -292,19 +292,19 @@ static int server_listen(void)
 	struct addrinfo *ai;
 	int val, ret;
 
-	if (rai_hints.ai_flags) {
-		rai_hints.ai_flags |= RAI_PASSIVE;
-		ret = rdma_getaddrinfo(src_addr, port, &rai_hints, &rai);
-	} else {
+	if (use_getaddrinfo) {
 		ai_hints.ai_flags |= AI_PASSIVE;
 		ret = getaddrinfo(src_addr, port, &ai_hints, &ai);
+	} else {
+		rai_hints.ai_flags |= RAI_PASSIVE;
+		ret = rdma_getaddrinfo(src_addr, port, &rai_hints, &rai);
 	}
 	if (ret) {
 		perror("getaddrinfo");
 		return ret;
 	}
 
-	lrs = rai_hints.ai_flags ?
+	lrs = rai->ai_family ?
 	      rs_socket(rai->ai_family, SOCK_STREAM, 0) :
 	      rs_socket(ai->ai_family, SOCK_STREAM, 0);
 	if (lrs < 0) {
@@ -377,23 +377,22 @@ static int server_connect(void)
 
 static int client_connect(void)
 {
-	struct rdma_addrinfo *rai;
+	struct rdma_addrinfo *rai = NULL;
 	struct addrinfo *ai;
 	struct pollfd fds;
 	int ret, err;
 	socklen_t len;
 
-	ret = use_getaddrinfo ?
-	      getaddrinfo(dst_addr, port, &ai_hints, &ai) :
-	      rdma_getaddrinfo(dst_addr, port, &rai_hints, &rai);
+	ret = use_rgai ? rdma_getaddrinfo(dst_addr, port, &rai_hints, &rai) :
+			 getaddrinfo(dst_addr, port, &ai_hints, &ai);
+
 	if (ret) {
 		perror("getaddrinfo");
 		return ret;
 	}
 
-	rs = rai->ai_family ?
-	     rs_socket(rai->ai_family, SOCK_STREAM, 0) :
-	     rs_socket(ai->ai_family, SOCK_STREAM, 0);
+	rs = rai ? rs_socket(rai->ai_family, SOCK_STREAM, 0) :
+		   rs_socket(ai->ai_family, SOCK_STREAM, 0);
 	if (rs < 0) {
 		perror("rsocket");
 		ret = rs;
@@ -403,18 +402,17 @@ static int client_connect(void)
 	set_options(rs);
 	/* TODO: bind client to src_addr */
 
-	if (rai_hints.ai_route) {
-		ret = rs_setsockopt(rs, SOL_RDMA, RDMA_ROUTE, rai_hints.ai_route,
-				    rai_hints.ai_route_len);
+	if (rai && rai->ai_route) {
+		ret = rs_setsockopt(rs, SOL_RDMA, RDMA_ROUTE, rai->ai_route,
+				    rai->ai_route_len);
 		if (ret) {
 			perror("rsetsockopt RDMA_ROUTE");
 			goto close;
 		}
 	}
 
-	ret = rai->ai_dst_addr ?
-	      rs_connect(rs, rai->ai_dst_addr, rai->ai_dst_len) :
-	      rs_connect(rs, ai->ai_addr, ai->ai_addrlen);
+	ret = rai ? rs_connect(rs, rai->ai_dst_addr, rai->ai_dst_len) :
+		    rs_connect(rs, ai->ai_addr, ai->ai_addrlen);
 	if (ret && (errno != EINPROGRESS)) {
 		perror("rconnect");
 		goto close;
@@ -442,10 +440,10 @@ close:
 	if (ret)
 		rs_close(rs);
 free:
-	if (use_getaddrinfo)
-		freeaddrinfo(ai);
-	else
+	if (rai)
 		rdma_freeaddrinfo(rai);
+	else
+		freeaddrinfo(ai);
 	return ret;
 }
 
@@ -538,7 +536,7 @@ static int set_test_opt(char *optarg)
 			flags |= MSG_DONTWAIT;
 			break;
 		case 'r':
-			use_getaddrinfo = 0;
+			use_rgai = 1;
 			break;
 		case 'v':
 			verify = 1;
@@ -556,7 +554,7 @@ static int set_test_opt(char *optarg)
 		} else if (!strncasecmp("nonblock", optarg, 8)) {
 			flags |= MSG_DONTWAIT;
 		} else if (strncasecmp("resolve", optarg, 7)) {
-			use_getaddrinfo = 0;
+			use_rgai = 1;
 		} else if (!strncasecmp("verify", optarg, 6)) {
 			verify = 1;
 		} else if (!strncasecmp("fork", optarg, 4)) {
@@ -589,7 +587,7 @@ int main(int argc, char **argv)
 			} else if (!strncasecmp("gid", optarg, 3)) {
 				rai_hints.ai_flags = RAI_NUMERICHOST | RAI_FAMILY;
 				rai_hints.ai_family = AF_IB;
-				use_getaddrinfo = 0;
+				use_rgai = 1;
 			}
 			break;
 		case 'B':
