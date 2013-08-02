@@ -7,9 +7,8 @@ rsockets: Add ability to set the IB route directly
 
 Add an RDMA specific rsocket option that allows the user
 to program the RDMA route directly.  This is useful
-for apps that have path record data available, either
-through the ibacm or SSA, and is needed by SSA itself
-to connect over rsockets.
+for apps that have path record data available, e.g. from
+ibacm.
 
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
