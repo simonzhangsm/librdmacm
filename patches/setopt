@@ -1,5 +1,5 @@
-Bottom: 739a68b4f57f0f0eb2ed2dff067ebc5d7d38c39d
-Top:    f5735a65fa21caff3bc2da3d25711351195dcadd
+Bottom: 4fa2d2eb3eeeff4c1dc33c67228929fcfd37b5cf
+Top:    95004f8e2a69e59188220e1d9d21f87485ff28d2
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-08-02 14:18:06 -0700
 
@@ -14,7 +14,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index e3406a4..3cc3a22 100644
+index d64c3bb..156f68d 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -3309,18 +3309,22 @@ int rsetsockopt(int socket, int level, int optname,
