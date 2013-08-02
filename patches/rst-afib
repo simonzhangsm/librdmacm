@@ -11,9 +11,6 @@ using real UDP sockets for QP resolution, so that support is
 deferred.  For connected sockets, we need to update internal
 checks to handle AF_IB.
 
-Allow the user to specify GID addresses into the rsocket sample
-applications.
-
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
