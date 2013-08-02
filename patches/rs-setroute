@@ -1,5 +1,5 @@
 Bottom: 69bf5ca32ecd53b5d4e71ae3c190fb165b0b729e
-Top:    c1ab11d740a32967db76710c9719b730964ab841
+Top:    739a68b4f57f0f0eb2ed2dff067ebc5d7d38c39d
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-06-10 12:33:20 -0700
 
@@ -31,7 +31,7 @@ index f220c13..efd0db5 100644
  
  int rsetsockopt(int socket, int level, int optname,
 diff --git a/src/rsocket.c b/src/rsocket.c
-index e2b1cc7..7768f58 100644
+index e2b1cc7..e3406a4 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -329,6 +329,8 @@ struct rsocket {
@@ -60,7 +60,7 @@ index e2b1cc7..7768f58 100644
  		if (!ret)
  			goto do_connect;
  		if (errno == EAGAIN || errno == EWOULDBLOCK)
-@@ -3312,6 +3322,14 @@ int rsetsockopt(int socket, int level, int optname,
+@@ -3312,6 +3322,15 @@ int rsetsockopt(int socket, int level, int optname,
  			rs->target_iomap_size = (uint16_t) rs_scale_to_value(
  				(uint8_t) rs_value_to_scale(*(int *) optval, 8), 8);
  			break;
@@ -68,6 +68,7 @@ index e2b1cc7..7768f58 100644
 +			if ((rs->optval = calloc(optlen, 1))) {
 +				memcpy(rs->optval, optval, optlen);
 +				rs->optlen = optlen;
++				ret = 0;
 +			} else {
 +				ret = ERR(ENOMEM);
 +			}
