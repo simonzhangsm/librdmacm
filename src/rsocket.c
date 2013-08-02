@@ -1251,15 +1251,20 @@ resolve_route:
 					      rs->optlen);
 			free(rs->optval);
 			rs->optval = NULL;
+			if (!ret) {
+				rs->state = rs_resolving_route;
+				goto resolving_route;
+			}
 		} else {
 			ret = rdma_resolve_route(rs->cm_id, to);
+			if (!ret)
+				goto do_connect;
 		}
-		if (!ret)
-			goto do_connect;
 		if (errno == EAGAIN || errno == EWOULDBLOCK)
 			rs->state = rs_resolving_route;
 		break;
 	case rs_resolving_route:
+resolving_route:
 		ret = ucma_complete(rs->cm_id);
 		if (ret) {
 			if (errno == ETIMEDOUT && rs->retries <= RS_CONN_RETRIES)
