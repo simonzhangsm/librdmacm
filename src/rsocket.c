@@ -1250,7 +1250,7 @@ resolve_route:
 					      RDMA_OPTION_IB_PATH, rs->optval,
 					      rs->optlen);
 			free(rs->optval);
-			rs->optval = 0;
+			rs->optval = NULL;
 		} else {
 			ret = rdma_resolve_route(rs->cm_id, to);
 		}
