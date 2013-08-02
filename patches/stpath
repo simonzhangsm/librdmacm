@@ -6,8 +6,13 @@ Date:   2013-07-26 09:52:55 -0700
 rstream: Use rsocket option to set route directly
 
 If we're using GID addressing, rdma_getaddrinfo can return
-routing data directly.  Call rsetsockopt to indicate that
-the available routing data should be used.
+routing data directly.  Add an option for the user to
+indicate that rdma_getaddrinfo should be called in place of
+getaddrinfo.  And if routing data is available, call
+rsetsockopt to set the route.
+
+This helps test rsockets when ibacm and AF_IB support are
+available.
 
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
