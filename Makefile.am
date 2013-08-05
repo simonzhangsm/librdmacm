@@ -54,6 +54,8 @@ examples_rcopy_SOURCES = examples/rcopy.c
 examples_rcopy_LDADD = $(top_builddir)/src/librdmacm.la
 examples_udpong_SOURCES = examples/udpong.c examples/common.c
 examples_udpong_LDADD = $(top_builddir)/src/librdmacm.la
+examples_cmtime_SOURCES = examples/cmtime.c examples/common.c
+examples_cmtime_LDADD = $(top_builddir)/src/librdmacm.la
 
 librdmacmincludedir = $(includedir)/rdma
 infinibandincludedir = $(includedir)/infiniband
