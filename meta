@@ -1,12 +1,7 @@
 Version: 1
-Previous: 4d2229f89f44eef12aeff7b0ad0cfac01f79c459
+Previous: 7bdf9d711b9b3081c4ac04b1f054a439da5d355d
 Head: 8fd079abb8b2835908017f74ac70781d84e1e163
 Applied:
-  rst-afib: ca353a3f985135504c429f82bf5a342ec26d11d4
-  ex-afib: f77079d79becf4476cb75ea5c816aae70724116e
-  rs-setroute: e33755decd339712fc57fbe25bed704d24e8621a
-  setopt: 21c703e5a594283cf119ce1286831df5d1483b34
-  stpath: 8fd079abb8b2835908017f74ac70781d84e1e163
 Unapplied:
   old-af-ib: d71ebf70cf74111cfd5f0982d9abe6ec68fb38e3
   old-seterr: 47eb0c419687c2690292c1910acae83a46e5388c
