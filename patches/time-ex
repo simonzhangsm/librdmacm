@@ -1,5 +1,5 @@
 Bottom: 2ab79436b858f0bf24ff91555665a0823faef381
-Top:    f7098734b90e3bb9a92221c046446891d12d7264
+Top:    a4acfa9cd78aabcf2e9936c67eda92310132be0c
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-08-05 10:57:43 -0700
 
@@ -9,9 +9,18 @@ example to time rdma cm calls
 ---
 
 diff --git a/Makefile.am b/Makefile.am
-index e1be9f3..08582d3 100644
+index e1be9f3..4e3dee7 100644
 --- a/Makefile.am
 +++ b/Makefile.am
+@@ -29,7 +29,7 @@ src_librspreload_la_LIBADD = $(top_builddir)/src/librdmacm.la
+ bin_PROGRAMS = examples/ucmatose examples/rping examples/udaddy examples/mckey \
+ 	       examples/rdma_client examples/rdma_server examples/rdma_xclient \
+ 	       examples/rdma_xserver examples/rstream examples/rcopy \
+-	       examples/riostream examples/udpong
++	       examples/riostream examples/udpong examples/cmtime
+ examples_ucmatose_SOURCES = examples/cmatose.c examples/common.c
+ examples_ucmatose_LDADD = $(top_builddir)/src/librdmacm.la
+ examples_rping_SOURCES = examples/rping.c
 @@ -54,6 +54,8 @@ examples_rcopy_SOURCES = examples/rcopy.c
  examples_rcopy_LDADD = $(top_builddir)/src/librdmacm.la
  examples_udpong_SOURCES = examples/udpong.c examples/common.c
