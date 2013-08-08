@@ -3,7 +3,14 @@ Top:    a4acfa9cd78aabcf2e9936c67eda92310132be0c
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-08-05 10:57:43 -0700
 
-example to time rdma cm calls
+cmtime: Add example program that times rdma cm calls
+
+cmtime is a new sample program that measures how long it
+takes for each step in the connection process to complete.
+It can be used to analyze the performance of the various
+CM steps.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
 ---
