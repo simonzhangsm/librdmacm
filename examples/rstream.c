@@ -445,8 +445,20 @@ free:
 	return ret;
 }
 
+static void *do_shutdown(void *arg)
+{
+	int rs = (int) arg;
+
+	sleep(1);
+	printf("calling shutdown from separate thread\n");
+	rs_shutdown(rs, SHUT_RDWR);
+	printf("shutdown completed\n");
+	return NULL;
+}
+
 static int run(void)
 {
+	struct pollfd fds;
 	int i, ret = 0;
 
 	buf = malloc(!custom ? test_size[TEST_CNT - 1].size : transfer_size);
@@ -506,7 +518,23 @@ static int run(void)
 	if (fork_pid)
 		wait(NULL);
 	else
-		rs_shutdown(rs, SHUT_RDWR);
+	{
+		if (dst_addr) {
+			pthread_t thread_id;
+			ret = pthread_create(&thread_id, NULL, do_shutdown, (void*) rs);
+
+			fds.fd = rs;
+			fds.events = POLLIN;
+			printf("calling poll\n");
+			ret = rs_poll(&fds, 1, 10000);
+			printf("poll ret %d (%s) revents 0x%x (POLLHUP 0x%x)\n",
+				ret, strerror(errno), fds.revents, POLLHUP);
+		} else {
+			printf("sleeping for 10 seconds\n");
+			sleep(10);
+			rs_shutdown(rs, SHUT_RDWR);
+		}
+	}
 	rs_close(rs);
 free:
 	free(buf);
