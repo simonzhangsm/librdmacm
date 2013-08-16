@@ -5,7 +5,7 @@ Date:   2013-08-16 15:15:12 -0700
 
 rsockets: Handle race between rshutdown and rpoll
 
-
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
 ---
