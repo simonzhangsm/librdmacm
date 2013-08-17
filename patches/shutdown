@@ -1,5 +1,5 @@
 Bottom: 668ddd4271538fc243a888fad972f12f0e1bf29d
-Top:    26793bc5d4be7bce14b20893dce3fbb7222355b2
+Top:    d4d2e5639ec08b8fe5dbd44a5f83ab895a727cee
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-08-16 15:15:12 -0700
 
@@ -10,56 +10,6 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 ---
 
-diff --git a/examples/rstream.c b/examples/rstream.c
-index 278437f..0135927 100644
---- a/examples/rstream.c
-+++ b/examples/rstream.c
-@@ -445,8 +445,20 @@ free:
- 	return ret;
- }
- 
-+static void *do_shutdown(void *arg)
-+{
-+	int rs = (int) arg;
-+
-+	sleep(1);
-+	printf("calling shutdown from separate thread\n");
-+	rs_shutdown(rs, SHUT_RDWR);
-+	printf("shutdown completed\n");
-+	return NULL;
-+}
-+
- static int run(void)
- {
-+	struct pollfd fds;
- 	int i, ret = 0;
- 
- 	buf = malloc(!custom ? test_size[TEST_CNT - 1].size : transfer_size);
-@@ -506,7 +518,23 @@ static int run(void)
- 	if (fork_pid)
- 		wait(NULL);
- 	else
--		rs_shutdown(rs, SHUT_RDWR);
-+	{
-+		if (dst_addr) {
-+			pthread_t thread_id;
-+			ret = pthread_create(&thread_id, NULL, do_shutdown, (void*) rs);
-+
-+			fds.fd = rs;
-+			fds.events = POLLIN;
-+			printf("calling poll\n");
-+			ret = rs_poll(&fds, 1, 10000);
-+			printf("poll ret %d (%s) revents 0x%x (POLLHUP 0x%x)\n",
-+				ret, strerror(errno), fds.revents, POLLHUP);
-+		} else {
-+			printf("sleeping for 10 seconds\n");
-+			sleep(10);
-+			rs_shutdown(rs, SHUT_RDWR);
-+		}
-+	}
- 	rs_close(rs);
- free:
- 	free(buf);
 diff --git a/src/rsocket.c b/src/rsocket.c
 index d544dd0..e45b26d 100644
 --- a/src/rsocket.c
