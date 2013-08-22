@@ -3,7 +3,7 @@ Top:    085f7c15662b316080106da090760de1b5abe8c5
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-08-22 12:00:54 -0700
 
-cmtime: Add retry support for route resolution
+cmtime: Add retry support for address and route resolution
 
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
