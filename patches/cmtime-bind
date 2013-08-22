@@ -1,5 +1,5 @@
 Bottom: 668ddd4271538fc243a888fad972f12f0e1bf29d
-Top:    3773213b5371853cc561f76a6c125ee7961adf4b
+Top:    f01c97374c3848a7f7eb3898418ec74afe2e5b64
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-08-22 11:30:33 -0700
 
@@ -11,7 +11,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/cmtime.c b/examples/cmtime.c
-index f97ab9e..fb6bb19 100644
+index f97ab9e..e083ac2 100644
 --- a/examples/cmtime.c
 +++ b/examples/cmtime.c
 @@ -54,6 +54,7 @@ static char *src_addr;
@@ -40,7 +40,7 @@ index f97ab9e..fb6bb19 100644
  		us = diff_us(&times[i][1], &times[i][0]);
  		printf("%-13s: %11.2f%11.2f%11.2f%11.2f\n", step_str[i], us / 1000.,
  			max[i] / 1000., min[i], us / connections);
-@@ -348,6 +353,22 @@ static int run_client(void)
+@@ -348,9 +353,27 @@ static int run_client(void)
  	conn_param.private_data = rai->ai_connect;
  	conn_param.private_data_len = rai->ai_connect_len;
  
@@ -63,3 +63,8 @@ index f97ab9e..fb6bb19 100644
  	printf("resolving address\n");
  	start_time(STEP_RESOLVE_ADDR);
  	for (i = 0; i < connections; i++) {
++		if (nodes[i].error)
++			continue;
+ 		start_perf(&nodes[i], STEP_RESOLVE_ADDR);
+ 		ret = rdma_resolve_addr(nodes[i].id, rai->ai_src_addr,
+ 					rai->ai_dst_addr, 2000);
