@@ -5,7 +5,7 @@ Date:   2013-08-22 11:54:56 -0700
 
 cmtime: Allow user to specify timeout values
 
-
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
 ---
