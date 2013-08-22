@@ -372,6 +372,8 @@ static int run_client(void)
 	printf("resolving address\n");
 	start_time(STEP_RESOLVE_ADDR);
 	for (i = 0; i < connections; i++) {
+		if (nodes[i].error)
+			continue;
 		start_perf(&nodes[i], STEP_RESOLVE_ADDR);
 		ret = rdma_resolve_addr(nodes[i].id, rai->ai_src_addr,
 					rai->ai_dst_addr, 2000);
