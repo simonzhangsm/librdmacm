@@ -1,0 +1,22 @@
+Bottom: 3773213b5371853cc561f76a6c125ee7961adf4b
+Top:    f01c97374c3848a7f7eb3898418ec74afe2e5b64
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-08-22 12:03:22 -0700
+
+Refresh of cmtime-bind
+
+---
+
+diff --git a/examples/cmtime.c b/examples/cmtime.c
+index fb6bb19..e083ac2 100644
+--- a/examples/cmtime.c
++++ b/examples/cmtime.c
+@@ -372,6 +372,8 @@ static int run_client(void)
+ 	printf("resolving address\n");
+ 	start_time(STEP_RESOLVE_ADDR);
+ 	for (i = 0; i < connections; i++) {
++		if (nodes[i].error)
++			continue;
+ 		start_perf(&nodes[i], STEP_RESOLVE_ADDR);
+ 		ret = rdma_resolve_addr(nodes[i].id, rai->ai_src_addr,
+ 					rai->ai_dst_addr, 2000);
