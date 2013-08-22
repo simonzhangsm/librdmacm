@@ -1,0 +1,41 @@
+Bottom: 2c19f63f87fca4a6072bdf2f255fb935db04cff0
+Top:    3773213b5371853cc561f76a6c125ee7961adf4b
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-08-22 11:52:28 -0700
+
+Refresh of cmtime-bind
+
+---
+
+diff --git a/examples/cmtime.c b/examples/cmtime.c
+index 5b416af..fb6bb19 100644
+--- a/examples/cmtime.c
++++ b/examples/cmtime.c
+@@ -125,6 +125,9 @@ static void show_perf(void)
+ 
+ 	printf("step              total ms     max ms     min us  us / conn\n");
+ 	for (i = 0; i < STEP_CNT; i++) {
++		if (i == STEP_BIND && !src_addr)
++			continue;
++
+ 		us = diff_us(&times[i][1], &times[i][0]);
+ 		printf("%-13s: %11.2f%11.2f%11.2f%11.2f\n", step_str[i], us / 1000.,
+ 			max[i] / 1000., min[i], us / connections);
+@@ -351,7 +354,7 @@ static int run_client(void)
+ 	conn_param.private_data_len = rai->ai_connect_len;
+ 
+ 	if (src_addr) {
+-		printf("binding source address");
++		printf("binding source address\n");
+ 		start_time(STEP_BIND);
+ 		for (i = 0; i < connections; i++) {
+ 			start_perf(&nodes[i], STEP_BIND);
+@@ -361,7 +364,7 @@ static int run_client(void)
+ 				nodes[i].error = 1;
+ 				continue;
+ 			}
+-			stop_perf(&nodes[i], STEP_RESOLVE_ADDR);
++			end_perf(&nodes[i], STEP_BIND);
+ 		}
+ 		end_time(STEP_BIND);
+ 	}
