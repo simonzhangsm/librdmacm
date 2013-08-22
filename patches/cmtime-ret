@@ -1,5 +1,5 @@
 Bottom: 4e28c06a2606dd99557b8d56fae4cb73eb704c83
-Top:    d51a790af9f15a8f2a95c58ab9cfa5fdde3dbff6
+Top:    085f7c15662b316080106da090760de1b5abe8c5
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-08-22 12:00:54 -0700
 
@@ -11,7 +11,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/cmtime.c b/examples/cmtime.c
-index 5ed83b5..220e675 100644
+index 5ed83b5..6761f2c 100644
 --- a/examples/cmtime.c
 +++ b/examples/cmtime.c
 @@ -52,6 +52,7 @@ static char *port = "7471";
@@ -30,14 +30,13 @@ index 5ed83b5..220e675 100644
  };
  
  static struct node *nodes;
-@@ -205,11 +207,22 @@ static void cma_handler(struct rdma_cm_id *id, struct rdma_cm_event *event)
+@@ -205,11 +207,20 @@ static void cma_handler(struct rdma_cm_id *id, struct rdma_cm_event *event)
  			conn_handler(n);
  		break;
  	case RDMA_CM_EVENT_ADDR_ERROR:
 +		if (n->retries--) {
-+			ret = rdma_resolve_addr(n->id, rai->ai_src_addr,
-+						rai->ai_dst_addr, timeout);
-+			if (!ret)
++			if (!rdma_resolve_addr(n->id, rai->ai_src_addr,
++					       rai->ai_dst_addr, timeout))
 +				break;
 +		}
  		printf("RDMA_CM_EVENT_ADDR_ERROR, error: %d\n", event->status);
@@ -46,14 +45,22 @@ index 5ed83b5..220e675 100644
  		break;
  	case RDMA_CM_EVENT_ROUTE_ERROR:
 +		if (n->retries--) {
-+			ret = rdma_resolve_route(n->id, timeout);
-+			if (!ret)
++			if (!rdma_resolve_route(n->id, timeout))
 +				break;
 +		}
  		printf("RDMA_CM_EVENT_ROUTE_ERROR, error: %d\n", event->status);
  		route_handler(n);
  		n->error = 1;
-@@ -375,6 +388,7 @@ static int run_client(void)
+@@ -350,7 +361,7 @@ static int run_client(void)
+ 
+ 	conn_param.responder_resources = 1;
+ 	conn_param.initiator_depth = 1;
+-	conn_param.retry_count = 5;
++	conn_param.retry_count = retries;
+ 	conn_param.private_data = rai->ai_connect;
+ 	conn_param.private_data_len = rai->ai_connect_len;
+ 
+@@ -375,6 +386,7 @@ static int run_client(void)
  	for (i = 0; i < connections; i++) {
  		if (nodes[i].error)
  			continue;
@@ -61,7 +68,7 @@ index 5ed83b5..220e675 100644
  		start_perf(&nodes[i], STEP_RESOLVE_ADDR);
  		ret = rdma_resolve_addr(nodes[i].id, rai->ai_src_addr,
  					rai->ai_dst_addr, timeout);
-@@ -395,6 +409,7 @@ static int run_client(void)
+@@ -395,6 +407,7 @@ static int run_client(void)
  	for (i = 0; i < connections; i++) {
  		if (nodes[i].error)
  			continue;
@@ -69,7 +76,7 @@ index 5ed83b5..220e675 100644
  		start_perf(&nodes[i], STEP_RESOLVE_ROUTE);
  		ret = rdma_resolve_route(nodes[i].id, timeout);
  		if (ret) {
-@@ -467,7 +482,7 @@ int main(int argc, char **argv)
+@@ -467,7 +480,7 @@ int main(int argc, char **argv)
  
  	hints.ai_port_space = RDMA_PS_TCP;
  	hints.ai_qp_type = IBV_QPT_RC;
@@ -78,7 +85,7 @@ index 5ed83b5..220e675 100644
  		switch (op) {
  		case 's':
  			dst_addr = optarg;
-@@ -481,6 +496,9 @@ int main(int argc, char **argv)
+@@ -481,6 +494,9 @@ int main(int argc, char **argv)
  		case 'p':
  			port = optarg;
  			break;
