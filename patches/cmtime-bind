@@ -1,5 +1,5 @@
 Bottom: 668ddd4271538fc243a888fad972f12f0e1bf29d
-Top:    2c19f63f87fca4a6072bdf2f255fb935db04cff0
+Top:    3773213b5371853cc561f76a6c125ee7961adf4b
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-08-22 11:30:33 -0700
 
@@ -11,7 +11,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/examples/cmtime.c b/examples/cmtime.c
-index f97ab9e..5b416af 100644
+index f97ab9e..fb6bb19 100644
 --- a/examples/cmtime.c
 +++ b/examples/cmtime.c
 @@ -54,6 +54,7 @@ static char *src_addr;
@@ -30,12 +30,22 @@ index f97ab9e..5b416af 100644
  	"resolve addr",
  	"resolve route",
  	"create qp",
-@@ -348,6 +350,22 @@ static int run_client(void)
+@@ -123,6 +125,9 @@ static void show_perf(void)
+ 
+ 	printf("step              total ms     max ms     min us  us / conn\n");
+ 	for (i = 0; i < STEP_CNT; i++) {
++		if (i == STEP_BIND && !src_addr)
++			continue;
++
+ 		us = diff_us(&times[i][1], &times[i][0]);
+ 		printf("%-13s: %11.2f%11.2f%11.2f%11.2f\n", step_str[i], us / 1000.,
+ 			max[i] / 1000., min[i], us / connections);
+@@ -348,6 +353,22 @@ static int run_client(void)
  	conn_param.private_data = rai->ai_connect;
  	conn_param.private_data_len = rai->ai_connect_len;
  
 +	if (src_addr) {
-+		printf("binding source address");
++		printf("binding source address\n");
 +		start_time(STEP_BIND);
 +		for (i = 0; i < connections; i++) {
 +			start_perf(&nodes[i], STEP_BIND);
@@ -45,7 +55,7 @@ index f97ab9e..5b416af 100644
 +				nodes[i].error = 1;
 +				continue;
 +			}
-+			stop_perf(&nodes[i], STEP_RESOLVE_ADDR);
++			end_perf(&nodes[i], STEP_BIND);
 +		}
 +		end_time(STEP_BIND);
 +	}
