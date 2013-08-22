@@ -1,13 +1,41 @@
 Bottom: 085f7c15662b316080106da090760de1b5abe8c5
-Top:    085f7c15662b316080106da090760de1b5abe8c5
+Top:    ffbbb287b1a2e4fbdbcedb90103f988acb8fcb42
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-08-22 15:29:15 -0700
 
-rsocket: Document fork support in man page
+rsocket: Update rsocket man page
 
+Update fork support and RDMA_ROUTE socket option.
 
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
 ---
 
-
+diff --git a/man/rsocket.7 b/man/rsocket.7
+index 9cc33f5..9a55887 100644
+--- a/man/rsocket.7
++++ b/man/rsocket.7
+@@ -96,6 +96,8 @@ RDMA_RQSIZE - Integer size of the underlying receive queue.
+ RDMA_INLINE - Integer size of inline data.
+ .TP
+ RDMA_IOMAPSIZE - Integer number of remote IO mappings supported
++.TP
++RDMA_ROUTE - struct ibv_path_data of path record for connection.
+ .P
+ Note that rsockets fd's cannot be passed into non-rsocket calls.  For
+ applications which must mix rsocket fd's with standard socket fd's or
+@@ -113,7 +115,12 @@ subdirectory.
+ The preload library can be used by setting LD_PRELOAD when running.
+ Note that not all applications will work with rsockets.  Support is
+ limited based on the socket options used by the application.
+-Additionally, applications which call fork are not supported.
++Support for fork() is limited, but available.  To use rsockets with
++the preload library for applications that call fork, users must
++set the environment variable RDMAV_FORK_SAFE=1 on both the client
++and server side of the connection.  In general, fork is
++supportable for server applications that accept a connection, then
++fork off a process to handle the new connection.
+ .P
+ rsockets uses configuration files that give an administrator control
+ over the default settings used by rsockets.  Use files under
