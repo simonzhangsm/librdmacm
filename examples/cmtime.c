@@ -125,6 +125,9 @@ static void show_perf(void)
 
 	printf("step              total ms     max ms     min us  us / conn\n");
 	for (i = 0; i < STEP_CNT; i++) {
+		if (i == STEP_BIND && !src_addr)
+			continue;
+
 		us = diff_us(&times[i][1], &times[i][0]);
 		printf("%-13s: %11.2f%11.2f%11.2f%11.2f\n", step_str[i], us / 1000.,
 			max[i] / 1000., min[i], us / connections);
@@ -351,7 +354,7 @@ static int run_client(void)
 	conn_param.private_data_len = rai->ai_connect_len;
 
 	if (src_addr) {
-		printf("binding source address");
+		printf("binding source address\n");
 		start_time(STEP_BIND);
 		for (i = 0; i < connections; i++) {
 			start_perf(&nodes[i], STEP_BIND);
@@ -361,7 +364,7 @@ static int run_client(void)
 				nodes[i].error = 1;
 				continue;
 			}
-			stop_perf(&nodes[i], STEP_RESOLVE_ADDR);
+			end_perf(&nodes[i], STEP_BIND);
 		}
 		end_time(STEP_BIND);
 	}
