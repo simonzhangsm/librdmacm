@@ -1,5 +1,5 @@
 Bottom: ffbbb287b1a2e4fbdbcedb90103f988acb8fcb42
-Top:    be51a8dcbbfb275a2e110375bff2d15cf10dc8e9
+Top:    e17d0dd680820260f177d598f36f7d3f76f02a6f
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-08-16 15:15:12 -0700
 
@@ -11,10 +11,34 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index d544dd0..e45b26d 100644
+index d544dd0..b4f5891 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
-@@ -2948,10 +2948,12 @@ static int rs_poll_events(struct pollfd *rfds, struct pollfd *fds, nfds_t nfds)
+@@ -133,7 +133,8 @@ enum {
+ 
+ enum {
+ 	RS_CTRL_DISCONNECT,
+-	RS_CTRL_SHUTDOWN
++	RS_CTRL_SHUTDOWN,
++	RS_CTRL_SYNC
+ };
+ 
+ struct rs_msg {
+@@ -1822,7 +1823,12 @@ static int rs_poll_cq(struct rsocket *rs)
+ 					rs->state = rs_disconnected;
+ 					return 0;
+ 				} else if (rs_msg_data(msg) == RS_CTRL_SHUTDOWN) {
+-					rs->state &= ~rs_readable;
++					if (rs->state & rs_writable) {
++						rs->state &= ~rs_readable;
++					} else {
++						rs->state = rs_disconnected;
++						return 0;
++					}
+ 				}
+ 				break;
+ 			case RS_OP_WRITE:
+@@ -2948,10 +2954,12 @@ static int rs_poll_events(struct pollfd *rfds, struct pollfd *fds, nfds_t nfds)
  
  		rs = idm_lookup(&idm, fds[i].fd);
  		if (rs) {
@@ -27,7 +51,7 @@ index d544dd0..e45b26d 100644
  			fds[i].revents = rs_poll_rs(rs, fds[i].events, 1, rs_poll_all);
  		} else {
  			fds[i].revents = rfds[i].revents;
-@@ -3098,7 +3100,8 @@ int rselect(int nfds, fd_set *readfds, fd_set *writefds,
+@@ -3098,7 +3106,8 @@ int rselect(int nfds, fd_set *readfds, fd_set *writefds,
  
  /*
   * For graceful disconnect, notify the remote side that we're
@@ -37,15 +61,60 @@ index d544dd0..e45b26d 100644
   */
  int rshutdown(int socket, int how)
  {
-@@ -3138,6 +3141,12 @@ int rshutdown(int socket, int how)
+@@ -3106,10 +3115,10 @@ int rshutdown(int socket, int how)
+ 	int ctrl, ret = 0;
+ 
+ 	rs = idm_at(&idm, socket);
+-	if (how == SHUT_RD) {
+-		rs->state &= ~rs_readable;
+-		return 0;
+-	}
++//	if (how == SHUT_RD) {
++//		rs->state &= ~rs_readable;
++//		return 0;
++//	}
+ 
+ 	if (rs->fd_flags & O_NONBLOCK)
+ 		rs_set_nonblocking(rs, 0);
+@@ -3118,15 +3127,20 @@ int rshutdown(int socket, int how)
+ 		if (how == SHUT_RDWR) {
+ 			ctrl = RS_CTRL_DISCONNECT;
+ 			rs->state &= ~(rs_readable | rs_writable);
+-		} else {
++		} else if (how == SHUT_WR) {
+ 			rs->state &= ~rs_writable;
+ 			ctrl = (rs->state & rs_readable) ?
+ 				RS_CTRL_SHUTDOWN : RS_CTRL_DISCONNECT;
++		} else {
++			rs->state &= ~rs_readable;
++			if (rs->state & rs_writable)
++				goto out;
++			ctrl = RS_CTRL_DISCONNECT;
+ 		}
+ 		if (!rs->ctrl_avail) {
+ 			ret = rs_process_cq(rs, 0, rs_conn_can_send_ctrl);
+ 			if (ret)
+-				return ret;
++				goto out;
+ 		}
+ 
+ 		if ((rs->state & rs_connected) && rs->ctrl_avail) {
+@@ -3138,10 +3152,17 @@ int rshutdown(int socket, int how)
  	if (rs->state & rs_connected)
  		rs_process_cq(rs, 0, rs_conn_all_sends_done);
  
++out:
+ 	if ((rs->fd_flags & O_NONBLOCK) && (rs->state & rs_connected))
+ 		rs_set_nonblocking(rs, rs->fd_flags);
+ 
+-	return 0;
 +	if (rs->state & rs_disconnected) {
 +		/* Generate event by flushing receives to unblock rpoll */
 +		ibv_req_notify_cq(rs->cm_id->recv_cq, 0);
 +		rdma_disconnect(rs->cm_id);
 +	}
 +
- 	if ((rs->fd_flags & O_NONBLOCK) && (rs->state & rs_connected))
- 		rs_set_nonblocking(rs, rs->fd_flags);
++	return ret;
+ }
+ 
+ static void ds_shutdown(struct rsocket *rs)
