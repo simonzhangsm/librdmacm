@@ -133,8 +133,7 @@ enum {
 
 enum {
 	RS_CTRL_DISCONNECT,
-	RS_CTRL_SHUTDOWN,
-	RS_CTRL_SYNC
+	RS_CTRL_SHUTDOWN
 };
 
 struct rs_msg {
@@ -3115,11 +3114,6 @@ int rshutdown(int socket, int how)
 	int ctrl, ret = 0;
 
 	rs = idm_at(&idm, socket);
-//	if (how == SHUT_RD) {
-//		rs->state &= ~rs_readable;
-//		return 0;
-//	}
-
 	if (rs->fd_flags & O_NONBLOCK)
 		rs_set_nonblocking(rs, 0);
 
