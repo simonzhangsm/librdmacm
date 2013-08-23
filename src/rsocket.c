@@ -133,7 +133,8 @@ enum {
 
 enum {
 	RS_CTRL_DISCONNECT,
-	RS_CTRL_SHUTDOWN
+	RS_CTRL_SHUTDOWN,
+	RS_CTRL_SYNC
 };
 
 struct rs_msg {
@@ -1822,7 +1823,12 @@ static int rs_poll_cq(struct rsocket *rs)
 					rs->state = rs_disconnected;
 					return 0;
 				} else if (rs_msg_data(msg) == RS_CTRL_SHUTDOWN) {
-					rs->state &= ~rs_readable;
+					if (rs->state & rs_writable) {
+						rs->state &= ~rs_readable;
+					} else {
+						rs->state = rs_disconnected;
+						return 0;
+					}
 				}
 				break;
 			case RS_OP_WRITE:
@@ -3109,10 +3115,10 @@ int rshutdown(int socket, int how)
 	int ctrl, ret = 0;
 
 	rs = idm_at(&idm, socket);
-	if (how == SHUT_RD) {
-		rs->state &= ~rs_readable;
-		return 0;
-	}
+//	if (how == SHUT_RD) {
+//		rs->state &= ~rs_readable;
+//		return 0;
+//	}
 
 	if (rs->fd_flags & O_NONBLOCK)
 		rs_set_nonblocking(rs, 0);
@@ -3121,15 +3127,20 @@ int rshutdown(int socket, int how)
 		if (how == SHUT_RDWR) {
 			ctrl = RS_CTRL_DISCONNECT;
 			rs->state &= ~(rs_readable | rs_writable);
-		} else {
+		} else if (how == SHUT_WR) {
 			rs->state &= ~rs_writable;
 			ctrl = (rs->state & rs_readable) ?
 				RS_CTRL_SHUTDOWN : RS_CTRL_DISCONNECT;
+		} else {
+			rs->state &= ~rs_readable;
+			if (rs->state & rs_writable)
+				goto out;
+			ctrl = RS_CTRL_DISCONNECT;
 		}
 		if (!rs->ctrl_avail) {
 			ret = rs_process_cq(rs, 0, rs_conn_can_send_ctrl);
 			if (ret)
-				return ret;
+				goto out;
 		}
 
 		if ((rs->state & rs_connected) && rs->ctrl_avail) {
@@ -3141,16 +3152,17 @@ int rshutdown(int socket, int how)
 	if (rs->state & rs_connected)
 		rs_process_cq(rs, 0, rs_conn_all_sends_done);
 
+out:
+	if ((rs->fd_flags & O_NONBLOCK) && (rs->state & rs_connected))
+		rs_set_nonblocking(rs, rs->fd_flags);
+
 	if (rs->state & rs_disconnected) {
 		/* Generate event by flushing receives to unblock rpoll */
 		ibv_req_notify_cq(rs->cm_id->recv_cq, 0);
 		rdma_disconnect(rs->cm_id);
 	}
 
-	if ((rs->fd_flags & O_NONBLOCK) && (rs->state & rs_connected))
-		rs_set_nonblocking(rs, rs->fd_flags);
-
-	return 0;
+	return ret;
 }
 
 static void ds_shutdown(struct rsocket *rs)
