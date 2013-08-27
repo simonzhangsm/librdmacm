@@ -1,12 +1,12 @@
 Bottom: ffbbb287b1a2e4fbdbcedb90103f988acb8fcb42
 Top:    ffbbb287b1a2e4fbdbcedb90103f988acb8fcb42
-Author: Sean Hefty <sean.hefty@intel.com>
+Author: Yan Droneaud <ydroneaud@opteya.com>
 Date:   2013-08-27 11:37:54 -0700
 
 examples: Add cmtime to .gitignore
 
 Signed-off-by: Yann Droneaud <ydroneaud@opteya.com>
-
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
 ---
