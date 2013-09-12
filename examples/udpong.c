@@ -44,7 +44,6 @@
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
 
-#include <rdma/rdma_cma.h>
 #include <rdma/rsocket.h>
 #include "common.h"
 
