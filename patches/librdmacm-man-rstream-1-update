@@ -6,6 +6,7 @@ Date:   2013-09-11 15:37:11 -0400
 [librdmacm] man/rstream.1: Update man page to be consistent with rstream -h
 
 Signed-off-by: Hal Rosenstock <hal@mellanox.com>
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
 ---
