@@ -6,6 +6,7 @@ Date:   2013-09-11 14:44:28 -0400
 [librdmacm] man/rdma_create_id.3: Add RDMA_PS_IB port space description
 
 Signed-off-by: Hal Rosenstock <hal@mellanox.com>
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
 ---
