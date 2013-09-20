@@ -1,0 +1,49 @@
+Bottom: 40821102c45434437b57fef0005aa6c4758c12b5
+Top:    9d02622430cdb20827f81b38eed99f8b534e0f19
+Author: Hal Rosenstock <hal@dev.mellanox.co.il>
+Date:   2013-09-12 08:53:35 -0400
+
+[librdmacm] examples: Remove unneeded include of header file when using rocket.h
+
+as it's included in rsocket.h
+
+Signed-off-by: Hal Rosenstock <hal@mellanox.com>
+
+
+---
+
+diff --git a/examples/riostream.c b/examples/riostream.c
+index a1d3671..6587707 100644
+--- a/examples/riostream.c
++++ b/examples/riostream.c
+@@ -43,7 +43,6 @@
+ #include <netinet/in.h>
+ #include <netinet/tcp.h>
+ 
+-#include <rdma/rdma_cma.h>
+ #include <rdma/rsocket.h>
+ #include "common.h"
+ 
+diff --git a/examples/rstream.c b/examples/rstream.c
+index cf84716..4e50f94 100644
+--- a/examples/rstream.c
++++ b/examples/rstream.c
+@@ -43,7 +43,6 @@
+ #include <netinet/in.h>
+ #include <netinet/tcp.h>
+ 
+-#include <rdma/rdma_cma.h>
+ #include <rdma/rsocket.h>
+ #include "common.h"
+ 
+diff --git a/examples/udpong.c b/examples/udpong.c
+index af8deb9..58e3d4e 100644
+--- a/examples/udpong.c
++++ b/examples/udpong.c
+@@ -44,7 +44,6 @@
+ #include <netinet/tcp.h>
+ #include <arpa/inet.h>
+ 
+-#include <rdma/rdma_cma.h>
+ #include <rdma/rsocket.h>
+ #include "common.h"

@@ -1,0 +1,25 @@
+Bottom: f8e50db6a6df431f252c42108acad59c82371cf7
+Top:    acfb32528de8f51be884ac2c5cfc593134cae8d1
+Author: Hal Rosenstock <hal@dev.mellanox.co.il>
+Date:   2013-09-11 14:44:28 -0400
+
+[librdmacm] man/rdma_create_id.3: Add RDMA_PS_IB port space description
+
+Signed-off-by: Hal Rosenstock <hal@mellanox.com>
+
+
+---
+
+diff --git a/man/rdma_create_id.3 b/man/rdma_create_id.3
+index da333fb..81acc9b 100644
+--- a/man/rdma_create_id.3
++++ b/man/rdma_create_id.3
+@@ -47,6 +47,8 @@ port space provides message, not stream, based communication.
+ .IP RDMA_PS_UDP
+ Provides unreliable, connectionless QP communication.  Supports both datagram
+ and multicast communication.
++.IP RDMA_PS_IB
++Provides for any IB services (UD, UC, RC, XRC, etc.).
+ .SH "SEE ALSO"
+ rdma_cm(7), rdma_create_event_channel(3), rdma_destroy_id(3), rdma_get_devices(3),
+ rdma_bind_addr(3), rdma_resolve_addr(3), rdma_connect(3), rdma_listen(3),
