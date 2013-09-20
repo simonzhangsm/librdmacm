@@ -1,12 +1,12 @@
 Version: 1
-Previous: f2559fab27788dcfcec6492cfc4e5712e1ae9264
-Head: a5577520a9d963d20f61aa4549b420bf25f5cc06
+Previous: 4d40e39e5a98d6192220a542dd3d5ab942fda166
+Head: a53376c3c7887c52cf5b311b0b96cfa405a49d31
 Applied:
+Unapplied:
   librdmacm-man-rdma_create_id-3: 02f7a61bba46b6ab360141d1953271253196b52a
   librdmacm-rstream-c-indicate-w: 2113ee2a6c1f35a8dac8b55abf49ac27caed57a4
   librdmacm-man-rstream-1-update: 41eaf34940bd4816eb91966b4959a355ccde56b3
   librdmacm-examples-remove-unne: a5577520a9d963d20f61aa4549b420bf25f5cc06
-Unapplied:
   shutdown: 470d7dd6682f761c2b93f997cf7ae355a2171d59
   old-af-ib: d71ebf70cf74111cfd5f0982d9abe6ec68fb38e3
   old-seterr: 47eb0c419687c2690292c1910acae83a46e5388c
