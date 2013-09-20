@@ -6,6 +6,7 @@ Date:   2013-09-11 14:44:32 -0400
 [librdmacm] rstream.c: Indicate when specified address family is unknown
 
 Signed-off-by: Hal Rosenstock >hal@mellanox.com>
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
 ---
