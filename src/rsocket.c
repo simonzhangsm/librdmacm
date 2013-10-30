@@ -3153,7 +3153,7 @@ out:
 	if (rs->state & rs_disconnected) {
 		/* Generate event by flushing receives to unblock rpoll */
 		ibv_req_notify_cq(rs->cm_id->recv_cq, 0);
-		rdma_disconnect(rs->cm_id);
+		ucma_shutdown(rs->cm_id);
 	}
 
 	return ret;
