@@ -1,9 +1,8 @@
 Version: 1
-Previous: 35b55ba5873c5fe49a05107d7ccd440ffdd614f6
-Head: 15549059baaa65ab5b8ebbda177b833e24cd0185
+Previous: 0781eb39b69783e6c7e5b4b40b7949ffa6ffeb30
+Head: 2a96a8bfe5195430d01da440c53475aae7ec521f
 Applied:
   shutdown: 2a96a8bfe5195430d01da440c53475aae7ec521f
-  refresh-temp: 15549059baaa65ab5b8ebbda177b833e24cd0185
 Unapplied:
   old-af-ib: d71ebf70cf74111cfd5f0982d9abe6ec68fb38e3
   old-seterr: 47eb0c419687c2690292c1910acae83a46e5388c
