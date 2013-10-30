@@ -1,5 +1,5 @@
 Bottom: 40821102c45434437b57fef0005aa6c4758c12b5
-Top:    5811e9d9c8d5ed97573872408f138609e535b721
+Top:    75b04ca01637eeac4f5b673a12c87917a9126271
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-08-16 15:15:12 -0700
 
@@ -10,8 +10,60 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 ---
 
+diff --git a/src/cma.c b/src/cma.c
+index 374844c..4f41879 100644
+--- a/src/cma.c
++++ b/src/cma.c
+@@ -1543,22 +1543,25 @@ int rdma_notify(struct rdma_cm_id *id, enum ibv_event_type event)
+ 	return 0;
+ }
+ 
+-int rdma_disconnect(struct rdma_cm_id *id)
++int ucma_shutdown(struct rdma_cm_id *id)
+ {
+-	struct ucma_abi_disconnect cmd;
+-	struct cma_id_private *id_priv;
+-	int ret;
+-
+ 	switch (id->verbs->device->transport_type) {
+ 	case IBV_TRANSPORT_IB:
+-		ret = ucma_modify_qp_err(id);
+-		break;
++		return ucma_modify_qp_err(id);
+ 	case IBV_TRANSPORT_IWARP:
+-		ret = ucma_modify_qp_sqd(id);
+-		break;
++		return ucma_modify_qp_sqd(id);
+ 	default:
+-		ret = ERR(EINVAL);
++		return ERR(EINVAL);
+ 	}
++}
++
++int rdma_disconnect(struct rdma_cm_id *id)
++{
++	struct ucma_abi_disconnect cmd;
++	struct cma_id_private *id_priv;
++	int ret;
++
++	ret = ucma_shutdown(id);
+ 	if (ret)
+ 		return ret;
+ 
+diff --git a/src/cma.h b/src/cma.h
+index e944a9a..4c991b4 100644
+--- a/src/cma.h
++++ b/src/cma.h
+@@ -150,6 +150,7 @@ void ucma_set_sid(enum rdma_port_space ps, struct sockaddr *addr,
+ 		  struct sockaddr_ib *sib);
+ int ucma_max_qpsize(struct rdma_cm_id *id);
+ int ucma_complete(struct rdma_cm_id *id);
++int ucma_shutdown(struct rdma_cm_id *id);
+ 
+ static inline int ERR(int err)
+ {
 diff --git a/src/rsocket.c b/src/rsocket.c
-index d544dd0..f94ddf3 100644
+index d544dd0..c7a491b 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -1822,7 +1822,12 @@ static int rs_poll_cq(struct rsocket *rs)
@@ -98,7 +150,7 @@ index d544dd0..f94ddf3 100644
 +	if (rs->state & rs_disconnected) {
 +		/* Generate event by flushing receives to unblock rpoll */
 +		ibv_req_notify_cq(rs->cm_id->recv_cq, 0);
-+		rdma_disconnect(rs->cm_id);
++		ucma_shutdown(rs->cm_id);
 +	}
 +
 +	return ret;
