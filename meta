@@ -1,7 +1,9 @@
 Version: 1
-Previous: da2be12735b67a54bfa27579a63c3dae28adc97b
-Head: 86520b86ffb45d3caf6e5bd94271f99deef0a5f9
+Previous: 0b8cd356a141074056d2d55d81a8082bec6853c9
+Head: 1f013fbdc9963b6fd17af42c99b093b3beb8d928
 Applied:
+  librdmacm-makefile-am-add-miss: 4d62c32794313aadd188b81e1ae2333582d6b923
+  librdmacm-some-fixes-to-man-pa: 1f013fbdc9963b6fd17af42c99b093b3beb8d928
 Unapplied:
   old-af-ib: d71ebf70cf74111cfd5f0982d9abe6ec68fb38e3
   old-seterr: 47eb0c419687c2690292c1910acae83a46e5388c

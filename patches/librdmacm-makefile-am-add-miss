@@ -1,0 +1,24 @@
+Bottom: 75b04ca01637eeac4f5b673a12c87917a9126271
+Top:    29f7286704569501e768c26716f57dc0a244e23d
+Author: Hal Rosenstock <hal@dev.mellanox.co.il>
+Date:   2013-11-04 07:56:08 -0500
+
+[librdmacm] Makefile.am: Add missing riostream man page to man_MANS
+
+Signed-off-by: Hal Rosenstock <hal@mellanox.com>
+
+
+---
+
+diff --git a/Makefile.am b/Makefile.am
+index 4e3dee7..bf72134 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -125,6 +125,7 @@ man_MANS = \
+ 	man/rdma_client.1 \
+ 	man/rdma_xserver.1 \
+ 	man/rdma_xclient.1 \
++	man/riostream.1 \
+ 	man/rstream.1 \
+ 	man/rcopy.1 \
+ 	man/rdma_cm.7 \
