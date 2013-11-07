@@ -5,6 +5,24 @@ Date:   2013-08-16 15:15:12 -0700
 
 rsockets: Handle race between rshutdown and rpoll
 
+Multi-threaded applications which call rpoll and rshutdown
+simultaneously can hang.  Ceph developers reported an issue
+with the rsocket implementation.  Ceph calls rpoll in
+one thread, and while that thread is blocked in rpoll,
+a second thread may cann rshutdown on the socket.  In
+normal sockets, this results in the poll call unblocking
+(since a call to read on the socket will no longer block).
+however, rsockets does not free the thread blocked on the
+rpoll call.
+
+To fix this, we add some additional state checking to
+protect against threads calling rpoll and rshutdown
+simultaneously.  We also have the rshutdown call
+transition the QP into an error state.  This causes all
+posted receives to complete as flushed, which results
+in unblocking the thread in rpoll (to process the flushed
+receives).
+
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
