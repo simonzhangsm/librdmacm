@@ -1,0 +1,21 @@
+Bottom: 45950061e96f3725b666bbe4061f648f52898e90
+Top:    45950061e96f3725b666bbe4061f648f52898e90
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-11-11 10:24:54 -0800
+
+Retrieve SGID after calling rdma_bind_addr
+
+A change was made to rdma_bind_addr when AF_IB is enabled
+to only retrieve the resulting bound address.  Previously,
+rdma_bind_addr would retrieve the corresponding SGID as
+well.  This breaks some apps which were checking the
+SGID after binding to an IP address.  Revert to the
+previous behavior of also retrieving the SGID after
+calling rdma_bind_addr.
+
+
+
+
+---
+
+
