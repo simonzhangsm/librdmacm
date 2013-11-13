@@ -13,7 +13,8 @@ SGID after binding to an IP address.  Revert to the
 previous behavior of also retrieving the SGID after
 calling rdma_bind_addr.
 
-
+Tested-by: Christoph Lameter <cl@linux.com>
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
 ---
