@@ -11,6 +11,8 @@ acm_lock mutex.  We need to check init again inside of
 holding the mutex to ensure that we don't run the
 initialization code twice.
 
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
 
 ---
 
