@@ -1,0 +1,17 @@
+Bottom: e93d2482fbadbab5970e58b2e895145c10480129
+Top:    e93d2482fbadbab5970e58b2e895145c10480129
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-11-26 13:16:19 -0800
+
+librdmacm: Check 'init' under mutex
+
+ucma_ib_init() does a quick check that access to ibacm has
+been initialized.  This check is done outside of the
+acm_lock mutex.  We need to check init again inside of
+holding the mutex to ensure that we don't run the
+initialization code twice.
+
+
+---
+
+
