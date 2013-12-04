@@ -1,6 +1,6 @@
 Bottom: ccdc242c2debe1fcb36d673c1005d1c45760c354
 Top:    902e9b159a88d01c26ca0aa86343d8cc4eaa1469
-Author: Sean Hefty <sean.hefty@intel.com>
+Author: Or Gerlitz <ogerlitz@mellanox.com>
 Date:   2013-12-03 16:51:07 -0800
 
 librdmacm: Add directives on binding to IPv6 any address to man pages
