@@ -3,23 +3,12 @@ Top:    902e9b159a88d01c26ca0aa86343d8cc4eaa1469
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2013-12-03 16:51:07 -0800
 
-From patchwork Sun Dec  1 07:31:38 2013
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: [V1,
-	librdmacm] Add directives on binding to IPv6 any address to man pages
-From: Or Gerlitz <ogerlitz@mellanox.com>
-X-Patchwork-Id: 3261731
-Message-Id: <1385883098-22307-1-git-send-email-ogerlitz@mellanox.com>
-To: sean.hefty@intel.com
-Cc: linux-rdma@vger.kernel.org, mrhines@us.ibm.com,
-	Or Gerlitz <ogerlitz@mellanox.com>
-Date: Sun,  1 Dec 2013 09:31:38 +0200
+librdmacm: Add directives on binding to IPv6 any address to man pages
 
 Explain how to bind to IPv6 any address in the man pages for the examples
 
 Signed-off-by: Or Gerlitz <ogerlitz@mellanox.com>
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
 ---
