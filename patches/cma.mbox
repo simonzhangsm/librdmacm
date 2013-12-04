@@ -1,0 +1,62 @@
+Bottom: ccdc242c2debe1fcb36d673c1005d1c45760c354
+Top:    902e9b159a88d01c26ca0aa86343d8cc4eaa1469
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-12-03 16:51:07 -0800
+
+From patchwork Sun Dec  1 07:31:38 2013
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: [V1,
+	librdmacm] Add directives on binding to IPv6 any address to man pages
+From: Or Gerlitz <ogerlitz@mellanox.com>
+X-Patchwork-Id: 3261731
+Message-Id: <1385883098-22307-1-git-send-email-ogerlitz@mellanox.com>
+To: sean.hefty@intel.com
+Cc: linux-rdma@vger.kernel.org, mrhines@us.ibm.com,
+	Or Gerlitz <ogerlitz@mellanox.com>
+Date: Sun,  1 Dec 2013 09:31:38 +0200
+
+Explain how to bind to IPv6 any address in the man pages for the examples
+
+Signed-off-by: Or Gerlitz <ogerlitz@mellanox.com>
+
+
+---
+
+diff --git a/man/rping.1 b/man/rping.1
+index a2b7b6b..127d290 100644
+--- a/man/rping.1
++++ b/man/rping.1
+@@ -23,6 +23,7 @@ Run as the client.
+ .TP
+ \-a address
+ On the server, specifies the network address to bind the connection to.
++To bind to any address with IPv6 use -a ::0 .
+ On the client, specifies the server address to connect to.
+ .TP
+ \-p
+diff --git a/man/ucmatose.1 b/man/ucmatose.1
+index 95dc2d6..57e2c1b 100644
+--- a/man/ucmatose.1
++++ b/man/ucmatose.1
+@@ -23,6 +23,7 @@ This option must be specified by the client.
+ .TP
+ \-b bind_address
+ The local network address to bind to.
++To bind to any address with IPv6 use -b ::0 .
+ .TP
+ \-f address_format
+ Specifies the format of the server and bind address.  Be default, the
+diff --git a/man/udaddy.1 b/man/udaddy.1
+index 2f56b46..022018e 100644
+--- a/man/udaddy.1
++++ b/man/udaddy.1
+@@ -22,6 +22,7 @@ This option must be specified by the client.
+ .TP
+ \-b bind_address
+ The local network address to bind to.
++To bind to any address with IPv6 use -b ::0 .
+ .TP
+ \-c connections
+ The number of communication paths to establish between the client and server.
