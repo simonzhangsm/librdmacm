@@ -1,0 +1,98 @@
+Bottom: 902e9b159a88d01c26ca0aa86343d8cc4eaa1469
+Top:    31a0f7652495ab379b83f6ac4221ec2a681640bb
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2013-12-03 16:53:06 -0800
+
+Refresh of old-af-ib
+
+---
+
+diff --git a/examples/cmatose.c b/examples/cmatose.c
+index ab3e746..fc4bef3 100644
+--- a/examples/cmatose.c
++++ b/examples/cmatose.c
+@@ -44,6 +44,7 @@
+ #include <getopt.h>
+ 
+ #include <rdma/rdma_cma.h>
++#include <infiniband/ib.h>
+ #include "common.h"
+ 
+ struct cmatest_node {
+@@ -81,7 +82,11 @@ static uint8_t tos;
+ static uint8_t migrate = 0;
+ static char *dst_addr;
+ static char *src_addr;
++<<<<<<< current
+ static struct rdma_addrinfo hints;
++=======
++static char addr_type = 'u';
++>>>>>>> patched
+ 
+ static int create_message(struct cmatest_node *node)
+ {
+@@ -507,6 +512,16 @@ static int run_server(void)
+ 		return ret;
+ 	}
+ 
++<<<<<<< current
++=======
++	memset(&hints, 0, sizeof hints);
++	if (addr_type == 'g') {
++		hints.ai_flags = RAI_FAMILY | RAI_NUMERICHOST;
++		hints.ai_family = AF_IB;
++	}
++	hints.ai_flags |= RAI_PASSIVE;
++	hints.ai_port_space = RDMA_PS_TCP;
++>>>>>>> patched
+ 	ret = get_rdma_addr(src_addr, dst_addr, port, &hints, &test.rai);
+ 	if (ret) {
+ 		perror("cmatose: getrdmaaddr error");
+@@ -580,6 +595,15 @@ static int run_client(void)
+ 
+ 	printf("cmatose: starting client\n");
+ 
++<<<<<<< current
++=======
++	memset(&hints, 0, sizeof hints);
++	if (addr_type == 'g') {
++		hints.ai_flags = RAI_FAMILY | RAI_NUMERICHOST;
++		hints.ai_family = AF_IB;
++	}
++	hints.ai_port_space = RDMA_PS_TCP;
++>>>>>>> patched
+ 	ret = get_rdma_addr(src_addr, dst_addr, port, &hints, &test.rai);
+ 	if (ret) {
+ 		perror("cmatose: getaddrinfo error");
+@@ -636,8 +660,12 @@ int main(int argc, char **argv)
+ {
+ 	int op, ret;
+ 
++<<<<<<< current
+ 	hints.ai_port_space = RDMA_PS_TCP;
+ 	while ((op = getopt(argc, argv, "s:b:f:P:c:C:S:t:p:m")) != -1) {
++=======
++	while ((op = getopt(argc, argv, "s:b:c:C:S:t:p:mf:")) != -1) {
++>>>>>>> patched
+ 		switch (op) {
+ 		case 's':
+ 			dst_addr = optarg;
+@@ -681,6 +709,9 @@ int main(int argc, char **argv)
+ 		case 'm':
+ 			migrate = 1;
+ 			break;
++		case 'f':
++			addr_type = optarg[0];
++			break;
+ 		default:
+ 			printf("usage: %s\n", argv[0]);
+ 			printf("\t[-s server_address]\n");
+@@ -695,6 +726,8 @@ int main(int argc, char **argv)
+ 			printf("\t[-t type_of_service]\n");
+ 			printf("\t[-p port_number]\n");
+ 			printf("\t[-m(igrate)]\n");
++			printf("\t[-f addr_format] - i(p), n(ame), l(id), g(gid), or u(nspecified)\n");
++			printf("\t                   address format for -s and -b options, default: 'u'\n");
+ 			exit(1);
+ 		}
+ 	}
