@@ -1,8 +1,7 @@
 Version: 1
-Previous: f3d510500718250e640ed41a9808759adb39ec26
+Previous: ade2c16386cf1977c7eb6a2b12480f52f1dd56fe
 Head: 176e6e961d17c51ae1f2dad5a2f50546e3a2ecf4
 Applied:
-  v18: 176e6e961d17c51ae1f2dad5a2f50546e3a2ecf4
 Unapplied:
   old-af-ib: aaa0d9ca917c8c361a978e5a116963c2cceac5ba
   old-seterr: 47eb0c419687c2690292c1910acae83a46e5388c
