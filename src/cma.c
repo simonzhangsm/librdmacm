@@ -74,7 +74,7 @@ do {						\
 } while (0)
 
 struct cma_device {
-	struct ibv_context *verbs;
+	struct ibv_context *lverbs; /* Lazy initialization */
 	struct ibv_pd	   *pd;
 	uint64_t	    guid;
 	int		    port_cnt;
@@ -130,13 +130,20 @@ static fastlock_t idm_lock;
 
 static void ucma_cleanup(void)
 {
+	struct ibv_context *verbs;
+	struct ibv_pd *pd;
+
 	ucma_ib_cleanup();
 
 	if (cma_dev_cnt) {
 		while (cma_dev_cnt--) {
-			if (cma_dev_array[cma_dev_cnt].refcnt)
-				ibv_dealloc_pd(cma_dev_array[cma_dev_cnt].pd);
-			ibv_close_device(cma_dev_array[cma_dev_cnt].verbs);
+			verbs = cma_dev_array[cma_dev_cnt].lverbs;
+			if (verbs) {
+				pd = cma_dev_array[cma_dev_cnt].pd;
+				if (cma_dev_array[cma_dev_cnt].refcnt)
+					ibv_dealloc_pd(pd);
+				ibv_close_device(verbs);
+			}
 		}
 
 		fastlock_destroy(&idm_lock);
@@ -202,11 +209,77 @@ static void ucma_set_af_ib_support(void)
 	rdma_destroy_id(id);
 }
 
-int ucma_init(void)
+static int ucma_lazy_dev_init(int dev_index)
 {
 	struct ibv_device **dev_list = NULL;
 	struct cma_device *cma_dev;
 	struct ibv_device_attr attr;
+	int ret = 0, i = dev_index, dev_cnt;
+
+	/* Quick check without lock to see if we're already initialized */
+	if (cma_dev_array[i].lverbs)
+		return 0;
+
+	pthread_mutex_lock(&mut);
+	if (cma_dev_array[i].lverbs) {
+		pthread_mutex_unlock(&mut);
+		return 0;
+	}
+
+	dev_list = ibv_get_device_list(&dev_cnt);
+	if (!dev_list) {
+		fprintf(stderr, PFX "Fatal: unable to get RDMA device list\n");
+		ret = ERR(ENODEV);
+		goto err1;
+	}
+
+	if (min(dev_cnt, cma_dev_cnt) <= i) {
+		fprintf(stderr, PFX
+			"Fatal: device index out of range, index %d, max %d\n",
+			i, min(dev_cnt, cma_dev_cnt));
+		ret = ERR(ENODEV);
+		goto err2;
+	}
+
+	cma_dev = &cma_dev_array[i];
+	cma_dev->lverbs = ibv_open_device(dev_list[i]);
+	if (!cma_dev->lverbs) {
+		fprintf(stderr, PFX "Fatal: unable to open RDMA device\n");
+		ret = ERR(ENODEV);
+		goto err2;
+	}
+
+	ret = ibv_query_device(cma_dev->lverbs, &attr);
+	if (ret) {
+		fprintf(stderr, PFX "Fatal: unable to query RDMA device\n");
+		ret = ERR(ret);
+		goto err3;
+	}
+
+	cma_dev->port_cnt = attr.phys_port_cnt;
+	cma_dev->max_qpsize = attr.max_qp_wr;
+	cma_dev->max_initiator_depth = (uint8_t) attr.max_qp_init_rd_atom;
+	cma_dev->max_responder_resources = (uint8_t) attr.max_qp_rd_atom;
+
+	pthread_mutex_unlock(&mut);
+	ibv_free_device_list(dev_list);
+	return 0;
+
+err3:
+	ibv_close_device(cma_dev->lverbs);
+	cma_dev->lverbs = NULL;
+err2:
+	ibv_free_device_list(dev_list);
+err1:
+	pthread_mutex_unlock(&mut);
+	return ret;
+}
+
+
+int ucma_init(void)
+{
+	struct ibv_device **dev_list = NULL;
+	struct cma_device *cma_dev;
 	int i, ret, dev_cnt;
 
 	/* Quick check without lock to see if we're already initialized */
@@ -243,29 +316,10 @@ int ucma_init(void)
 		goto err2;
 	}
 
-	for (i = 0; dev_list[i];) {
+	for (i = 0; dev_list[i]; i++) {
 		cma_dev = &cma_dev_array[i];
-
 		cma_dev->guid = ibv_get_device_guid(dev_list[i]);
-		cma_dev->verbs = ibv_open_device(dev_list[i]);
-		if (!cma_dev->verbs) {
-			fprintf(stderr, PFX "Fatal: unable to open RDMA device\n");
-			ret = ERR(ENODEV);
-			goto err3;
-		}
-
-		i++;
-		ret = ibv_query_device(cma_dev->verbs, &attr);
-		if (ret) {
-			fprintf(stderr, PFX "Fatal: unable to query RDMA device\n");
-			ret = ERR(ret);
-			goto err3;
-		}
-
-		cma_dev->port_cnt = attr.phys_port_cnt;
-		cma_dev->max_qpsize = attr.max_qp_wr;
-		cma_dev->max_initiator_depth = (uint8_t) attr.max_qp_init_rd_atom;
-		cma_dev->max_responder_resources = (uint8_t) attr.max_qp_rd_atom;
+		/* Open device only when needed... */
 	}
 
 	cma_dev_cnt = dev_cnt;
@@ -274,16 +328,37 @@ int ucma_init(void)
 	ibv_free_device_list(dev_list);
 	return 0;
 
-err3:
-	while (i--)
-		ibv_close_device(cma_dev_array[i].verbs);
-	free(cma_dev_array);
 err2:
 	ibv_free_device_list(dev_list);
 err1:
 	fastlock_destroy(&idm_lock);
 	pthread_mutex_unlock(&mut);
 	return ret;
+}
+
+static struct ibv_context *ucma_get_verbs_index(int dev_index)
+{
+	int ret;
+
+	ret = ucma_lazy_dev_init(dev_index);
+	assert(!ret);
+
+	if (ret)
+		return NULL;
+
+	return cma_dev_array[dev_index].lverbs;
+}
+
+static struct ibv_context *ucma_get_verbs_guid(uint64_t guid)
+{
+	int i;
+
+	for (i = 0; i < cma_dev_cnt; i++) {
+		if (cma_dev_array[i].guid == guid)
+			return ucma_get_verbs_index(i);
+	}
+
+	return NULL;
 }
 
 struct ibv_context **rdma_get_devices(int *num_devices)
@@ -299,7 +374,7 @@ struct ibv_context **rdma_get_devices(int *num_devices)
 		goto out;
 
 	for (i = 0; i < cma_dev_cnt; i++)
-		devs[i] = cma_dev_array[i].verbs;
+		devs[i] = ucma_get_verbs_index(i);
 	devs[i] = NULL;
 out:
 	if (num_devices)
@@ -348,6 +423,7 @@ void rdma_destroy_event_channel(struct rdma_event_channel *channel)
 static int ucma_get_device(struct cma_id_private *id_priv, uint64_t guid)
 {
 	struct cma_device *cma_dev;
+	struct ibv_context *verbs;
 	int i, ret = 0;
 
 	for (i = 0; i < cma_dev_cnt; i++) {
@@ -358,9 +434,12 @@ static int ucma_get_device(struct cma_id_private *id_priv, uint64_t guid)
 
 	return ERR(ENODEV);
 match:
+	verbs = ucma_get_verbs_index(i);
+	if (!verbs)
+		return ERR(ENODEV);
 	pthread_mutex_lock(&mut);
 	if (!cma_dev->refcnt++) {
-		cma_dev->pd = ibv_alloc_pd(cma_dev_array[i].verbs);
+		cma_dev->pd = ibv_alloc_pd(verbs);
 		if (!cma_dev->pd) {
 			cma_dev->refcnt--;
 			ret = ERR(ENOMEM);
@@ -368,7 +447,7 @@ match:
 		}
 	}
 	id_priv->cma_dev = cma_dev;
-	id_priv->id.verbs = cma_dev->verbs;
+	id_priv->id.verbs = verbs;
 	id_priv->id.pd = cma_dev->pd;
 out:
 	pthread_mutex_unlock(&mut);
@@ -1022,11 +1101,16 @@ static int ucma_modify_qp_err(struct rdma_cm_id *id)
 static int ucma_find_pkey(struct cma_device *cma_dev, uint8_t port_num,
 			  uint16_t pkey, uint16_t *pkey_index)
 {
+	struct ibv_context *verbs;
 	int ret, i;
 	uint16_t chk_pkey;
 
+	verbs = ucma_get_verbs_guid(cma_dev->guid);
+	if (!verbs)
+		return ERR(ENODEV);
+
 	for (i = 0, ret = 0; !ret; i++) {
-		ret = ibv_query_pkey(cma_dev->verbs, port_num, i, &chk_pkey);
+		ret = ibv_query_pkey(verbs, port_num, i, &chk_pkey);
 		if (!ret && pkey == chk_pkey) {
 			*pkey_index = (uint16_t) i;
 			return 0;
