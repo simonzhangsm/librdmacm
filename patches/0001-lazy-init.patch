@@ -3,35 +3,9 @@ Top:    e8db2daf7a65a047a306c58371b1ef790e1c3489
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2014-04-09 12:19:25 -0700
 
-From patchwork Tue Mar 25 06:58:44 2014
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: librdmacm: lazy initialization for ib devices
-From: Shamir Rabinovitch <shamir.rabinovitch@oracle.com>
-X-Patchwork-Id: 3885371
-Message-Id: <20140325065839.GA3794@shamir-pc>
-To: linux-rdma@vger.kernel.org
-Date: Tue, 25 Mar 2014 08:58:44 +0200
+librdmacm: Support lazy initialization
 
-Hi Sean,
-
-Resending the patch with proper mail client.
-
-There was a request by teams in Oracle to decouple the HCA limited
-ability to open device context and the rising amount of processes that
-run on the servers.
-It appear that the lowest capable HCA become the limit to all the
-processes that attempt to use the library.
-This patch try to decouple this by allowing the process to use the
-library w/o implicitly opening the device.
-Device will be opened only when needed.
-
-BR, Shamir
-
-
-
-LIBRDMACM currently opens a device context per configured HCA. This is
+librdmacm currently opens a device context per configured HCA. This is
 usually done in rdma_create_event_channel() or first time whenever
 ucma_init() is called. If a process is only going to use one of the
 configured HCAs/RDMA IPs then the remaining device contexts are not
@@ -41,6 +15,7 @@ number of open context supported per HCA regardless of number of HCAs present
 in the system.
 
 Signed-off-by: Shamir Rabinovitch <shamir.rabinovitch@oracle.com>
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
 ---
