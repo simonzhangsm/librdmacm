@@ -256,7 +256,7 @@ static int ucma_dev_init(struct cma_device *cma_dev)
 	if (ret) {
 		fprintf(stderr, PFX "Fatal: unable to query RDMA device\n");
 		ret = ERR(ret);
-		goto err3;
+		goto err2;
 	}
 
 	cma_dev->port_cnt = attr.phys_port_cnt;
@@ -267,7 +267,7 @@ static int ucma_dev_init(struct cma_device *cma_dev)
 	pthread_mutex_unlock(&mut);
 	return 0;
 
-err1:
+err2:
 	ibv_close_device(cma_dev->verbs);
 	cma_dev->verbs = NULL;
 err1:
@@ -308,7 +308,7 @@ int ucma_init(void)
 		goto err2;
 	}
 		
-	cma_dev_array = calloc(dev_cnt, sizeof *cma_dev);
+	cma_dev_array = calloc(dev_cnt, sizeof *cma_dev_array);
 	if (!cma_dev_array) {
 		ret = ERR(ENOMEM);
 		goto err2;
@@ -344,8 +344,8 @@ struct ibv_context **rdma_get_devices(int *num_devices)
 		goto err1;
 
 	for (i = 0; i < cma_dev_cnt; i++) {
-		ucma_dev_init(cma_dev_array[i]);
-		devs[i] = cma_dev_array[i].verbs
+		ucma_dev_init(&cma_dev_array[i]);
+		devs[i] = cma_dev_array[i].verbs;
 		if (!devs[i])
 			goto err2;
 	}
