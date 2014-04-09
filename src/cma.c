@@ -331,24 +331,6 @@ err1:
 	return ret;
 }
 
-//static struct ibv_context *ucma_get_verbs_by_index(int dev_index)
-//{
-//	ucma_dev_init(cma_dev_array[dev_index]);
-//	return cma_dev_array[dev_index].verbs;
-//}
-//
-//static struct ibv_context *ucma_get_verbs_by_guid(uint64_t guid)
-//{
-//	int i;
-//
-//	for (i = 0; i < cma_dev_cnt; i++) {
-//		if (cma_dev_array[i].guid == guid)
-//			return ucma_get_verbs_by_index(i);
-//	}
-//
-//	return NULL;
-//}
-
 struct ibv_context **rdma_get_devices(int *num_devices)
 {
 	struct ibv_context **devs;
@@ -369,7 +351,7 @@ struct ibv_context **rdma_get_devices(int *num_devices)
 	}
 	devs[i] = NULL;
 	if (num_devices)
-		*num_devices = devs ? cma_dev_cnt : 0;
+		*num_devices = cma_dev_cnt;
 	return devs;
 
 err2:
