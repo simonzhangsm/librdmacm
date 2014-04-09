@@ -1,6 +1,6 @@
 Bottom: cfaf412b12d199cabb53905590c9a63ba8c40349
 Top:    e8db2daf7a65a047a306c58371b1ef790e1c3489
-Author: Sean Hefty <sean.hefty@intel.com>
+Author: Shamir Rabinovitch <shamir.rabinovitch@oracle.com>
 Date:   2014-04-09 12:19:25 -0700
 
 librdmacm: Support lazy initialization
