@@ -1,5 +1,5 @@
 Bottom: cfaf412b12d199cabb53905590c9a63ba8c40349
-Top:    a9f20cc25349fe2594aeae1014c86512beaff711
+Top:    5fe7b77f89825f3fb2f887164f7bd1fbde8d04da
 Author: Shamir Rabinovitch <shamir.rabinovitch@oracle.com>
 Date:   2014-04-09 12:19:25 -0700
 
@@ -21,7 +21,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/cma.c b/src/cma.c
-index 0cf4203..b34472e 100644
+index 0cf4203..12c8599 100644
 --- a/src/cma.c
 +++ b/src/cma.c
 @@ -134,6 +134,9 @@ static void ucma_cleanup(void)
@@ -89,7 +89,7 @@ index 0cf4203..b34472e 100644
 +	if (ret) {
 +		fprintf(stderr, PFX "Fatal: unable to query RDMA device\n");
 +		ret = ERR(ret);
-+		goto err3;
++		goto err2;
 +	}
 +
 +	cma_dev->port_cnt = attr.phys_port_cnt;
@@ -100,7 +100,7 @@ index 0cf4203..b34472e 100644
 +	pthread_mutex_unlock(&mut);
 +	return 0;
 +
-+err1:
++err2:
 +	ibv_close_device(cma_dev->verbs);
 +	cma_dev->verbs = NULL;
 +err1:
@@ -116,7 +116,14 @@ index 0cf4203..b34472e 100644
  	int i, ret, dev_cnt;
  
  	/* Quick check without lock to see if we're already initialized */
-@@ -243,30 +314,8 @@ int ucma_init(void)
+@@ -237,36 +308,14 @@ int ucma_init(void)
+ 		goto err2;
+ 	}
+ 		
+-	cma_dev_array = calloc(dev_cnt, sizeof *cma_dev);
++	cma_dev_array = calloc(dev_cnt, sizeof *cma_dev_array);
+ 	if (!cma_dev_array) {
+ 		ret = ERR(ENOMEM);
  		goto err2;
  	}
  
@@ -178,10 +185,9 @@ index 0cf4203..b34472e 100644
 +		goto err1;
  
 -	for (i = 0; i < cma_dev_cnt; i++)
--		devs[i] = cma_dev_array[i].verbs;
 +	for (i = 0; i < cma_dev_cnt; i++) {
-+		ucma_dev_init(cma_dev_array[i]);
-+		devs[i] = cma_dev_array[i].verbs
++		ucma_dev_init(&cma_dev_array[i]);
+ 		devs[i] = cma_dev_array[i].verbs;
 +		if (!devs[i])
 +			goto err2;
 +	}
