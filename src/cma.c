@@ -122,6 +122,7 @@ struct cma_event {
 
 static struct cma_device *cma_dev_array;
 static int cma_dev_cnt;
+static int cma_init_cnt;
 static pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
 static int abi_ver = RDMA_USER_CM_MAX_ABI_VERSION;
 int af_ib_support;
@@ -140,6 +141,7 @@ static void ucma_cleanup(void)
 			if (cma_dev_array[cma_dev_cnt].refcnt)
 				ibv_dealloc_pd(cma_dev_array[cma_dev_cnt].pd);
 			ibv_close_device(cma_dev_array[cma_dev_cnt].verbs);
+			cma_init_cnt--;
 		}
 
 		fastlock_destroy(&idm_lock);
@@ -205,76 +207,6 @@ static void ucma_set_af_ib_support(void)
 	rdma_destroy_id(id);
 }
 
-static struct ibv_context *ucma_open_device(uint64_t guid)
-{
-	struct ibv_device **dev_list;
-	struct ibv_context *verbs = NULL;
-	int i;
-
-	dev_list = ibv_get_device_list(NULL);
-	if (!dev_list) {
-		fprintf(stderr, PFX "Fatal: unable to get RDMA device list\n");
-		return NULL;
-	}
-
-	for (i = 0; dev_list[i]; i++) {
-		if (ibv_get_device_guid(dev_list[i]) == guid) {
-			verbs = ibv_open_device(dev_list[i]);
-			break;
-		}
-	}
-
-	if (!verbs)
-		fprintf(stderr, PFX "Fatal: unable to open RDMA device\n");
-
-	ibv_free_device_list(dev_list);
-	return verbs;
-}
-
-static int ucma_dev_init(struct cma_device *cma_dev)
-{
-	struct ibv_device_attr attr;
-	int ret;
-
-	/* Quick check without lock to see if we're already initialized */
-	if (cma_dev->verbs)
-		return 0;
-
-	pthread_mutex_lock(&mut);
-	if (cma_dev->verbs) {
-		pthread_mutex_unlock(&mut);
-		return 0;
-	}
-
-	cma_dev->verbs = ucma_open_device(cma_dev->guid);
-	if (!cma_dev->verbs) {
-		ret = ERR(ENODEV);
-		goto err1;
-	}
-
-	ret = ibv_query_device(cma_dev->verbs, &attr);
-	if (ret) {
-		fprintf(stderr, PFX "Fatal: unable to query RDMA device\n");
-		ret = ERR(ret);
-		goto err2;
-	}
-
-	cma_dev->port_cnt = attr.phys_port_cnt;
-	cma_dev->max_qpsize = attr.max_qp_wr;
-	cma_dev->max_initiator_depth = (uint8_t) attr.max_qp_init_rd_atom;
-	cma_dev->max_responder_resources = (uint8_t) attr.max_qp_rd_atom;
-
-	pthread_mutex_unlock(&mut);
-	return 0;
-
-err2:
-	ibv_close_device(cma_dev->verbs);
-	cma_dev->verbs = NULL;
-err1:
-	pthread_mutex_unlock(&mut);
-	return ret;
-}
-
 int ucma_init(void)
 {
 	struct ibv_device **dev_list = NULL;
@@ -307,7 +239,7 @@ int ucma_init(void)
 		ret = ERR(ENODEV);
 		goto err2;
 	}
-		
+
 	cma_dev_array = calloc(dev_cnt, sizeof *cma_dev_array);
 	if (!cma_dev_array) {
 		ret = ERR(ENOMEM);
@@ -331,12 +263,98 @@ err1:
 	return ret;
 }
 
+static struct ibv_context *ucma_open_device(uint64_t guid)
+{
+	struct ibv_device **dev_list;
+	struct ibv_context *verbs = NULL;
+	int i;
+
+	dev_list = ibv_get_device_list(NULL);
+	if (!dev_list) {
+		fprintf(stderr, PFX "Fatal: unable to get RDMA device list\n");
+		return NULL;
+	}
+
+	for (i = 0; dev_list[i]; i++) {
+		if (ibv_get_device_guid(dev_list[i]) == guid) {
+			verbs = ibv_open_device(dev_list[i]);
+			break;
+		}
+	}
+
+	if (!verbs)
+		fprintf(stderr, PFX "Fatal: unable to open RDMA device\n");
+
+	ibv_free_device_list(dev_list);
+	return verbs;
+}
+
+static int ucma_init_device(struct cma_device *cma_dev)
+{
+	struct ibv_device_attr attr;
+	int ret;
+
+	if (cma_dev->verbs)
+		return 0;
+
+	cma_dev->verbs = ucma_open_device(cma_dev->guid);
+	if (!cma_dev->verbs)
+		return ERR(ENODEV);
+
+	ret = ibv_query_device(cma_dev->verbs, &attr);
+	if (ret) {
+		fprintf(stderr, PFX "Fatal: unable to query RDMA device\n");
+		ret = ERR(ret);
+		goto err;
+	}
+
+	cma_dev->port_cnt = attr.phys_port_cnt;
+	cma_dev->max_qpsize = attr.max_qp_wr;
+	cma_dev->max_initiator_depth = (uint8_t) attr.max_qp_init_rd_atom;
+	cma_dev->max_responder_resources = (uint8_t) attr.max_qp_rd_atom;
+	cma_init_cnt++;
+	return 0;
+
+err:
+	ibv_close_device(cma_dev->verbs);
+	cma_dev->verbs = NULL;
+	return ret;
+}
+
+int ucma_init_all(void)
+{
+	int i, ret;
+
+	if (!cma_dev_cnt) {
+		ret = ucma_init();
+		if (ret)
+			return ret;
+	}
+
+	if (cma_init_cnt == cma_dev_cnt)
+		return 0;
+
+	pthread_mutex_lock(&mut);
+	if (cma_init_cnt == cma_dev_cnt) {
+		pthread_mutex_unlock(&mut);
+		return 0;
+	}
+
+	for (i = 0; i < cma_dev_cnt; i++) {
+		ret = ucma_init_device(ucma_dev_array[i]);
+		if (ret)
+			break;
+	}
+	pthread_mutex_unlock(&mut);
+	return ret;
+}
+
 struct ibv_context **rdma_get_devices(int *num_devices)
 {
 	struct ibv_context **devs;
 	int i;
 
-	if (ucma_init())
+	if (ucma_init_all())
 		goto err1;
 
 	devs = malloc(sizeof *devs * (cma_dev_cnt + 1));
@@ -344,7 +362,6 @@ struct ibv_context **rdma_get_devices(int *num_devices)
 		goto err1;
 
 	for (i = 0; i < cma_dev_cnt; i++) {
-		ucma_dev_init(&cma_dev_array[i]);
 		devs[i] = cma_dev_array[i].verbs;
 		if (!devs[i])
 			goto err2;
@@ -401,7 +418,7 @@ void rdma_destroy_event_channel(struct rdma_event_channel *channel)
 static int ucma_get_device(struct cma_id_private *id_priv, uint64_t guid)
 {
 	struct cma_device *cma_dev;
-	int i, ret = 0;
+	int i, ret;
 
 	for (i = 0; i < cma_dev_cnt; i++) {
 		cma_dev = &cma_dev_array[i];
@@ -411,8 +428,8 @@ static int ucma_get_device(struct cma_id_private *id_priv, uint64_t guid)
 
 	return ERR(ENODEV);
 match:
-	if (ucma_dev_init(cma_dev))
-		return ERR(ENODEV);
+	if ((ret = ucma_dev_init(cma_dev)))
+		return ret;
 
 	pthread_mutex_lock(&mut);
 	if (!cma_dev->refcnt++) {
@@ -2348,7 +2365,7 @@ int ucma_max_qpsize(struct rdma_cm_id *id)
 	if (id && id_priv->cma_dev) {
 		max_size = id_priv->cma_dev->max_qpsize;
 	} else {
-		ucma_init();
+		ucma_init_all();
 		for (i = 0; i < cma_dev_cnt; i++) {
 			if (!max_size || max_size > cma_dev_array[i].max_qpsize)
 				max_size = cma_dev_array[i].max_qpsize;
