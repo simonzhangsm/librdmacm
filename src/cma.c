@@ -336,7 +336,7 @@ int ucma_init_all(void)
 
 	pthread_mutex_lock(&mut);
 	for (i = 0; i < cma_dev_cnt; i++) {
-		ret = ucma_init_device(ucma_dev_array[i]);
+		ret = ucma_init_device(&cma_dev_array[i]);
 		if (ret)
 			break;
 	}
@@ -346,7 +346,7 @@ int ucma_init_all(void)
 
 struct ibv_context **rdma_get_devices(int *num_devices)
 {
-	struct ibv_context **devs;
+	struct ibv_context **devs = NULL;
 	int i;
 
 	if (ucma_init_all())
@@ -416,7 +416,7 @@ static int ucma_get_device(struct cma_id_private *id_priv, uint64_t guid)
 
 	return ERR(ENODEV);
 match:
-	if ((ret = ucma_dev_init(cma_dev)))
+	if ((ret = ucma_init_device(cma_dev)))
 		return ret;
 
 	pthread_mutex_lock(&mut);
