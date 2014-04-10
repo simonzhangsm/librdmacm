@@ -1,5 +1,5 @@
 Bottom: cfaf412b12d199cabb53905590c9a63ba8c40349
-Top:    c3252da09e1e769e714f5e9969503cce1df221a6
+Top:    09ed451c6b5c30d2dbe0bbedc3379ef8034dc899
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2014-04-09 12:19:25 -0700
 
@@ -21,7 +21,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/cma.c b/src/cma.c
-index 0cf4203..892d69e 100644
+index 0cf4203..0dc229e 100644
 --- a/src/cma.c
 +++ b/src/cma.c
 @@ -122,6 +122,7 @@ struct cma_event {
@@ -185,7 +185,7 @@ index 0cf4203..892d69e 100644
 +
 +	pthread_mutex_lock(&mut);
 +	for (i = 0; i < cma_dev_cnt; i++) {
-+		ret = ucma_init_device(ucma_dev_array[i]);
++		ret = ucma_init_device(&cma_dev_array[i]);
 +		if (ret)
 +			break;
 +	}
@@ -195,8 +195,7 @@ index 0cf4203..892d69e 100644
 +
  struct ibv_context **rdma_get_devices(int *num_devices)
  {
--	struct ibv_context **devs = NULL;
-+	struct ibv_context **devs;
+ 	struct ibv_context **devs = NULL;
  	int i;
  
 -	if (ucma_init())
@@ -217,7 +216,7 @@ index 0cf4203..892d69e 100644
  
  	return ERR(ENODEV);
  match:
-+	if ((ret = ucma_dev_init(cma_dev)))
++	if ((ret = ucma_init_device(cma_dev)))
 +		return ret;
 +
  	pthread_mutex_lock(&mut);
