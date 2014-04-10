@@ -323,7 +323,7 @@ err:
 
 int ucma_init_all(void)
 {
-	int i, ret;
+	int i, ret = 0;
 
 	if (!cma_dev_cnt) {
 		ret = ucma_init();
@@ -335,11 +335,6 @@ int ucma_init_all(void)
 		return 0;
 
 	pthread_mutex_lock(&mut);
-	if (cma_init_cnt == cma_dev_cnt) {
-		pthread_mutex_unlock(&mut);
-		return 0;
-	}
-
 	for (i = 0; i < cma_dev_cnt; i++) {
 		ret = ucma_init_device(ucma_dev_array[i]);
 		if (ret)
@@ -355,26 +350,19 @@ struct ibv_context **rdma_get_devices(int *num_devices)
 	int i;
 
 	if (ucma_init_all())
-		goto err1;
+		goto out;
 
 	devs = malloc(sizeof *devs * (cma_dev_cnt + 1));
 	if (!devs)
-		goto err1;
+		goto out;
 
-	for (i = 0; i < cma_dev_cnt; i++) {
+	for (i = 0; i < cma_dev_cnt; i++)
 		devs[i] = cma_dev_array[i].verbs;
-		if (!devs[i])
-			goto err2;
-	}
 	devs[i] = NULL;
+out:
 	if (num_devices)
-		*num_devices = cma_dev_cnt;
+		*num_devices = devs ? cma_dev_cnt : 0;
 	return devs;
-
-err2:
-	free(devs);
-err1:
-	return NULL;
 }
 
 void rdma_free_devices(struct ibv_context **list)
