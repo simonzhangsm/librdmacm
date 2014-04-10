@@ -1,0 +1,31 @@
+Bottom: 5fe7b77f89825f3fb2f887164f7bd1fbde8d04da
+Top:    99652de79f6e570f6df54f6ac0bcb32159c9afc5
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2014-04-09 20:27:27 -0700
+
+Refresh of 0001-lazy-init.patch
+
+---
+
+diff --git a/src/cma.c b/src/cma.c
+index 12c8599..886d04a 100644
+--- a/src/cma.c
++++ b/src/cma.c
+@@ -228,7 +228,7 @@ static struct ibv_context *ucma_open_device(uint64_t guid)
+ 		fprintf(stderr, PFX "Fatal: unable to open RDMA device\n");
+ 
+ 	ibv_free_device_list(dev_list);
+-	return 0;
++	return verbs;
+ }
+ 
+ static int ucma_dev_init(struct cma_device *cma_dev)
+@@ -411,7 +411,7 @@ static int ucma_get_device(struct cma_id_private *id_priv, uint64_t guid)
+ 
+ 	return ERR(ENODEV);
+ match:
+-	if (!ucma_dev_init(cma_dev))
++	if (ucma_dev_init(cma_dev))
+ 		return ERR(ENODEV);
+ 
+ 	pthread_mutex_lock(&mut);
