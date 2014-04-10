@@ -1,9 +1,8 @@
 Version: 1
-Previous: a75251ddafe71fd42650beea469a3e3a1603bae6
-Head: ed6b49f5c34c3a8abe6c7bfda633c1fe7a284ac3
+Previous: 15b94d285195271ee6637dc23f39ff3fdf8f581a
+Head: ddab97f4d13ff0ba466a25718e1a708ef50c0747
 Applied:
-  0001-lazy-init.patch: 79cab9b7dd9d2d4b8794079b8d0bd6a3c265eb9d
-  refresh-temp: ed6b49f5c34c3a8abe6c7bfda633c1fe7a284ac3
+  0001-lazy-init.patch: ddab97f4d13ff0ba466a25718e1a708ef50c0747
 Unapplied:
   old-af-ib: aaa0d9ca917c8c361a978e5a116963c2cceac5ba
   old-seterr: 47eb0c419687c2690292c1910acae83a46e5388c

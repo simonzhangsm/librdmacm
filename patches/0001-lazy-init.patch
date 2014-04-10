@@ -1,5 +1,5 @@
 Bottom: cfaf412b12d199cabb53905590c9a63ba8c40349
-Top:    5fe7b77f89825f3fb2f887164f7bd1fbde8d04da
+Top:    99652de79f6e570f6df54f6ac0bcb32159c9afc5
 Author: Shamir Rabinovitch <shamir.rabinovitch@oracle.com>
 Date:   2014-04-09 12:19:25 -0700
 
@@ -21,7 +21,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/cma.c b/src/cma.c
-index 0cf4203..12c8599 100644
+index 0cf4203..886d04a 100644
 --- a/src/cma.c
 +++ b/src/cma.c
 @@ -134,6 +134,9 @@ static void ucma_cleanup(void)
@@ -61,7 +61,7 @@ index 0cf4203..12c8599 100644
 +		fprintf(stderr, PFX "Fatal: unable to open RDMA device\n");
 +
 +	ibv_free_device_list(dev_list);
-+	return 0;
++	return verbs;
 +}
 +
 +static int ucma_dev_init(struct cma_device *cma_dev)
@@ -209,7 +209,7 @@ index 0cf4203..12c8599 100644
  
  	return ERR(ENODEV);
  match:
-+	if (!ucma_dev_init(cma_dev))
++	if (ucma_dev_init(cma_dev))
 +		return ERR(ENODEV);
 +
  	pthread_mutex_lock(&mut);
