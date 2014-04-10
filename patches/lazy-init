@@ -1,5 +1,5 @@
 Bottom: cfaf412b12d199cabb53905590c9a63ba8c40349
-Top:    8375a2135fb3ff8da1bb99921fe042c311ea0dbb
+Top:    c3252da09e1e769e714f5e9969503cce1df221a6
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2014-04-09 12:19:25 -0700
 
@@ -21,7 +21,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/cma.c b/src/cma.c
-index 0cf4203..aacc809 100644
+index 0cf4203..892d69e 100644
 --- a/src/cma.c
 +++ b/src/cma.c
 @@ -122,6 +122,7 @@ struct cma_event {
@@ -108,7 +108,7 @@ index 0cf4203..aacc809 100644
  err2:
  	ibv_free_device_list(dev_list);
  err1:
-@@ -286,25 +263,118 @@ err1:
+@@ -286,12 +263,93 @@ err1:
  	return ret;
  }
  
@@ -172,7 +172,7 @@ index 0cf4203..aacc809 100644
 +
 +int ucma_init_all(void)
 +{
-+	int i, ret;
++	int i, ret = 0;
 +
 +	if (!cma_dev_cnt) {
 +		ret = ucma_init();
@@ -184,11 +184,6 @@ index 0cf4203..aacc809 100644
 +		return 0;
 +
 +	pthread_mutex_lock(&mut);
-+	if (cma_init_cnt == cma_dev_cnt) {
-+		pthread_mutex_unlock(&mut);
-+		return 0;
-+	}
-+
 +	for (i = 0; i < cma_dev_cnt; i++) {
 +		ret = ucma_init_device(ucma_dev_array[i]);
 +		if (ret)
@@ -205,36 +200,11 @@ index 0cf4203..aacc809 100644
  	int i;
  
 -	if (ucma_init())
--		goto out;
 +	if (ucma_init_all())
-+		goto err1;
+ 		goto out;
  
  	devs = malloc(sizeof *devs * (cma_dev_cnt + 1));
- 	if (!devs)
--		goto out;
-+		goto err1;
- 
--	for (i = 0; i < cma_dev_cnt; i++)
-+	for (i = 0; i < cma_dev_cnt; i++) {
- 		devs[i] = cma_dev_array[i].verbs;
-+		if (!devs[i])
-+			goto err2;
-+	}
- 	devs[i] = NULL;
--out:
- 	if (num_devices)
--		*num_devices = devs ? cma_dev_cnt : 0;
-+		*num_devices = cma_dev_cnt;
- 	return devs;
-+
-+err2:
-+	free(devs);
-+err1:
-+	return NULL;
- }
- 
- void rdma_free_devices(struct ibv_context **list)
-@@ -348,7 +418,7 @@ void rdma_destroy_event_channel(struct rdma_event_channel *channel)
+@@ -348,7 +406,7 @@ void rdma_destroy_event_channel(struct rdma_event_channel *channel)
  static int ucma_get_device(struct cma_id_private *id_priv, uint64_t guid)
  {
  	struct cma_device *cma_dev;
@@ -243,7 +213,7 @@ index 0cf4203..aacc809 100644
  
  	for (i = 0; i < cma_dev_cnt; i++) {
  		cma_dev = &cma_dev_array[i];
-@@ -358,9 +428,12 @@ static int ucma_get_device(struct cma_id_private *id_priv, uint64_t guid)
+@@ -358,9 +416,12 @@ static int ucma_get_device(struct cma_id_private *id_priv, uint64_t guid)
  
  	return ERR(ENODEV);
  match:
@@ -257,7 +227,7 @@ index 0cf4203..aacc809 100644
  		if (!cma_dev->pd) {
  			cma_dev->refcnt--;
  			ret = ERR(ENOMEM);
-@@ -2292,7 +2365,7 @@ int ucma_max_qpsize(struct rdma_cm_id *id)
+@@ -2292,7 +2353,7 @@ int ucma_max_qpsize(struct rdma_cm_id *id)
  	if (id && id_priv->cma_dev) {
  		max_size = id_priv->cma_dev->max_qpsize;
  	} else {
@@ -267,7 +237,7 @@ index 0cf4203..aacc809 100644
  			if (!max_size || max_size > cma_dev_array[i].max_qpsize)
  				max_size = cma_dev_array[i].max_qpsize;
 diff --git a/src/cma.h b/src/cma.h
-index 4c991b4..e4fe3f5 100644
+index 4c991b4..a7bab0f 100644
 --- a/src/cma.h
 +++ b/src/cma.h
 @@ -158,7 +158,7 @@ static inline int ERR(int err)
@@ -275,7 +245,7 @@ index 4c991b4..e4fe3f5 100644
  }
  
 -int ucma_init();
-+int ucma_init(int lazy);
++int ucma_init(void);
  extern int af_ib_support;
  
  #define RAI_ROUTEONLY		0x01000000
