@@ -228,7 +228,7 @@ static struct ibv_context *ucma_open_device(uint64_t guid)
 		fprintf(stderr, PFX "Fatal: unable to open RDMA device\n");
 
 	ibv_free_device_list(dev_list);
-	return 0;
+	return verbs;
 }
 
 static int ucma_dev_init(struct cma_device *cma_dev)
@@ -411,7 +411,7 @@ static int ucma_get_device(struct cma_id_private *id_priv, uint64_t guid)
 
 	return ERR(ENODEV);
 match:
-	if (!ucma_dev_init(cma_dev))
+	if (ucma_dev_init(cma_dev))
 		return ERR(ENODEV);
 
 	pthread_mutex_lock(&mut);
