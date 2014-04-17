@@ -1,10 +1,10 @@
 Version: 1
-Previous: 5e52407a6990c936067d5d147670aaadebbc5e11
-Head: a1f7a896dbf6bbe57a220cc1fb2ae32141da226c
+Previous: 7a77138d2ff8209e448c2c57d12fd4aa4c4dd198
+Head: 23ffef06cf462c4c5ac4ec5880b96c8719b64774
 Applied:
   lazy-init: 23ffef06cf462c4c5ac4ec5880b96c8719b64774
-  rs-inline: a1f7a896dbf6bbe57a220cc1fb2ae32141da226c
 Unapplied:
+  rs-inline: a1f7a896dbf6bbe57a220cc1fb2ae32141da226c
   old-af-ib: aaa0d9ca917c8c361a978e5a116963c2cceac5ba
   old-seterr: 47eb0c419687c2690292c1910acae83a46e5388c
   old-clisvr: 0db572abcf3d78374a5ea0f91b709136948809cc
