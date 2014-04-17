@@ -17,6 +17,8 @@ number of SQEs allocated for control messages.  This will
 also help in subsequent patches that will need to deal
 with HCAs that do not support inline data.
 
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
 
 ---
 
