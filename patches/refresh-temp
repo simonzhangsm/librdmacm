@@ -1,0 +1,22 @@
+Bottom: 589161ae78e6cb97402984e81f5f917493d82619
+Top:    55ffa8849cf2c6e18856f1e9d278573786bcb7f0
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2014-04-16 21:52:26 -0700
+
+Refresh of rs-inline
+
+---
+
+diff --git a/src/cma.h b/src/cma.h
+index 4c991b4..a7bab0f 100644
+--- a/src/cma.h
++++ b/src/cma.h
+@@ -158,7 +158,7 @@ static inline int ERR(int err)
+ 	return -1;
+ }
+ 
+-int ucma_init();
++int ucma_init(void);
+ extern int af_ib_support;
+ 
+ #define RAI_ROUTEONLY		0x01000000
