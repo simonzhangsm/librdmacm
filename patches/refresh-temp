@@ -1,0 +1,21 @@
+Bottom: 55ffa8849cf2c6e18856f1e9d278573786bcb7f0
+Top:    9b9db7dccdce60eca7001269d594d509b5a0f2f6
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2014-04-16 23:55:34 -0700
+
+Refresh of rs-inline
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 8325edf..46f6fac 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -860,7 +860,7 @@ static int rs_create_ep(struct rsocket *rs)
+ 	if (ret)
+ 		return ret;
+ 
+-	rs->sq_inline = qp_attr->cap.max_inline_size;
++	rs->sq_inline = qp_attr.cap.max_inline_size;
+ 	if (rs->sq_inline < RS_MIN_INLINE)
+ 		return ERR(EINVAL);
