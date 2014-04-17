@@ -1,0 +1,23 @@
+Bottom: efcbaa1f674e8166f36fe2274c9c14e195a30159
+Top:    efcbaa1f674e8166f36fe2274c9c14e195a30159
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2014-04-17 08:37:47 -0700
+
+rsocket: Dedicate a fixed number of SQEs for control messages
+
+The number of SQEs allocated for control messages is set
+to 1 of 2 constant values (either 4 or 2).  A default
+value is used unless the size of the SQ is below a certain
+threshold (16 entries).  This results in additional code
+complexity, and it is highly unlikely that the SQ would
+ever be allocated smaller than 16 entries.
+
+Simplify the code to use a single constant value for the
+number of SQEs allocated for control messages.  This will
+also help in subsequent patches that will need to deal
+with HCAs that do not support inline data.
+
+
+---
+
+
