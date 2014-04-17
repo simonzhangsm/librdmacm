@@ -1,5 +1,5 @@
 Bottom: efcbaa1f674e8166f36fe2274c9c14e195a30159
-Top:    efcbaa1f674e8166f36fe2274c9c14e195a30159
+Top:    d606172e65d6a7d4f669aa091bfd78c46188b53c
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2014-04-17 08:37:47 -0700
 
@@ -22,4 +22,35 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 ---
 
-
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 7c5083c..899f419 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -59,6 +59,7 @@
+ #define RS_OLAP_START_SIZE 2048
+ #define RS_MAX_TRANSFER 65536
+ #define RS_SNDLOWAT 2048
++#define RS_QP_MIN_SIZE 16
+ #define RS_QP_MAX_SIZE 0xFFFE
+ #define RS_QP_CTRL_SIZE 4
+ #define RS_CONN_RETRIES 6
+@@ -642,15 +643,13 @@ static void rs_set_qp_size(struct rsocket *rs)
+ 
+ 	if (rs->sq_size > max_size)
+ 		rs->sq_size = max_size;
+-	else if (rs->sq_size < 4)
+-		rs->sq_size = 4;
+-	if (rs->sq_size <= (RS_QP_CTRL_SIZE << 2))
+-		rs->ctrl_avail = 2;
++	else if (rs->sq_size < RS_MIN_QP_SIZE)
++		rs->sq_size = RS_MIN_QP_SIZE;
+ 
+ 	if (rs->rq_size > max_size)
+ 		rs->rq_size = max_size;
+-	else if (rs->rq_size < 4)
+-		rs->rq_size = 4;
++	else if (rs->rq_size < RS_MIN_QP_SIZE)
++		rs->rq_size = RS_MIN_QP_SIZE;
+ }
+ 
+ static void ds_set_qp_size(struct rsocket *rs)
