@@ -1,0 +1,35 @@
+Bottom: 55ffa8849cf2c6e18856f1e9d278573786bcb7f0
+Top:    55ffa8849cf2c6e18856f1e9d278573786bcb7f0
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2014-04-16 22:33:38 -0700
+
+rsocket: Modify when control messages are available
+
+Rsockets currently tracks how many control messages (i.e.
+entries in the send queue) that are available using a
+single ctrl_avail counter.  Seems simple enough.
+
+However, control messages currently require the use of
+inline data.  In order to support control messages that
+do not use inline data, we need to associate each
+control message with a specific data buffer.  This will
+become easier to manage if we modify how we track when
+control messages are available.
+
+We replace the single ctrl_avail counter with two new
+counters.  The new counters conceptually treat control
+messages as if each message had its own sequence number.
+The sequence number will then be able to correspond to
+a specific data buffer in a follow up patch.
+
+ctrl_seqno will be used to indicate the current control
+message being sent.  ctrl_max_seqno will track the
+highest control message that may be sent.
+
+A side effect of this change is that we will be able to
+see how many control messages have been sent.
+
+
+---
+
+
