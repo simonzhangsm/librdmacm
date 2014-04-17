@@ -643,13 +643,13 @@ static void rs_set_qp_size(struct rsocket *rs)
 
 	if (rs->sq_size > max_size)
 		rs->sq_size = max_size;
-	else if (rs->sq_size < RS_MIN_QP_SIZE)
-		rs->sq_size = RS_MIN_QP_SIZE;
+	else if (rs->sq_size < RS_QP_MIN_SIZE)
+		rs->sq_size = RS_QP_MIN_SIZE;
 
 	if (rs->rq_size > max_size)
 		rs->rq_size = max_size;
-	else if (rs->rq_size < RS_MIN_QP_SIZE)
-		rs->rq_size = RS_MIN_QP_SIZE;
+	else if (rs->rq_size < RS_QP_MIN_SIZE)
+		rs->rq_size = RS_QP_MIN_SIZE;
 }
 
 static void ds_set_qp_size(struct rsocket *rs)
