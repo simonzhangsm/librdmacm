@@ -1,10 +1,11 @@
 Version: 1
-Previous: 7d86baae983fd56961ced91b76c1a22de72d4e29
-Head: 8528325dd11bd0afbd0914ffbf1b0410e9069855
+Previous: 2c1f450295e93f1f005f98ac635e3da8e541a917
+Head: c5a422d671b5baa1b33360b97f15ed097e38cb0c
 Applied:
   lazy-init: f306625fe8cafef70e3d60fddd7e685bc0696047
   rs-inline: 4243da0ad9206c662b3a3c8ba7a9f4b2b7269d3f
   fixed-ctrl: 8528325dd11bd0afbd0914ffbf1b0410e9069855
+  refresh-temp: c5a422d671b5baa1b33360b97f15ed097e38cb0c
 Unapplied:
   rs-ctrl: 378027452cba5fc6597c590d70c69b6c4fcdb549
   inline0: f187212a28d15ba2fed172e2428c4fb777cf8a09
