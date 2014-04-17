@@ -1,0 +1,154 @@
+Bottom: cfb4e06d73107deeb818771d285c201b7e0eb692
+Top:    23c0606ee51ef70a8c14fb009810480936ef9d44
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2014-04-17 16:26:24 -0700
+
+Refresh of inline0
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 77b3979..09b658b 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -61,7 +61,7 @@
+ #define RS_SNDLOWAT 2048
+ #define RS_QP_MIN_SIZE 16
+ #define RS_QP_MAX_SIZE 0xFFFE
+-#define RS_QP_CTRL_SIZE 4
++#define RS_QP_CTRL_SIZE 4	/* must be power of 2 */
+ #define RS_CONN_RETRIES 6
+ #define RS_SGL_SIZE 2
+ static struct index_map idm;
+@@ -195,7 +195,7 @@ struct rs_iomap_mr {
+ 	int index;	/* -1 if mapping is local and not in iomap_list */
+ };
+ 
+-#define RS_MIN_INLINE      (sizeof(struct rs_sge))
++#define RS_MAX_CTRL_MSG    (sizeof(struct rs_sge))
+ #define rs_host_is_net()   (1 == htonl(1))
+ #define RS_CONN_FLAG_NET   (1 << 0)
+ #define RS_CONN_FLAG_IOMAP (1 << 1)
+@@ -506,9 +506,6 @@ void rs_configure(void)
+ 	if ((f = fopen(RS_CONF_DIR "/inline_default", "r"))) {
+ 		(void) fscanf(f, "%hu", &def_inline);
+ 		fclose(f);
+-
+-		if (def_inline < RS_MIN_INLINE)
+-			def_inline = RS_MIN_INLINE;
+ 	}
+ 
+ 	if ((f = fopen(RS_CONF_DIR "/sqsize_default", "r"))) {
+@@ -678,18 +675,21 @@ static void ds_set_qp_size(struct rsocket *rs)
+ 
+ static int rs_init_bufs(struct rsocket *rs)
+ {
+-	uint32_t rbuf_msg_size;
++	uint32_t total_rbuf_size, total_sbuf_size;
+ 	size_t len;
+ 
+ 	rs->rmsg = calloc(rs->rq_size + 1, sizeof(*rs->rmsg));
+ 	if (!rs->rmsg)
+ 		return ERR(ENOMEM);
+ 
+-	rs->sbuf = calloc(rs->sbuf_size, sizeof(*rs->sbuf));
++	total_sbuf_size = rs->sbuf_size;
++	if (rs->sq_inline < RS_MAX_CTRL_MSG)
++		total_sbuf_size += RS_MAX_CTRL_MSG * RS_QP_CTRL_SIZE;
++	rs->sbuf = calloc(total_sbuf_size sizeof(*rs->sbuf));
+ 	if (!rs->sbuf)
+ 		return ERR(ENOMEM);
+ 
+-	rs->smr = rdma_reg_msgs(rs->cm_id, rs->sbuf, rs->sbuf_size);
++	rs->smr = rdma_reg_msgs(rs->cm_id, rs->sbuf, total_sbuf_size);
+ 	if (!rs->smr)
+ 		return -1;
+ 
+@@ -708,14 +708,14 @@ static int rs_init_bufs(struct rsocket *rs)
+ 	if (rs->target_iomap_size)
+ 		rs->target_iomap = (struct rs_iomap *) (rs->target_sgl + RS_SGL_SIZE);
+ 
+-	rbuf_msg_size = rs->rbuf_size;
++	total_rbuf_size = rs->rbuf_size;
+ 	if (rs->opts & RS_OPT_MSG_SEND)
+-		rbuf_msg_size += rs->rq_size * RS_MSG_SIZE;
+-	rs->rbuf = calloc(rbuf_msg_size, 1);
++		total_rbuf_size += rs->rq_size * RS_MSG_SIZE;
++	rs->rbuf = calloc(total_rbuf_size, 1);
+ 	if (!rs->rbuf)
+ 		return ERR(ENOMEM);
+ 
+-	rs->rmr = rdma_reg_write(rs->cm_id, rs->rbuf, rbuf_msg_size);
++	rs->rmr = rdma_reg_write(rs->cm_id, rs->rbuf, total_rbuf_size);
+ 	if (!rs->rmr)
+ 		return -1;
+ 
+@@ -862,9 +862,6 @@ static int rs_create_ep(struct rsocket *rs)
+ 		return ret;
+ 
+ 	rs->sq_inline = qp_attr.cap.max_inline_data;
+-	if (rs->sq_inline < RS_MIN_INLINE)
+-		return ERR(EINVAL);
+-
+ 	for (i = 0; i < rs->rq_size; i++) {
+ 		ret = rs_post_recv(rs);
+ 		if (ret)
+@@ -1497,11 +1494,6 @@ static int ds_create_qp(struct rsocket *rs, union socket_addr *src_addr,
+ 		goto err;
+ 
+ 	rs->sq_inline = qp_attr.cap.max_inline_data;
+-	if (rs->sq_inline < RS_MIN_INLINE) {
+-		ret = ERR(ENOMEM);
+-		goto err;
+-	}
+-
+ 	ret = ds_add_qp_dest(qp, src_addr, addrlen);
+ 	if (ret)
+ 		goto err;
+@@ -1613,6 +1605,12 @@ int rconnect(int socket, const struct sockaddr *addr, socklen_t addrlen)
+ 	return ret;
+ }
+ 
++static void *rs_get_ctrl_buf(struct rsocket *rs)
++{
++	return rs->sbuf + rs->sbuf_size +
++		RS_MAX_CTRL_MSG * (rs->ctrl_seqno & (RS_QP_CTRL_SIZE - 1));
++}
++
+ static int rs_post_msg(struct rsocket *rs, uint32_t msg)
+ {
+ 	struct ibv_send_wr wr, *bad;
+@@ -1627,13 +1625,20 @@ static int rs_post_msg(struct rsocket *rs, uint32_t msg)
+ 		wr.send_flags = 0;
+ 		wr.imm_data = htonl(msg);
+ 	} else {
+-		sge.addr = (uintptr_t) &msg;
+-		sge.lkey = 0;
+-		sge.length = sizeof msg;
++		if (rs->sq_inline < sizeof msg) {
++			sge.addr = (uintptr_t) rs_get_ctrl_buf(rs);
++			sge.lkey = rs->smr->lkey;
++			sge.length = sizeof msg;
++			wr.send_flags = 0;
++		} else {
++			sge.addr = (uintptr_t) &msg;
++			sge.lkey = 0;
++			sge.length = sizeof msg;
++			wr.send_flags = IBV_SEND_INLINE;
++		}
+ 		wr.sg_list = &sge;
+ 		wr.num_sge = 1;
+ 		wr.opcode = IBV_WR_SEND;
+-		wr.send_flags = IBV_SEND_INLINE;
+ 	}
+ 
+ 	return rdma_seterrno(ibv_post_send(rs->cm_id->qp, &wr, &bad));
+@@ -3456,8 +3461,6 @@ int rsetsockopt(int socket, int level, int optname,
+ 			break;
+ 		case RDMA_INLINE:
+ 			rs->sq_inline = min(*(uint32_t *) optval, RS_QP_MAX_SIZE);
+-			if (rs->sq_inline < RS_MIN_INLINE)
+-				rs->sq_inline = RS_MIN_INLINE;
+ 			ret = 0;
+ 			break;
+ 		case RDMA_IOMAPSIZE:
