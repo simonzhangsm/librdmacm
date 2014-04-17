@@ -1,0 +1,17 @@
+Bottom: 09ed451c6b5c30d2dbe0bbedc3379ef8034dc899
+Top:    09ed451c6b5c30d2dbe0bbedc3379ef8034dc899
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2014-04-16 21:42:06 -0700
+
+rsocket: Check max inline data after creating QP
+
+The ipath provider will ignore the max_inline_size
+specified as input into ibv_create_qp and instead
+return the size that it supports (which is 0) on
+output.  Check that the max_inline_size returned
+from ibv_create_qp is the size needed.
+
+
+---
+
+
