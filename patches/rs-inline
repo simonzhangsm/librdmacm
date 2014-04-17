@@ -1,4 +1,4 @@
-Bottom: 09ed451c6b5c30d2dbe0bbedc3379ef8034dc899
+Bottom: 1c60f4db6798ea721b5d8e64b7989ffbd653b24b
 Top:    55ffa8849cf2c6e18856f1e9d278573786bcb7f0
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2014-04-16 21:42:06 -0700
@@ -19,19 +19,6 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 ---
 
-diff --git a/src/cma.c b/src/cma.c
-index 0dc229e..4fa41ff 100644
---- a/src/cma.c
-+++ b/src/cma.c
-@@ -321,7 +321,7 @@ err:
- 	return ret;
- }
- 
--int ucma_init_all(void)
-+static int ucma_init_all(void)
- {
- 	int i, ret = 0;
- 
 diff --git a/src/rsocket.c b/src/rsocket.c
 index 30ea55d..8325edf 100644
 --- a/src/rsocket.c
