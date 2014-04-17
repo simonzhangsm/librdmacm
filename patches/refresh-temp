@@ -1,0 +1,31 @@
+Bottom: d606172e65d6a7d4f669aa091bfd78c46188b53c
+Top:    3986bbc00f7e9396ea8f940c8d5550b241f203da
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2014-04-17 08:43:09 -0700
+
+Refresh of fixed-ctrl
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 899f419..ea18ba7 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -643,13 +643,13 @@ static void rs_set_qp_size(struct rsocket *rs)
+ 
+ 	if (rs->sq_size > max_size)
+ 		rs->sq_size = max_size;
+-	else if (rs->sq_size < RS_MIN_QP_SIZE)
+-		rs->sq_size = RS_MIN_QP_SIZE;
++	else if (rs->sq_size < RS_QP_MIN_SIZE)
++		rs->sq_size = RS_QP_MIN_SIZE;
+ 
+ 	if (rs->rq_size > max_size)
+ 		rs->rq_size = max_size;
+-	else if (rs->rq_size < RS_MIN_QP_SIZE)
+-		rs->rq_size = RS_MIN_QP_SIZE;
++	else if (rs->rq_size < RS_QP_MIN_SIZE)
++		rs->rq_size = RS_QP_MIN_SIZE;
+ }
+ 
+ static void ds_set_qp_size(struct rsocket *rs)
