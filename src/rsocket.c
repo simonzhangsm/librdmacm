@@ -860,7 +860,7 @@ static int rs_create_ep(struct rsocket *rs)
 	if (ret)
 		return ret;
 
-	rs->sq_inline = qp_attr->cap.max_inline_size;
+	rs->sq_inline = qp_attr.cap.max_inline_size;
 	if (rs->sq_inline < RS_MIN_INLINE)
 		return ERR(EINVAL);
 
