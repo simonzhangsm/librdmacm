@@ -3,11 +3,12 @@ Top:    7f75ab2faf5a23755d593d5c77a94121b8c88a7c
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2014-04-16 22:01:51 -0700
 
-rsocket: Remove requirement for minimal inline data
+rsocket: Relax requirement for minimal inline data
 
 Inline data support is optional.  Allow rsockets to work
-with devices that do not support inline data, such as the
-Intel TrueScale HCA.
+with devices that do not support inline data, provided
+that they do support RDMA writes with immediate data.
+This allows rsockets to work over Intel TrueScale HCA.
 
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
