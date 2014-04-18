@@ -10,6 +10,9 @@ with devices that do not support inline data, provided
 that they do support RDMA writes with immediate data.
 This allows rsockets to work over Intel TrueScale HCA.
 
+Patch derived from work by: Amir Hanania
+
+Signed-off-by: Amir Hanania <amir.hanania@intel.com>
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
