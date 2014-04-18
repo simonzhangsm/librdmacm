@@ -1608,7 +1608,7 @@ int rconnect(int socket, const struct sockaddr *addr, socklen_t addrlen)
 	return ret;
 }
 
-static struct rs_sge *rs_get_ctrl_buf(struct rsocket *rs)
+static void *rs_get_ctrl_buf(struct rsocket *rs)
 {
 	return rs->sbuf + rs->sbuf_size +
 		RS_MAX_CTRL_MSG * (rs->ctrl_seqno & (RS_QP_CTRL_SIZE - 1));
