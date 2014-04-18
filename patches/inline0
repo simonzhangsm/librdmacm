@@ -1,5 +1,5 @@
 Bottom: cfb4e06d73107deeb818771d285c201b7e0eb692
-Top:    b0b290209f74fac22ab4edeb9acc1cfdd6e9cc51
+Top:    249d637d5f2c73789cfc1db5cdf82861f2b12641
 Author: Sean Hefty <sean.hefty@intel.com>
 Date:   2014-04-16 22:01:51 -0700
 
@@ -16,7 +16,7 @@ Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 ---
 
 diff --git a/src/rsocket.c b/src/rsocket.c
-index 77b3979..beba738 100644
+index 77b3979..3d80690 100644
 --- a/src/rsocket.c
 +++ b/src/rsocket.c
 @@ -61,7 +61,7 @@
@@ -118,7 +118,7 @@ index 77b3979..beba738 100644
  	return ret;
  }
  
-+static struct rs_sge *rs_get_ctrl_buf(struct rsocket *rs)
++static void *rs_get_ctrl_buf(struct rsocket *rs)
 +{
 +	return rs->sbuf + rs->sbuf_size +
 +		RS_MAX_CTRL_MSG * (rs->ctrl_seqno & (RS_QP_CTRL_SIZE - 1));
