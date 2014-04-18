@@ -1,0 +1,21 @@
+Bottom: 249d637d5f2c73789cfc1db5cdf82861f2b12641
+Top:    ed641761946bf49be187e237b92349aa8a4c29d0
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2014-04-17 23:19:51 -0700
+
+Refresh of inline0
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 3d80690..3a9ff7d 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -685,7 +685,7 @@ static int rs_init_bufs(struct rsocket *rs)
+ 	total_sbuf_size = rs->sbuf_size;
+ 	if (rs->sq_inline < RS_MAX_CTRL_MSG)
+ 		total_sbuf_size += RS_MAX_CTRL_MSG * RS_QP_CTRL_SIZE;
+-	rs->sbuf = calloc(total_sbuf_size sizeof(*rs->sbuf));
++	rs->sbuf = calloc(total_sbuf_size, 1);
+ 	if (!rs->sbuf)
+ 		return ERR(ENOMEM);
