@@ -27,7 +27,9 @@ message being sent.  ctrl_max_seqno will track the
 highest control message that may be sent.
 
 A side effect of this change is that we will be able to
-see how many control messages have been sent.
+see how many control messages have been sent.  This also
+separates the updating of the control count on the
+sending  side, versus the receiving side.
 
 Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
