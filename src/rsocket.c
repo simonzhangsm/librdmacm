@@ -685,7 +685,7 @@ static int rs_init_bufs(struct rsocket *rs)
 	total_sbuf_size = rs->sbuf_size;
 	if (rs->sq_inline < RS_MAX_CTRL_MSG)
 		total_sbuf_size += RS_MAX_CTRL_MSG * RS_QP_CTRL_SIZE;
-	rs->sbuf = calloc(total_sbuf_size sizeof(*rs->sbuf));
+	rs->sbuf = calloc(total_sbuf_size, 1);
 	if (!rs->sbuf)
 		return ERR(ENOMEM);
 
