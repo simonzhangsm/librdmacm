@@ -1,13 +1,7 @@
 Version: 1
-Previous: 2a0aecacbedb8ffa1708467f5b9e1a880a8e7230
+Previous: f30102482266ff9471cf17d679c4f16159c69022
 Head: b3758e215f0abbea0d48996ef9b95f01530a4210
 Applied:
-  init-static: 8ce5823e02b6a38fd5ed7e11a1bb586847dbcb03
-  rsocket-check-max-inline-data-: d62a52590741da993c5ac3c39c82601c273175d9
-  rsocket-dedicate-a-fixed-numbe: 5ac6f3eab852606575f9affa515ec77b978a001c
-  rsocket-modify-when-control-me: dfb5886db5975d209be6b31656c95b0d9c608195
-  rsocket-relax-requirement-for-: 1291d9c7b52e829057458dad0e0ddd5aa9821a2a
-  librdmacm-fix-verbs-leak-due-t: b3758e215f0abbea0d48996ef9b95f01530a4210
 Unapplied:
   old-af-ib: aaa0d9ca917c8c361a978e5a116963c2cceac5ba
   old-seterr: 47eb0c419687c2690292c1910acae83a46e5388c
