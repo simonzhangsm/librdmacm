@@ -8,6 +8,7 @@ librdmacm: Fix verbs leak due to reentrancy issue
 Any call to ucma_init_device must be done under lock.
 
 Signed-off-by: Shamir Rabinovitch <shamir.rabinovitch@oracle.com>
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
 ---
