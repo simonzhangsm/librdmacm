@@ -1,0 +1,56 @@
+Bottom: efcbaa1f674e8166f36fe2274c9c14e195a30159
+Top:    3986bbc00f7e9396ea8f940c8d5550b241f203da
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2014-04-17 08:37:47 -0700
+
+rsocket: Dedicate a fixed number of SQEs for control messages
+
+The number of SQEs allocated for control messages is set
+to 1 of 2 constant values (either 4 or 2).  A default
+value is used unless the size of the SQ is below a certain
+threshold (16 entries).  This results in additional code
+complexity, and it is highly unlikely that the SQ would
+ever be allocated smaller than 16 entries.
+
+Simplify the code to use a single constant value for the
+number of SQEs allocated for control messages.  This will
+also help in subsequent patches that will need to deal
+with HCAs that do not support inline data.
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+diff --git a/src/rsocket.c b/src/rsocket.c
+index 7c5083c..ea18ba7 100644
+--- a/src/rsocket.c
++++ b/src/rsocket.c
+@@ -59,6 +59,7 @@
+ #define RS_OLAP_START_SIZE 2048
+ #define RS_MAX_TRANSFER 65536
+ #define RS_SNDLOWAT 2048
++#define RS_QP_MIN_SIZE 16
+ #define RS_QP_MAX_SIZE 0xFFFE
+ #define RS_QP_CTRL_SIZE 4
+ #define RS_CONN_RETRIES 6
+@@ -642,15 +643,13 @@ static void rs_set_qp_size(struct rsocket *rs)
+ 
+ 	if (rs->sq_size > max_size)
+ 		rs->sq_size = max_size;
+-	else if (rs->sq_size < 4)
+-		rs->sq_size = 4;
+-	if (rs->sq_size <= (RS_QP_CTRL_SIZE << 2))
+-		rs->ctrl_avail = 2;
++	else if (rs->sq_size < RS_QP_MIN_SIZE)
++		rs->sq_size = RS_QP_MIN_SIZE;
+ 
+ 	if (rs->rq_size > max_size)
+ 		rs->rq_size = max_size;
+-	else if (rs->rq_size < 4)
+-		rs->rq_size = 4;
++	else if (rs->rq_size < RS_QP_MIN_SIZE)
++		rs->rq_size = RS_QP_MIN_SIZE;
+ }
+ 
+ static void ds_set_qp_size(struct rsocket *rs)
