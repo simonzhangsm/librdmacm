@@ -1,7 +1,8 @@
 Version: 1
-Previous: 6f0e8f65697beaa49159e1a2a9116df7de44dd35
-Head: 23ffef06cf462c4c5ac4ec5880b96c8719b64774
+Previous: 09a764ffd271dac696d2b60623b4a7cc27c7be4d
+Head: dc1020c458ed4bad21a019af74868b1f897accfe
 Applied:
+  init-static: dc1020c458ed4bad21a019af74868b1f897accfe
 Unapplied:
   rsocket-check-max-inline-data-: 4243da0ad9206c662b3a3c8ba7a9f4b2b7269d3f
   rsocket-dedicate-a-fixed-numbe: fa7872e54b5ef5a986cdfcc4d2a895c3a0c733c8

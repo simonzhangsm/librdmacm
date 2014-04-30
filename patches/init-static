@@ -1,0 +1,13 @@
+Bottom: 09ed451c6b5c30d2dbe0bbedc3379ef8034dc899
+Top:    09ed451c6b5c30d2dbe0bbedc3379ef8034dc899
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2014-04-29 20:11:35 -0700
+
+librdmacm: Make ucma_init_all static
+
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
+
+
+---
+
+
