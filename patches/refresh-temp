@@ -1,0 +1,26 @@
+Bottom: ed641761946bf49be187e237b92349aa8a4c29d0
+Top:    72f074a690109b0df738d72f03a06cb4b9aaff9f
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2014-04-29 19:59:10 -0700
+
+Refresh of fix-lock
+
+---
+
+diff --git a/src/cma.c b/src/cma.c
+index 4fa41ff..bedc95f 100644
+--- a/src/cma.c
++++ b/src/cma.c
+@@ -416,10 +416,10 @@ static int ucma_get_device(struct cma_id_private *id_priv, uint64_t guid)
+ 
+ 	return ERR(ENODEV);
+ match:
++	pthread_mutex_lock(&mut);
+ 	if ((ret = ucma_init_device(cma_dev)))
+-		return ret;
++		goto out;
+ 
+-	pthread_mutex_lock(&mut);
+ 	if (!cma_dev->refcnt++) {
+ 		cma_dev->pd = ibv_alloc_pd(cma_dev->verbs);
+ 		if (!cma_dev->pd) {
