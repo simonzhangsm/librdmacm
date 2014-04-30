@@ -1,0 +1,15 @@
+Bottom: ed641761946bf49be187e237b92349aa8a4c29d0
+Top:    ed641761946bf49be187e237b92349aa8a4c29d0
+Author: Sean Hefty <sean.hefty@intel.com>
+Date:   2014-04-29 19:57:36 -0700
+
+librdmacm: Fix verbs leak due to reentrancy issue
+
+Any call to ucma_init_device must be done under lock.
+
+Signed-off-by: Shamir Rabinovitch <shamir.rabinovitch@oracle.com>
+
+
+---
+
+
