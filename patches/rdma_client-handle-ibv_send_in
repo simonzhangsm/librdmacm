@@ -15,6 +15,7 @@ if not, fall back to non-inline sends and to register the send memory
 region.
 
 Signed-off-by: Doug Ledford <dledford@redhat.com>
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
 ---
