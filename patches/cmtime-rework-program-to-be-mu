@@ -73,6 +73,7 @@ destroy      :       36.57       0.02       2.00       3.66
 with this patch.
 
 Signed-off-by: Doug Ledford <dledford@redhat.com>
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
 ---
