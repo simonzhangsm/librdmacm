@@ -1,9 +1,8 @@
 Version: 1
-Previous: c2949893bb68121b9d0d36395f5094bfaea4f802
-Head: b5cc89170350a5758994945442aaa29a8a03f38e
+Previous: 4e5cad7e2552f34cb4dea78a559b4817d3f4136e
+Head: 7f0fbf984a5140efb76f93fef1f35202c617249d
 Applied:
-  rsocket-add-support-for-rdma_r: b15aac4e41025f4db220e7efb0478bfbe72b832a
-  refresh-temp: b5cc89170350a5758994945442aaa29a8a03f38e
+  rsocket-add-support-for-rdma_r: 7f0fbf984a5140efb76f93fef1f35202c617249d
 Unapplied:
   librdmacm-trivial-cma-in-ucma_: 6f396165f59e627ad8f50c015c3fc6686e04ca82
   old-af-ib: aaa0d9ca917c8c361a978e5a116963c2cceac5ba

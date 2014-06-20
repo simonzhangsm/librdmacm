@@ -10,6 +10,7 @@ ibv_sa_path_rec struct for the rsocket based on how
 many fit into the supplied buffer.
 
 Signed-off-by: Hal Rosenstock <hal@mellanox.com>
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
 ---
