@@ -1,0 +1,34 @@
+Bottom: 2490dec4b0d82730355b60c6be57f040b1e26505
+Top:    34e7fe6d90ff2e1271470ff705ad105d17a0e073
+Author: Hal Rosenstock <hal@dev.mellanox.co.il>
+Date:   2014-06-19 13:08:02 -0400
+
+[librdmacm,TRIVIAL] cma: In ucma_convert_path, fix selector values
+
+Intent is for the selectors to be equal to (exactly) rather than less than.
+Selector for exactly is value of 2 rather than 1.
+
+Signed-off-by: Hal Rosenstock <hal@mellanox.com>
+
+
+---
+
+diff --git a/src/cma.c b/src/cma.c
+index bedc95f..9a49a5b 100644
+--- a/src/cma.c
++++ b/src/cma.c
+@@ -701,11 +701,11 @@ static void ucma_convert_path(struct ibv_path_data *path_data,
+ 	sa_path->numb_path = 1;
+ 	sa_path->pkey = path_data->path.pkey;
+ 	sa_path->sl = ntohs(path_data->path.qosclass_sl) & 0xF;
+-	sa_path->mtu_selector = 1;
++	sa_path->mtu_selector = 2;	/* exactly */
+ 	sa_path->mtu = path_data->path.mtu & 0x1F;
+-	sa_path->rate_selector = 1;
++	sa_path->rate_selector = 2;
+ 	sa_path->rate = path_data->path.rate & 0x1F;
+-	sa_path->packet_life_time_selector = 1;
++	sa_path->packet_life_time_selector = 2;
+ 	sa_path->packet_life_time = path_data->path.packetlifetime & 0x1F;
+ 
+ 	sa_path->preference = (uint8_t) path_data->flags;
