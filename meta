@@ -1,10 +1,10 @@
 Version: 1
-Previous: b175eb2dc3df87297f3d738dd646ea91cd391585
-Head: 7b1eb6407f1f7a953673ab23a2d75f8a3cd8dbb9
+Previous: 5a251230ee61b2fa43a9e4c7d0d10e52add1309d
+Head: 7f0fbf984a5140efb76f93fef1f35202c617249d
 Applied:
   rsocket-add-support-for-rdma_r: 7f0fbf984a5140efb76f93fef1f35202c617249d
-  librdmacm-trivial-cma-in-ucma_: 7b1eb6407f1f7a953673ab23a2d75f8a3cd8dbb9
 Unapplied:
+  librdmacm-trivial-cma-in-ucma_: 7b1eb6407f1f7a953673ab23a2d75f8a3cd8dbb9
   old-af-ib: aaa0d9ca917c8c361a978e5a116963c2cceac5ba
   old-seterr: 47eb0c419687c2690292c1910acae83a46e5388c
   old-clisvr: 0db572abcf3d78374a5ea0f91b709136948809cc
