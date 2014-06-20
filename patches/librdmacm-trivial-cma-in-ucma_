@@ -3,12 +3,13 @@ Top:    34e7fe6d90ff2e1271470ff705ad105d17a0e073
 Author: Hal Rosenstock <hal@dev.mellanox.co.il>
 Date:   2014-06-19 13:08:02 -0400
 
-[librdmacm,TRIVIAL] cma: In ucma_convert_path, fix selector values
+librdmacm: In ucma_convert_path, fix selector values
 
 Intent is for the selectors to be equal to (exactly) rather than less than.
 Selector for exactly is value of 2 rather than 1.
 
 Signed-off-by: Hal Rosenstock <hal@mellanox.com>
+Signed-off-by: Sean Hefty <sean.hefty@intel.com>
 
 
 ---
