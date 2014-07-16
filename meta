@@ -1,9 +1,8 @@
 Version: 1
-Previous: 8779a0085ac20fb63309b702afe4a88dfe59e33b
-Head: 4c04079d83d17c36d0e26e6f3c0ec544ba7a963b
+Previous: 7771132ca03c7fbe2d2240329d6d30a99434ae1e
+Head: 806de778b1fe665dee2f62c7bf7211ab9bd2d53f
 Applied:
-  v1.0.19: e2dfb37dd2f80057a37a63fd9fdfbe0fc54718ac
-  refresh-temp: 4c04079d83d17c36d0e26e6f3c0ec544ba7a963b
+  v1.0.19: 806de778b1fe665dee2f62c7bf7211ab9bd2d53f
 Unapplied:
   old-af-ib: aaa0d9ca917c8c361a978e5a116963c2cceac5ba
   old-seterr: 47eb0c419687c2690292c1910acae83a46e5388c
