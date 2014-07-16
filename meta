@@ -1,7 +1,8 @@
 Version: 1
-Previous: 3038278ccde45c5bde01daadbfba9782c66a0b7a
-Head: 8f53f2a5d3cb5d6c30fe5695b48268ea1bbe2ff0
+Previous: 8081a6311f4a194f44f84b1bde3c6f67e4f478ec
+Head: e2dfb37dd2f80057a37a63fd9fdfbe0fc54718ac
 Applied:
+  v1.0.19: e2dfb37dd2f80057a37a63fd9fdfbe0fc54718ac
 Unapplied:
   old-af-ib: aaa0d9ca917c8c361a978e5a116963c2cceac5ba
   old-seterr: 47eb0c419687c2690292c1910acae83a46e5388c
